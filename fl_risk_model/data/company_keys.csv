@@ -1,0 +1,101 @@
+StatEntityKey,Company_MS,NAIC,Company_FHCF,fhcf_participant
+C10014,Orange Insurance Exchange,17522,Orange Insurance Exchange,TRUE
+C10040,Manatee Insurance Exchange,17580,Manatee Insurance Exchange,TRUE
+C10067,Ovation Home Ins Exchange,17621,Ovation Home Insurance Exchange,TRUE
+C1046,Lexington Insurance Co.,,,FALSE
+C1051,Liberty Mutual Fire Ins Co.,23035,Liberty Mutual Fire Insurance Company,TRUE
+C1142,Farmers Casualty Ins Co.,40169,Farmers Casualty Insurance Company,TRUE
+C1250,Narragansett Bay Insurance Co.,,,FALSE
+C1265,National Fire & Marine Ins Co.,,,FALSE
+C1298,Nationwide Mutual Insurance Co,23787,Nationwide Mutual Insurance Company,TRUE
+C1299,Nationwide P&C Insurance Co.,37877,Nationwide Property and Casualty Insurance Co,TRUE
+C134,AIG Specialty Insurance Co.,,,FALSE
+C144,American Modern Home Ins Co.,23469,American Modern Home Insurance Company,TRUE
+C1581,Garrison P&C Insurance Co.,21253,Garrison Property and Casualty Insurance Company,TRUE
+C1621,Homesite Insurance Co.,17221,Homesite Insurance Company,TRUE
+C1622,MS Transverse Spclty Ins Co.,,,FALSE
+C1650,Scottsdale Insurance Co.,,,FALSE
+C1685,Berkley Insurance Co.,32603,Berkley Insurance Company,TRUE
+C1712,Southern-Owners Insurance Co.,10190,Southern-Owners Insurance Company,TRUE
+C1803,Topa Insurance Co.,,,FALSE
+C1847,Truck Insurance Exchange,21709,Truck Insurance Exchange,TRUE
+C1866,Sutton National Insurance Co.,25798,Sutton National Insurance Company,TRUE
+C1904,United Svcs Automobile Assn,25941,United Services Automobile Association,TRUE
+C1927,USAA Casualty Insurance Co.,25968,USAA Casualty Insurance Company,TRUE
+C1929,USAA General Indemnity Co.,18600,USAA General Indemnity Company,TRUE
+C1936,GeoVera Specialty Insurance Co,,,FALSE
+C1937,Spinnaker Insurance Co.,24376,Spinnaker Insurance Company,TRUE
+C194,Amica Mutual Insurance Co.,19976,AMICA Mutual Insurance Company,TRUE
+C1975,Voyager Indemnity Insurance Co,,,FALSE
+C2027,Wilshire Insurance Co.,,,FALSE
+C284,Trisura Insurance Co.,,,FALSE
+C295,AIG Property Casualty Co.,19402,AIG Property Casualty Company,TRUE
+C2962,First Floridian Auto & Home,10647,First Floridian Auto and Home Insurance Company,TRUE
+C2971,Florida Family Insurance Co.,10688,Florida Family Insurance Company,TRUE
+C2999,Unique Insurance Co.,10655,Unique Insurance Company,TRUE
+C3205,State Farm FL Ins Co,10739,State Farm Florida Insurance Company,TRUE
+C3244,Castle Key Indemnity Co.,10835,Castle Key Indemnity Company,TRUE
+C3253,American Strategic Ins Corp.,10872,American Strategic Insurance Corporation,TRUE
+C3431,Cypress P&C Insurance Co.,10953,Cypress Property & Casualty Insurance Company,TRUE
+C3736,QBE Specialty Insurance Co.,,,FALSE
+C385,Chubb Custom Insurance Co.,,,FALSE
+C397,ACE Ins Co. of the Midwest,26417,ACE Insurance Company of the Midwest,TRUE
+C3986,Amer Integrity Ins Co FL,12841,American Integrity Insurance Company of Florida,TRUE
+C3993,American Traditions Ins Co.,12359,American Traditions Insurance Company,TRUE
+C405,Cincinnati Insurance Co.,10677,Cincinnati Insurance Company,TRUE
+C4152,Edison Insurance Co.,12482,Edison Insurance Company,TRUE
+C4202,First Protective Insurance Co.,10897,First Protective Insurance Company,TRUE
+C4209,Florida Peninsula Insurance Co,10132,Florida Peninsula Insurance Company,TRUE
+C4297,Centauri Specialty Ins Co.,12573,Centauri Specialty Insurance Company,TRUE
+C4520,Safe Harbor Insurance Co.,12563,Safe Harbor Insurance Company,TRUE
+C4528,Security First Insurance Co.,10117,Security First Insurance Company,TRUE
+C4548,Southern Oak Insurance Co.,12247,Southern Oak Insurance Company,TRUE
+C4614,Universal North America Ins Co,10759,Universal North America Insurance Company,TRUE
+C4615,Universal P&C Insurance Co.,10861,Universal Property and Casualty Insurance Company,TRUE
+C5107,Auto Club Insurance Co. of FL,12813,Auto Club Insurance Company of Florida,TRUE
+C603,Evanston Insurance Co.,,,FALSE
+C6187,Privilege Underwriters Recpl,12873,Privilege Underwriters Reciprocal Exchange,TRUE
+C6245,Homeowners Choice P&C Ins Co.,12944,Homeowners Choice Property and Casualty Insurance Company,TRUE
+C6248,Olympus Insurance Co.,12954,Olympus Insurance Company,TRUE
+C6404,Covington Specialty Ins Co.,,,FALSE
+C6408,Cincinnati Spclty Underwriters,,,FALSE
+C6513,People's Trust Insurance Co.,13125,People's Trust Insurance Company,TRUE
+C6525,ASI Preferred Insurance Corp.,13142,ASI Preferred Insurance Corporation,TRUE
+C674,Federal Insurance Co.,20281,Federal Insurance Company,TRUE
+C681,Kinsale Insurance Co.,,,FALSE
+C6949,Citizens Property Ins Corp.,10064,Citizens Property Insurance Corporation,TRUE
+C714,Castle Key Insurance Co.,30511,Castle Key Insurance Company,TRUE
+C717,Stillwater P&C Insurance Co.,16578,Stillwater Property and Casualty Insurance Company,TRUE
+C725,First Liberty Insurance Corp.,33588,First Liberty Insurance Corporation,TRUE
+C726,American Modern P&C Ins Co.,42722,American Modern Property and Casualty Insurance Company,TRUE
+C7302,American Platinum P&C Ins Co.,13563,American Platinum Property and Casualty Insurance Company,TRUE
+C741,Florida Farm Bureau Cas Ins Co,31216,Florida Farm Bureau Casualty Insurance Co.,TRUE
+C742,FL Farm Bureau General Ins Co.,21817,Florida Farm Bureau General Insurance Company,TRUE
+C7460,Florida Family Home Ins Co.,13648,Florida Family Home Insurance Company,TRUE
+C752,Foremost Ins Co. Grand Rapids,11185,Foremost Insurance Company Grand Rapids Michigan,TRUE
+C754,Foremost P&C Insurance Co.,11800,Foremost Property and Casualty Insurance Co.,TRUE
+C8002,Heritage P&C Insurance Co.,14407,Heritage Property and Casualty Insurance Company,TRUE
+C82,American Bankers Ins Co. of FL,10111,American Bankers Insurance Company of Florida,TRUE
+C8520,Safepoint Insurance Co.,15341,Safepoint Insurance Company,TRUE
+C8792,Monarch National Insurance Co.,15715,Monarch National Insurance Company,TRUE
+C888,Hartford Ins Co. of the MW,37478,Hartford Insurance Company of the Midwest,TRUE
+C8884,TypTap Insurance Co.,15885,Typtap Insurance Company,TRUE
+C8911,US Coastal P&C Insurance Co.,15900,US Coastal Property and Casualty Insurance Company,TRUE
+C8913,Dover Bay Specialty Ins Co.,,,FALSE
+C8979,Lemonade Insurance Co.,16023,Lemonade Insurance Company,TRUE
+C9125,Vault Reciprocal Exchange,16186,Vault Reciprocal Exchange,TRUE
+C9151,Vault E&S Insurance Co.,,,FALSE
+C9175,KW Specialty Insurance Co.,,,FALSE
+C9365,Kin Interinsurance Network,16603,Kin Interinsurance Network,TRUE
+C9661,Sutton Specialty Insurance Co.,,,FALSE
+C9699,Trusted Resource Underwriters,16881,Trusted Resource Underwriters Exchange,TRUE
+C9700,Accredited Specialty Ins Co.,,,FALSE
+C9757,SureChoice Underwriters Recpl,,,FALSE
+C9779,Spinnaker Specialty Ins Co.,,,FALSE
+C9805,Vyrd Insurance Co.,17153,VYRD Insurance Company,TRUE
+C9817,Tower Hill Insurance Exchange,17179,Tower Hill Insurance Exchange,TRUE
+C9832,PURE Specialty Exchange,,,FALSE
+C9834,Slide Insurance Co.,17227,Slide Insurance Company,TRUE
+C9910,Loggerhead Recpl Interinsuranc,17360,Loggerhead Reciprocal Interinsurance Exchange,TRUE
+C9979,Victor Insurance Exchange,,,FALSE
+C9994,Beazley Excess & Surplus Ins I,,,FALSE

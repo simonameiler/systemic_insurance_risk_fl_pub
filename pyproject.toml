@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fl-risk-model"
+version = "1.0.0"
+description = "Florida Systemic Insurance Risk Model - Stress testing financial stability under climate change"
+readme = "README.md"
+license = {text = "Apache-2.0"}
+requires-python = ">=3.9"
+authors = [
+    {name = "Simona Meiler", email = "PLACEHOLDER@example.com"}
+]
+keywords = [
+    "climate risk",
+    "insurance",
+    "tropical cyclones",
+    "Florida",
+    "systemic risk",
+    "Monte Carlo simulation",
+    "catastrophe modeling"
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = [
+    "numpy>=1.20",
+    "pandas>=1.3",
+    "scipy>=1.7",
+    "matplotlib>=3.4",
+    "seaborn>=0.11",
+    "h5py>=3.0",
+    "openpyxl>=3.0",
+    "tqdm>=4.60",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=3.0",
+    "black>=22.0",
+    "flake8>=4.0",
+]
+climada = [
+    "climada>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/simonameiler/systemic_insurance_risk_fl"
+Documentation = "https://github.com/simonameiler/systemic_insurance_risk_fl#readme"
+Repository = "https://github.com/simonameiler/systemic_insurance_risk_fl.git"
+Issues = "https://github.com/simonameiler/systemic_insurance_risk_fl/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["fl_risk_model*"]
+
+[tool.setuptools.package-data]
+"fl_risk_model.data" = ["*.csv"]
+
+[tool.black]
+line-length = 100
+target-version = ['py39', 'py310', 'py311']
+
+[tool.pytest.ini_options]
+testpaths = ["fl_risk_model/tests"]
+python_files = ["test_*.py"]

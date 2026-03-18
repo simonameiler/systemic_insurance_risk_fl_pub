@@ -1,0 +1,44 @@
+cff-version: 1.2.0
+title: "Florida Systemic Insurance Risk Model"
+message: "If you use this software, please cite it as below."
+type: software
+authors:
+  - family-names: "Meiler"
+    given-names: "Simona"
+    orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"
+    affiliation: "[Institution]"
+    email: "[email]"
+  # Add co-authors here:
+  # - family-names: "Last"
+  #   given-names: "First"
+  #   orcid: "https://orcid.org/XXXX-XXXX-XXXX-XXXX"
+repository-code: "https://github.com/simonameiler/systemic_insurance_risk_fl"
+url: "https://github.com/simonameiler/systemic_insurance_risk_fl"
+abstract: >-
+  This model assesses whether major tropical cyclone catastrophes in Florida 
+  could generate systemic financial risks across insurers, homeowners, mortgage 
+  lenders, capital markets, and public finance institutions. It provides 
+  county-level wind/water damage attribution, climate change projections, 
+  insurance market stress testing via Monte Carlo simulation, and policy 
+  scenario analysis.
+keywords:
+  - climate risk
+  - insurance
+  - tropical cyclones
+  - Florida
+  - systemic risk
+  - Monte Carlo simulation
+  - catastrophe modeling
+license: Apache-2.0
+version: "1.0.0"
+date-released: "2026-XX-XX"
+preferred-citation:
+  type: article
+  authors:
+    - family-names: "Meiler"
+      given-names: "Simona"
+    # Add co-authors
+  title: "Stress Testing Financial Stability of Florida's Insurance Market Under Climate Change"
+  journal: "[Journal Name]"
+  year: 2026
+  doi: "PLACEHOLDER"
