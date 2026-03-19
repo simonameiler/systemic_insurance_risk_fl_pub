@@ -235,9 +235,9 @@ sbatch --array=0 submit_precompute_emanuel_sherlock.sh
 - Citizens separate with federal backstop (NFIP similar)
 - Full capital model with surplus/deficit tracking
 
-**Climate scaling:**
-- `--climate_scaling` flag applies 2050 SSP2-4.5 damage scaling
-- Use for sensitivity analysis (not needed for Emanuel GCM scenarios which have physical climate changes)
+**Climate scenarios:**
+- Use Emanuel GCM event sets directly for climate change analysis (e.g., `FL_canesm_ssp245cal`)
+- This provides physics-based climate projections instead of post-hoc damage scaling
 
 ---
 
