@@ -139,28 +139,65 @@ python scripts/run/run_variance_decomposition.py --mode nested --M 300 --K 50
 ## Data Availability
 
 ### Included Data
-This repository includes publicly available data:
 - FHCF terms and reimbursement structure
 - Citizens Property Insurance county-level data
 - NFIP penetration rates and claims statistics
 - County geographic reference files
 - Impact function parameters
+- Pre-computed per-event impacts (historical climate)
 
 ### Large Data Files (Not Included)
-Due to GitHub file size limits, the following file is not included:
-- `fl_risk_model/data/fl_per_event_impacts_future_ssp245.csv` (~166 MB)
+Due to GitHub file size limits (~166 MB):
+- `fl_risk_model/data/fl_per_event_impacts_future_ssp245.csv`
 
-To generate this file using CLIMADA:
-```bash
-python scripts/hazard/build_per_event_impacts.py --climate ssp245
+Generate with: `python scripts/hazard/build_per_event_impacts.py --climate ssp245`
+
+### External Data Requirements
+The following must be obtained separately:
+
+**Kerry Emanuel TC Tracks** (contact authors):
+- `.mat` files with synthetic TC tracks for ERA5 and CMIP6 GCMs
+- Required for windfield generation
+
+**CLIMADA Exposure** (auto-downloaded):
+- LitPop exposure for Florida (downloaded by CLIMADA on first run)
+
+---
+
+## Complete Workflow
+
+The full pipeline from TC tracks to final analysis:
+
+```
+TC Tracks (.mat) → Windfields → Per-Event Impacts → Year-Sets → Monte Carlo → Analysis
 ```
 
-### Data Available on Request
-The following data are available for scientific purposes upon request:
-- Kerry Emanuel tropical cyclone track datasets
-- Florida OIR insurer surplus capital data
+### Step 1: Generate Windfields (requires CLIMADA + Emanuel tracks)
+Place Emanuel track files in `$CLIMADA_DATA/tracks/Kerry/Florida/`, then:
+```bash
+python scripts/hazard/compute_windfields_emanuel.py Simona_FLA_AL_era5_reanalcal.mat
+```
+Output: `$CLIMADA_DATA/hazard/Florida/FL_era5_reanalcal.hdf5`
 
-Contact: [email]
+### Step 2: Compute Per-Event County Impacts
+```bash
+python scripts/hazard/precompute_emanuel_tc_impacts.py FL_era5_reanalcal
+```
+
+### Step 3: Generate Year-Sets
+```bash
+python scripts/hazard/generate_emanuel_year_sets.py \
+    --event_set FL_era5_reanalcal --n_years 10000 --seed 42
+```
+
+### Step 4: Run Monte Carlo
+```bash
+python scripts/run/run_emanuel_monte_carlo.py \
+    --event_set FL_era5_reanalcal --n_years 10000
+```
+
+### Step 5: Analysis
+Open notebooks in `notebooks/` to reproduce paper figures.
 
 ---
 
