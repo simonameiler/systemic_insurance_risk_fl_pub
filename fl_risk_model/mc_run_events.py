@@ -177,11 +177,6 @@ COMPOSITE_WIND_SHARE_UNCERTAINTY = getattr(cfg, "COMPOSITE_WIND_SHARE_UNCERTAINT
 # County-specific wind/water redistribution toggle
 USE_COUNTY_REDISTRIBUTION = bool(getattr(cfg, "USE_COUNTY_REDISTRIBUTION", False))
 
-# Climate change damage scaling toggle
-# NOTE: Don't cache this as a module variable - read dynamically from cfg
-# so that run_policy_scenarios_mc() can override it
-# USE_CLIMATE_SCALING = bool(getattr(cfg, "USE_CLIMATE_SCALING", False))  # OLD
-
 # Flood / NFIP: enforce BORROW so federal backstop usage is visible
 DO_FLOOD = bool(getattr(cfg, "DO_FLOOD", True))
 try:
@@ -722,108 +717,6 @@ def _apply_county_redistribution(base_df: pd.DataFrame, baseline_wind_share: flo
     return wind_df, water_df
 
 # --------------------------------------------------------------------------------------
-# Climate change damage scaling
-# --------------------------------------------------------------------------------------
-
-# Cache climate scaling factors (loaded once per run)
-_CLIMATE_SCALING_FACTORS = None
-
-def _load_climate_scaling_factors():
-    """Load county-specific climate change damage scaling factors (cached)."""
-    global _CLIMATE_SCALING_FACTORS
-    if _CLIMATE_SCALING_FACTORS is None:
-        # Load linear damage scaling factors from Gori-based analysis
-        # Using linear approach to avoid double-counting nonlinearity in Climada impact functions
-        scaling_file = DATA_DIR / 'florida_linear_damage_scaling_factors.csv'
-        df = pd.read_csv(scaling_file)
-        
-        # Create county name to FIPS mapping (Florida = 12)
-        county_to_fips = {
-            'Alachua': '12001', 'Baker': '12003', 'Bay': '12005', 'Bradford': '12007',
-            'Brevard': '12009', 'Broward': '12011', 'Calhoun': '12013', 'Charlotte': '12015',
-            'Citrus': '12017', 'Clay': '12019', 'Collier': '12021', 'Columbia': '12023',
-            'DeSoto': '12027', 'Dixie': '12029', 'Duval': '12031', 'Escambia': '12033',
-            'Flagler': '12035', 'Franklin': '12037', 'Gadsden': '12039', 'Gilchrist': '12041',
-            'Glades': '12043', 'Gulf': '12045', 'Hamilton': '12047', 'Hardee': '12049',
-            'Hendry': '12051', 'Hernando': '12053', 'Highlands': '12055', 'Hillsborough': '12057',
-            'Holmes': '12059', 'Indian River': '12061', 'Jackson': '12063', 'Jefferson': '12065',
-            'Lafayette': '12067', 'Lake': '12069', 'Lee': '12071', 'Leon': '12073',
-            'Levy': '12075', 'Liberty': '12077', 'Madison': '12079', 'Manatee': '12081',
-            'Marion': '12083', 'Martin': '12085', 'Miami-Dade': '12086', 'Monroe': '12087',
-            'Nassau': '12089', 'Okaloosa': '12091', 'Okeechobee': '12093', 'Orange': '12095',
-            'Osceola': '12097', 'Palm Beach': '12099', 'Pasco': '12101', 'Pinellas': '12103',
-            'Polk': '12105', 'Putnam': '12107', 'St. Johns': '12109', 'St. Lucie': '12111',
-            'Santa Rosa': '12113', 'Sarasota': '12115', 'Seminole': '12117', 'Sumter': '12119',
-            'Suwannee': '12121', 'Taylor': '12123', 'Union': '12125', 'Volusia': '12127',
-            'Wakulla': '12129', 'Walton': '12131', 'Washington': '12133'
-        }
-        
-        df['fips'] = df['county_name'].map(county_to_fips)
-        
-        # Use total scaling factor = wind_ratio × rain_ratio × surge_ratio
-        # This is LINEAR scaling (no exponents) to avoid double-counting Climada's nonlinearity
-        _CLIMATE_SCALING_FACTORS = df[['fips', 'damage_scaling_total']].copy()
-        _CLIMATE_SCALING_FACTORS = _CLIMATE_SCALING_FACTORS.dropna(subset=['fips'])
-        
-        dbg(f"[Climate Scaling] Loaded {len(_CLIMATE_SCALING_FACTORS)} counties")
-    
-    return _CLIMATE_SCALING_FACTORS
-
-def _apply_climate_scaling(base_df: pd.DataFrame):
-    """
-    Apply county-specific climate change damage scaling.
-    
-    Multiplies baseline losses by county-specific scaling factors derived from
-    Gori et al. damage functions applied to CLIMADA TC climate projections.
-    
-    Parameters:
-    -----------
-    base_df : DataFrame with columns ['County', 'TotalLossUSD'] and optionally 'countyfp'
-    
-    Returns:
-    --------
-    scaled_df : DataFrame with ['County', 'TotalLossUSD'] with scaled losses
-    """
-    factors = _load_climate_scaling_factors()
-    
-    df = base_df.copy()
-    
-    # Check if FIPS codes available
-    if 'countyfp' in df.columns:
-        df['fips'] = '12' + df['countyfp'].astype(int).astype(str).str.zfill(3)
-    elif 'FIPS' in df.columns:
-        df['fips'] = df['FIPS'].astype(str).str.zfill(5)
-    elif 'fips' in df.columns:
-        df['fips'] = df['fips'].astype(str).str.zfill(5)
-    else:
-        # Fallback: no scaling if no FIPS
-        return df[['County', 'TotalLossUSD']]
-    
-    # Merge with scaling factors
-    df = df.merge(factors, on='fips', how='left')
-    
-    # For counties without scaling factors, use 1.0 (no change)
-    df['damage_scaling_total'] = df['damage_scaling_total'].fillna(1.0)
-    
-    # Apply scaling
-    df['TotalLossUSD_original'] = df['TotalLossUSD']
-    df['TotalLossUSD'] = df['TotalLossUSD'] * df['damage_scaling_total']
-    
-    # Log the overall impact
-    total_original = df['TotalLossUSD_original'].sum()
-    total_scaled = df['TotalLossUSD'].sum()
-    overall_scaling = total_scaled / total_original if total_original > 0 else 1.0
-    
-    dbg(f"[Climate Scaling] Overall damage increase: {overall_scaling:.2f}x")
-    
-    # Return with FIPS preserved (needed for county redistribution)
-    output_cols = ['County', 'TotalLossUSD']
-    if 'countyfp' in base_df.columns:
-        output_cols.append('countyfp')
-    
-    return df[output_cols]
-
-# --------------------------------------------------------------------------------------
 # One iteration
 # --------------------------------------------------------------------------------------
 
@@ -856,12 +749,6 @@ def _combine_events_for_scenario(scenario_name: str, event_stems: List[str], rng
             )
         
         base = _load_event_df(p)
-        
-        # Apply climate change damage scaling if enabled (BEFORE wind/water split)
-        # NOTE: This is SEPARATE from wind/water attribution shift
-        use_climate_scaling = getattr(cfg, "USE_CLIMATE_SCALING", False)
-        if use_climate_scaling:
-            base = _apply_climate_scaling(base)
         
         # Sample wind share for composite scenarios
         # Use Beta distribution centered at weighted average with tighter concentration
@@ -915,12 +802,6 @@ def _combine_events_for_scenario(scenario_name: str, event_stems: List[str], rng
         if not p.exists():
             raise FileNotFoundError(f"Missing event CSV: {p}")
         base = _load_event_df(p)
-        
-        # Apply climate change damage scaling if enabled (BEFORE wind/water split)
-        # NOTE: This is SEPARATE from wind/water attribution shift
-        use_climate_scaling = getattr(cfg, "USE_CLIMATE_SCALING", False)
-        if use_climate_scaling:
-            base = _apply_climate_scaling(base)
         
         # Sample wind share (use future parameters if future wind share enabled)
         use_future_wind_share = getattr(cfg, "USE_FUTURE_WIND_SHARE", False)
@@ -1532,6 +1413,15 @@ def run_policy_scenarios_mc(hazard_scenario: str = "great_miami",
     original_climate_setting = getattr(cfg, "USE_CLIMATE_SCALING", False)
     cfg.USE_CLIMATE_SCALING = climate_scaling
     
+    # DEPRECATED: climate_scaling via damage factors is no longer supported.
+    # Use direct GCM event sets for future climate runs instead.
+    if climate_scaling:
+        raise NotImplementedError(
+            "climate_scaling=True is no longer supported. "
+            "Use direct GCM event sets (e.g., FL_canesm_ssp245cal) instead of damage scaling factors. "
+            "See run_climate_buildingcode_sensitivity_windfloods.py for the recommended approach."
+        )
+    
     # Load policy scenario configs
     if policy_scenarios is None:
         policy_scenarios = getattr(cfg, "GREAT_MIAMI_POLICY_RUN", {}).get("policy_scenarios", ["baseline"])
@@ -1838,6 +1728,13 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
         original_future_wind = getattr(cfg, "USE_FUTURE_WIND_SHARE", False)
         cfg.USE_CLIMATE_SCALING = climate_scaling
         cfg.USE_FUTURE_WIND_SHARE = future_wind_share
+        
+        # DEPRECATED: climate_scaling via damage factors is no longer supported.
+        if climate_scaling:
+            raise NotImplementedError(
+                "climate_scaling=True is no longer supported. "
+                "Use direct GCM event sets (e.g., FL_canesm_ssp245cal) instead of damage scaling factors."
+            )
         
         # Load year-sets
         year_sets = pd.read_csv(year_sets_csv)
