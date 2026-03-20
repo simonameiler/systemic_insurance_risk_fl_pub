@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+<Document id="root_doc">
+<Schema name="fl_coastal_segments_150km" id="fl_coastal_segments_150km">
+	<SimpleField name="id" type="string"></SimpleField>
+</Schema>
+<Folder><name>fl_coastal_segments_150km</name>
+  <Placemark id="fl_coastal_segments_150km.1">
+	<name>0</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-89.1508043624059,31.2183874289688 -88.9819882515164,31.6431478567259</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.2">
+	<name>1</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-88.9819882515164,31.6431478567259 -88.6597278611922,31.9974582126414</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.3">
+	<name>2</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-88.6597278611922,31.9974582126414 -88.218041665295,32.2422623747062</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.4">
+	<name>3</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-88.218041665295,32.2422623747062 -87.7045791760084,32.3459712044901</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.5">
+	<name>4</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-87.7045791760084,32.3459712044901 -87.1741523948789,32.3521197304817</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.6">
+	<name>5</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-87.1741523948789,32.3521197304817 -86.6435924276909,32.3490312873963</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.7">
+	<name>6</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-86.6435924276909,32.3490312873963 -86.1130418245172,32.3470503687851</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.8">
+	<name>7</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-86.1130418245172,32.3470503687851 -85.5825142510833,32.3502169166972</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.9">
+	<name>8</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-85.5825142510833,32.3502169166972 -85.0519543115548,32.3537872815504</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.10">
+	<name>9</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-85.0519543115548,32.3537872815504 -84.5288344815519,32.2913751358195</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.11">
+	<name>10</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-84.5288344815519,32.2913751358195 -84.0607120563663,32.0848643393935</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.12">
+	<name>11</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-84.0607120563663,32.0848643393935 -83.5568338788974,32.0038743177058</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.13">
+	<name>12</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.5568338788974,32.0038743177058 -83.0292993454031,31.973355218798</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.14">
+	<name>13</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.0292993454031,31.973355218798 -82.5363329396492,32.0805079547402</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.15">
+	<name>14</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-82.5363329396492,32.0805079547402 -82.0218929108454,32.1771634431968</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.16">
+	<name>15</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-82.0218929108454,32.1771634431968 -81.4979063817963,32.1272338705935</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.17">
+	<name>16</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-81.4979063817963,32.1272338705935 -80.9904342850594,32.0038396734185</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.18">
+	<name>17</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-80.9904342850594,32.0038396734185 -80.5200883332845,31.8036421090667</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.19">
+	<name>18</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-80.5200883332845,31.8036421090667 -80.1508274655479,31.4849474464134</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.20">
+	<name>19</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-80.1508274655479,31.4849474464134 -79.9233476711391,31.0811956902352</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.21">
+	<name>20</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-79.9233476711391,31.0811956902352 -79.8576906830535,30.6359303820995</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.22">
+	<name>21</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-79.8576906830535,30.6359303820995 -79.756493360203,30.1949219611434</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.23">
+	<name>22</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-79.756493360203,30.1949219611434 -79.5873876911532,29.7706885299964</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.24">
+	<name>23</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-79.5873876911532,29.7706885299964 -79.3276322799394,29.3815985651838</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.25">
+	<name>24</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-79.3276322799394,29.3815985651838 -79.1031797575002,28.9780907821961</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.26">
+	<name>25</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-79.1031797575002,28.9780907821961 -78.9932678829119,28.5401918411859</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.27">
+	<name>26</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.9932678829119,28.5401918411859 -78.9121323676868,28.1047847733563</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.28">
+	<name>27</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.9121323676868,28.1047847733563 -78.7463231158829,27.6795869829449</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.29">
+	<name>28</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.7463231158829,27.6795869829449 -78.5957664993854,27.2498619382962</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.30">
+	<name>29</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.5957664993854,27.2498619382962 -78.5223106275501,26.8053492896375</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.31">
+	<name>30</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.5223106275501,26.8053492896375 -78.551846135736,26.3562346784402</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.32">
+	<name>31</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.551846135736,26.3562346784402 -78.6145153315659,25.909700501129</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.33">
+	<name>32</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.6145153315659,25.909700501129 -78.6654695031527,25.4631784084178</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.34">
+	<name>33</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.6654695031527,25.4631784084178 -78.7510736459864,25.0211377396746</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.35">
+	<name>34</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.7510736459864,25.0211377396746 -78.9721677263041,24.6185930898796</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.36">
+	<name>35</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-78.9721677263041,24.6185930898796 -79.2534247268114,24.2484915049274</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.37">
+	<name>36</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-79.2534247268114,24.2484915049274 -79.5905325932231,23.920633109738</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.38">
+	<name>37</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-79.5905325932231,23.920633109738 -79.9859646191101,23.6563675523141</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.39">
+	<name>38</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-79.9859646191101,23.6563675523141 -80.4212777455456,23.4506740874819</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.40">
+	<name>39</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-80.4212777455456,23.4506740874819 -80.8914443375488,23.3308262999701</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.41">
+	<name>40</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-80.8914443375488,23.3308262999701 -81.3675559120902,23.236715557229</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.42">
+	<name>41</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-81.3675559120902,23.236715557229 -81.8435972925396,23.146884505042</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.43">
+	<name>42</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-81.8435972925396,23.146884505042 -82.329117499713,23.1732902240912</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.44">
+	<name>43</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-82.329117499713,23.1732902240912 -82.7963345727789,23.2997549568812</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.45">
+	<name>44</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-82.7963345727789,23.2997549568812 -83.1985032583936,23.552754393542</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.46">
+	<name>45</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.1985032583936,23.552754393542 -83.4929013771178,23.9110480978486</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.47">
+	<name>46</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.4929013771178,23.9110480978486 -83.6452793507694,24.3382067393768</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.48">
+	<name>47</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.6452793507694,24.3382067393768 -83.6510007008359,24.7871218200433</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.49">
+	<name>48</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.6510007008359,24.7871218200433 -83.4973166225893,25.213501175888</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.50">
+	<name>49</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.4973166225893,25.213501175888 -83.2960651140363,25.5732654433273</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.51">
+	<name>50</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.2960651140363,25.5732654433273 -83.5667368778202,25.9495341308301</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.52">
+	<name>51</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.5667368778202,25.9495341308301 -83.7398260254827,26.3704183966736</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.53">
+	<name>52</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.7398260254827,26.3704183966736 -83.9975685644998,26.7555035928378</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.54">
+	<name>53</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-83.9975685644998,26.7555035928378 -84.2045544204076,27.1648865200565</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.55">
+	<name>54</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-84.2045544204076,27.1648865200565 -84.3411140151412,27.5971534212217</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.56">
+	<name>55</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-84.3411140151412,27.5971534212217 -84.3812879297038,28.0448290734964</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.57">
+	<name>56</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-84.3812879297038,28.0448290734964 -84.5027940778638,28.3235596394521</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.58">
+	<name>57</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-84.5027940778638,28.3235596394521 -85.0015395176854,28.2380213199047</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.59">
+	<name>58</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-85.0015395176854,28.2380213199047 -85.5049155490345,28.2988981134985</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.60">
+	<name>59</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-85.5049155490345,28.2988981134985 -85.9918197068576,28.4314170792956</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.61">
+	<name>60</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-85.9918197068576,28.4314170792956 -86.4153619617058,28.6804309033496</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.62">
+	<name>61</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-86.4153619617058,28.6804309033496 -86.7313660097011,29.0238329503656</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.63">
+	<name>62</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-86.7313660097011,29.0238329503656 -87.2385254833477,28.952225426336</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.64">
+	<name>63</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-87.2385254833477,28.952225426336 -87.7497718338082,28.9461982903301</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.65">
+	<name>64</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-87.7497718338082,28.9461982903301 -88.2365250760871,29.0839301945316</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.66">
+	<name>65</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-88.2365250760871,29.0839301945316 -88.6467928122996,29.3525246277601</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.67">
+	<name>66</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-88.6467928122996,29.3525246277601 -88.9347485155952,29.7236796188465</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.68">
+	<name>67</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-88.9347485155952,29.7236796188465 -89.0704905563838,30.1559818595152</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.69">
+	<name>68</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-89.0704905563838,30.1559818595152 -89.1695670643103,30.5933666016753</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.70">
+	<name>69</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-89.1695670643103,30.5933666016753 -89.1909166140095,31.0414065368543</coordinates></LineString>
+  </Placemark>
+  <Placemark id="fl_coastal_segments_150km.71">
+	<name>70</name>
+	<Style><LineStyle><color>ff0000ff</color></LineStyle><PolyStyle><fill>0</fill></PolyStyle></Style>
+      <LineString><coordinates>-89.1909166140095,31.0414065368543 -89.1508043624059,31.2183874289688</coordinates></LineString>
+  </Placemark>
+</Folder>
+</Document></kml>

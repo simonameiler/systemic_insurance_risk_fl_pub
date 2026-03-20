@@ -1,0 +1,5 @@
+Synthetic Wind
+
+Wind fields are simulated by combining a symmetric hurricane component, asymmetric background component, and parametric gradient-to-surface reduction factor. The symmetric component is estimated with the CLE15 model (Chavas, Lin and Emanuel, 2015), which is a physics-based hurricane wind profile model that links solutions for the inner convective region of the storm with the outer descending portion. Asymmetric background wind is estimated based on the translation vector of the synthetic TC. Background wind is estimated as 0.55 times translation speed rotated 20 degrees counterclockwise from the translation vector as in Lin & Chavas (2012). A uniform 0.85 gradient-to-surface reduction factor is applied. 
+
+maxwindmat  = contains the peak wind speed in m/s for each county (rows) and each synthetic storm (columns). Counties are listed in the "US_counties.shp" file. 
