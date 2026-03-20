@@ -710,10 +710,13 @@ def run_one_scenario(
                 wind_penetration_after = 0.85
         
         # Use penetration rate to set insured fraction
-        # Assume underinsured is 10% of insured, rest is uninsured
+        # Underinsured is 30% of household portion (Beta(3,7) mean)
+        # Uninsured is 70% of household portion
         insured_frac = wind_penetration_after
-        underinsured_frac = insured_frac * 0.10  # 10% of insured amount
-        uninsured_frac = 1.0 - insured_frac - underinsured_frac
+        household_portion = 1.0 - insured_frac
+        under_share_of_hh = 0.30  # Beta(3,7) mean
+        underinsured_frac = household_portion * under_share_of_hh
+        uninsured_frac = household_portion * (1.0 - under_share_of_hh)
         
         carveout_rates = {
             "insured": insured_frac,

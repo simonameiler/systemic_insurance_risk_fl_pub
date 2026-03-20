@@ -66,7 +66,6 @@ from fl_risk_model.loader import (
 from fl_risk_model.capital import load_citizens_capital_row_from_csv
 from fl_risk_model.nfip import load_nfip_claims_county_year, aggregate_nfip_claims
 
-from fl_risk_model.branches import uninsured as uninsured_branch
 from fl_risk_model import scenarios
 
 # mc_run_events.py (top of file)
@@ -261,60 +260,6 @@ def _sum_col_robust(container, *candidate_names: str) -> float:
             return _safe_sum(container)
     except Exception:
         return 0.0
-
-def _carve_and_attribute(loss_df: pd.DataFrame, loss_col_out: str, seed: int, 
-                         insurance_rates: dict | None = None) -> tuple[float, float]:
-    """
-    Carve wind damage into insured/underinsured/uninsured components.
-    
-    Parameters:
-    -----------
-    loss_df : pd.DataFrame
-        Wind damage dataframe with loss_col_out column
-    loss_col_out : str
-        Name of loss column (e.g., 'GrossWindLossUSD')
-    seed : int
-        Random seed for sampling
-    insurance_rates : dict | None
-        Optional insurance rate overrides for policy scenarios.
-        If provided, should contain {'insured': float, 'underinsured': float, 'uninsured': float}.
-        If None, uses default Beta sampling from config (baseline).
-    
-    Returns:
-    --------
-    tuple[float, float]
-        (underinsured_total, uninsured_total)
-    """
-    if loss_col_out not in loss_df.columns:
-        raise KeyError(f"Expected '{loss_col_out}' in loss_df; have {loss_df.columns.tolist()}")
-
-    carved = uninsured_branch.apply_gross_carveout_wind(
-        loss_df, county_col="County", loss_col=loss_col_out, seed=seed,
-        rates=insurance_rates  # Pass policy scenario rates if provided
-    )
-    if isinstance(carved, tuple):
-        carved_df = next((c for c in carved if isinstance(c, pd.DataFrame)), None)
-        carved = carved_df if carved_df is not None else carved
-
-    under = _sum_col_robust(
-        carved, "UnderinsuredFloodUSD", "UnderinsuredWindUSD", "UnderinsuredUSD", "underinsured_usd"
-    )
-    unins = _sum_col_robust(
-        carved, "UninsuredFloodUSD", "UninsuredWindUSD", "UninsuredUSD", "uninsured_usd"
-    )
-
-    if under == 0.0 and isinstance(carved, pd.DataFrame):
-        under_cols = [c for c in carved.columns if "underinsured" in c.lower()]
-        if under_cols:
-            # flatten 2D -> 1D before numsum
-            under = numsum(carved[under_cols].to_numpy().ravel())
-
-    if unins == 0.0 and isinstance(carved, pd.DataFrame):
-        un_cols = [c for c in carved.columns if "uninsured" in c.lower()]
-        if un_cols:
-            unins = numsum(carved[un_cols].to_numpy().ravel())
-
-    return under, unins
 
 def _preflight_events():
     missing = []
@@ -913,53 +858,6 @@ def run_one_iteration(scenario_name: str,
     # so that runner.load_wind_damage() gets the reduced wind damage
     _inject_damage_loaders(wind_df, water_df)
     
-    # Extract insurance rates from penetration scenario if applicable
-    insurance_rates = None
-
-    # Global override for sensitivity analysis
-    _fixed_ins = getattr(cfg, "FIXED_INSURED_FRAC", None)
-    if _fixed_ins is not None:
-        _hh = 1.0 - _fixed_ins
-        insurance_rates = {
-            "insured": _fixed_ins,
-            "underinsured": _hh * 0.30,
-            "uninsured": _hh * 0.70,
-        }
-    elif policy_scenario_config is not None and policy_scenario_config.get("type") == "penetration":
-        scenario_params = policy_scenario_config.get("params", {})
-        scenario_name = scenario_params.get("scenario", "BASELINE")
-        
-        # Import penetration presets to get target rates
-        from fl_risk_model.scenarios.penetration import PENETRATION_INCREASE_PRESETS
-        
-        if scenario_name in PENETRATION_INCREASE_PRESETS:
-            preset = PENETRATION_INCREASE_PRESETS[scenario_name]
-            wind_penetration = preset.get("wind_penetration_target", 0.40)
-            
-            # Convert penetration rate to insured/underinsured/uninsured fractions
-            # Assume underinsured is 30% of household portion (Beta(3,7) mean)
-            # and uninsured is 70% of household portion
-            household_portion = 1.0 - wind_penetration
-            under_share_of_hh = 0.30  # Beta(3,7) mean
-            
-            insurance_rates = {
-                "insured": wind_penetration,
-                "underinsured": household_portion * under_share_of_hh,
-                "uninsured": household_portion * (1.0 - under_share_of_hh),
-            }
-    
-    # Underinsured / Uninsured attribution (exposure-side carve)
-    # Now uses building-codes-reduced damage if applicable
-    # For penetration scenarios, uses policy-adjusted rates instead of Beta sampling
-    # Derive per-iteration seed so carveout fractions vary across iterations
-    carve_seed = int(rng.integers(0, 2**31))
-    underinsured_wind, uninsured_wind = _carve_and_attribute(
-        wind_df.rename(columns={"WindDamageUSD":"GrossWindLossUSD"}), 
-        "GrossWindLossUSD", 
-        carve_seed,
-        insurance_rates=insurance_rates
-    )
-    
     fhcf_county_df, mshare, county_xwalk, cit_cap, nfip_claims_df, nfip_exposure_df = common_inputs
 
     # Full scenario pipeline with optional policy intervention
@@ -1009,11 +907,16 @@ def run_one_iteration(scenario_name: str,
 
     # --- Six-bucket gross decomposition that adds back to total damage ---
 
-    # Wind buckets
+    # Wind buckets - extract from runner's carveout result
     wind_insured_private_usd  = float(result.get("insured_private_wind_pre_usd", 0.0) or 0.0)
     wind_insured_citizens_usd = float(result.get("insured_citizens_wind_pre_usd", 0.0) or 0.0)
-    wind_underinsured_usd     = float(underinsured_wind)   # from _carve_and_attribute(...), already computed
-    wind_uninsured_usd        = float(uninsured_wind)      # from _carve_and_attribute(...), already computed
+    carved_wind = result.get("carveout_wind_county")
+    if isinstance(carved_wind, pd.DataFrame) and not carved_wind.empty:
+        wind_underinsured_usd = float(numseries(carved_wind.get("UnderinsuredWindUSD", 0)).sum())
+        wind_uninsured_usd    = float(numseries(carved_wind.get("UninsuredWindUSD", 0)).sum())
+    else:
+        wind_underinsured_usd = 0.0
+        wind_uninsured_usd    = 0.0
 
     # Flood buckets (from runner’s NFIP view)
     flood_df = result.get("flood_nfip_recovery")
@@ -1230,8 +1133,8 @@ def run_one_iteration(scenario_name: str,
         "wind_total_usd": wind_total,
         "water_total_usd": water_total,
         # attribution
-        "underinsured_wind_usd": underinsured_wind,
-        "uninsured_wind_usd": uninsured_wind,
+        "underinsured_wind_usd": wind_underinsured_usd,
+        "uninsured_wind_usd": wind_uninsured_usd,
         "nfip_policyholder_shortfall_usd": policyholder_shortfall_usd,
         **row_updates,
         # insured (pre-recovery)
