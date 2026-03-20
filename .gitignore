@@ -101,9 +101,6 @@ results/
 *.nc
 *.mat
 
-# Proprietary data (not tracked)
-fl_risk_model/data/*.xlsx
-
 # Logs
 logs/
 *.log
