@@ -727,7 +727,7 @@ def run_one_scenario(
         county_col="County",
         loss_col="GrossWindLossUSD",
         rates=carveout_rates,
-        seed=getattr(cfg, "RNG_SEED", None),
+        rng=rng,
     )
     # carved: ['County','GrossWindLossUSD','InsuredWindUSD','UnderinsuredWindUSD','UninsuredWindUSD']
 

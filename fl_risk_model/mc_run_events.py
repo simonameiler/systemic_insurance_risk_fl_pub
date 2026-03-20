@@ -951,11 +951,12 @@ def run_one_iteration(scenario_name: str,
     # Underinsured / Uninsured attribution (exposure-side carve)
     # Now uses building-codes-reduced damage if applicable
     # For penetration scenarios, uses policy-adjusted rates instead of Beta sampling
-    seed_val = int(getattr(cfg, "RNG_SEED", RNG_SEED))
+    # Derive per-iteration seed so carveout fractions vary across iterations
+    carve_seed = int(rng.integers(0, 2**31))
     underinsured_wind, uninsured_wind = _carve_and_attribute(
         wind_df.rename(columns={"WindDamageUSD":"GrossWindLossUSD"}), 
         "GrossWindLossUSD", 
-        seed_val,
+        carve_seed,
         insurance_rates=insurance_rates
     )
     
