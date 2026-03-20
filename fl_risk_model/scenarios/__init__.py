@@ -1,9 +1,9 @@
 """
-scenarios — Scenario configuration and transformation utilities
+scenarios - Scenario configuration and transformation utilities
 ---------------------------------------------------------------
 
 This module provides scenario-specific transformations for:
-1. Market exit (private → Citizens reallocation)
+1. Market exit (private -> Citizens reallocation)
 2. Penetration increase (coverage expansion)
 3. Building code mitigation (loss reduction)
 

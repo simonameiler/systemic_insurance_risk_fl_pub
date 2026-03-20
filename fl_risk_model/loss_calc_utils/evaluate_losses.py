@@ -1,5 +1,22 @@
+"""
+evaluate_losses.py - Loss evaluation and benchmarking utilities
+-----------------------------------------------------------------
+
+Provides functions for evaluating modeled losses against FLOIR claims data
+and generating diagnostic outputs.
+
+Public API
+----------
+- EVENT_ID_TO_SLUG: Dict mapping IBTrACS IDs to storm slugs
+- load_floir_statewide
+- load_floir_county
+- build_benchmarks_from_top50
+- append_benchmarks_and_score
+- plot_event_county_map
+"""
 import os
 import re
+
 import pandas as pd
 import numpy as np
 import geopandas as gpd
@@ -346,7 +363,7 @@ def plot_event_county_map(exp_with_county, fl_counties, event_id,
     gdf_ev.boundary.plot(ax=ax, color=edgecolor, linewidth=linewidth, zorder=2)
 
     ax.set_axis_off()
-    ttl = title if title is not None else f"County Totals — {event_id}"
+    ttl = title if title is not None else f"County Totals - {event_id}"
     ax.set_title(ttl, pad=8)
 
     # colorbar

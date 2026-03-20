@@ -1,5 +1,5 @@
 """
-utils.py — county normalization & crosswalk helpers
+utils.py - county normalization & crosswalk helpers
 
 Public API
 ----------
@@ -9,9 +9,9 @@ Public API
 Behavioral notes (kept exactly as before)
 -----------------------------------------
 - County names:
-  * "St." → "Saint", "St " → "Saint " (space)
-  * "Miami Dade" → "Miami-Dade"
-  * Hyphenated parts are Title-Cased individually (e.g., "miami-dade" → "Miami-Dade").
+  * "St." -> "Saint", "St " -> "Saint " (space)
+  * "Miami Dade" -> "Miami-Dade"
+  * Hyphenated parts are Title-Cased individually (e.g., "miami-dade" -> "Miami-Dade").
 - `norm_county_name(None or NaN)` returns None.
 - `make_xwalk_from_tiger` expects (case-insensitive) columns: STATEFP, COUNTYFP, COUNTYNAME,
   and returns unique rows of ['County','county_fips'] with county_fips = zfill2(STATEFP)+zfill3(COUNTYFP).

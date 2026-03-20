@@ -1,7 +1,6 @@
-from __future__ import annotations
-
 """
-runner.py — Scenario runner for the Florida risk-flow model (CLEANED)
+runner.py - Scenario runner for the Florida risk-flow model
+-------------------------------------------------------------------------
 
 Flow (aligned with Methods)
 ---------------------------
@@ -12,17 +11,18 @@ Flow (aligned with Methods)
 2) Load county wind damages (USD).
 3) CARVE-OUT at county level (insured/underinsured/uninsured) [uninsured branch WIP].
 4) PRE-SPLIT insured wind by Citizens/Private share of county TIV.
-5) PRIVATE: allocate private share by exposure → FHCF (using keyed terms) → apply seasonal industry cap (pro‑rata).
-6) CITIZENS: allocate Citizens share (County View) → FHCF (using keyed terms) → Citizens capital hit.
-7) Flood → NFIP recovery.
+5) PRIVATE: allocate private share by exposure -> FHCF (using keyed terms) -> apply seasonal industry cap (pro-rata).
+6) CITIZENS: allocate Citizens share (County View) -> FHCF (using keyed terms) -> Citizens capital hit.
+7) Flood -> NFIP recovery.
 8) Aggregate company losses; load surplus; apply capital depletion and group support.
 9) Assessments: FIGA (private, keyed by Statutory Entity Key) and Citizens Tier-1/Tier-2.
 
 Notes
 -----
-- Applies a **single** industry seasonal cap across Private + Citizens (pro‑rata), once.
+- Applies a **single** industry seasonal cap across Private + Citizens (pro-rata), once.
 - Removes duplicate helpers and dead code; keeps public signatures intact.
 """
+from __future__ import annotations
 
 import re
 import numpy as np
@@ -178,7 +178,7 @@ def _apply_industry_season_cap(
     return p, c, diag
 
 
-# --- Canonical County↔FIPS crosswalk → ['County','county_fips'] ----------------
+# --- Canonical County<->FIPS crosswalk -> ['County','county_fips'] ----------------
 
 def _strip_suffix(s: str) -> str:
     return re.sub(r"\s+(County|Parish|Borough|City)$", "", str(s), flags=re.I).strip()
@@ -241,7 +241,7 @@ def _build_xwalk(county_xwalk, fhcf_county_df=None, statefp_default="12"):
     xw["County"] = xw["County"].astype(str).str.replace(r"\\s+County$","",regex=True).str.strip()
     xw = xw.dropna().drop_duplicates()[["County","county_fips"]]
     if xw.empty or not {"County","county_fips"}.issubset(xw.columns):
-        raise ValueError("Failed to construct County↔FIPS crosswalk.")
+        raise ValueError("Failed to construct County<->FIPS crosswalk.")
     return xw
 
 def _print_exposure_diagnostics(private_exp: pd.DataFrame,
@@ -336,8 +336,8 @@ def run_one_scenario(
         Group-to-Entity surplus ratio threshold for intragroup capital support eligibility.
         Distressed insurers are eligible for group support only if their group's surplus
         is at least this many times larger than the entity's own baseline surplus.
-        - Lower values (e.g., 5.0): More permissive → more companies eligible for support
-        - Higher values (e.g., 15.0): More restrictive → fewer companies eligible
+        - Lower values (e.g., 5.0): More permissive -> more companies eligible for support
+        - Higher values (e.g., 15.0): More restrictive -> fewer companies eligible
         Default of 10.0 represents a conservative threshold requiring substantial group strength.
     
     See fl_risk_model/scenarios/ modules for detailed parameter documentation.
@@ -385,7 +385,7 @@ def run_one_scenario(
             rng=rng,
         )
 
-        # Strict (but tolerant) mass-balance: FHCF ≈ Private + Citizens
+        # Strict (but tolerant) mass-balance: FHCF ~ Private + Citizens
         priv = private_exp.groupby("County", as_index=False)["TIV"].sum().rename(columns={"TIV":"Private"})
         cit  = citizens_exp.groupby("County", as_index=False)["TIV"].sum().rename(columns={"TIV":"Citizens"})
         chk = (fhcf_county_df[["County","CountyTIV"]]
@@ -667,7 +667,7 @@ def run_one_scenario(
     #     print("[check] Largest rel. gaps (top 5):")
     #     print(cmp.sort_values("rel_gap_%", ascending=False).head(5).to_string(index=False))
     # else:
-    #     print("[runner] ALT private is empty — check workbook path and filters.")
+    #     print("[runner] ALT private is empty - check workbook path and filters.")
 
     # --- 2) County-level wind damages
     county_wind = load_wind_damage(storm_name)  # ['County','WindDamageUSD']
@@ -768,7 +768,7 @@ def run_one_scenario(
         .rename(columns={"PrivateInsuredUSD": "InsuredWindUSD"})
     )
 
-    # --- 5) PRIVATE + CITIZENS FHCF (attach terms → recover → seasonal cap) ---
+    # --- 5) PRIVATE + CITIZENS FHCF (attach terms -> recover -> seasonal cap) ---
     company_keys = pd.read_csv(cfg.DATA_DIR / "company_keys.csv",
                            dtype={"StatEntityKey": str, "NAIC": str})
     # Optional: sanity
@@ -827,7 +827,7 @@ def run_one_scenario(
             columns=["Company","County","GrossWindLossUSD","FHCF_RecoveryPreCapUSD"]
         )
 
-    # --- 5.4 CITIZENS: gross insured wind → FHCF terms → pre-cap recovery ---
+    # --- 5.4 CITIZENS: gross insured wind -> FHCF terms -> pre-cap recovery ---
     # CIT_NAME = getattr(cfg, "CITIZENS_COMPANY_NAME", getattr(cfg, "CITIZENS_NAME", "Citizens Property Insurance Corporation"))
 
     # citizens_gross = (
@@ -864,14 +864,14 @@ def run_one_scenario(
     # else:
     #     citizens_precap = pd.DataFrame(columns=["Company","County","GrossWindLossUSD","FHCF_RecoveryPreCapUSD"])
     def _citizens_terms_fallback_row(cfg) -> pd.DataFrame:
-        """One-row fallback for Citizens → will be normalized to get Retention/Limit."""
+        """One-row fallback for Citizens -> will be normalized to get Retention/Limit."""
         return pd.DataFrame([{
             "Company": getattr(cfg, "CITIZENS_COMPANY_NAME", "Citizens Property Insurance Corporation"),
             "FHCFPremium": float(getattr(cfg, "CITIZENS_FHCF_PREMIUM_USD", 0.0)),
             "CoveragePct": float(getattr(cfg, "CITIZENS_FHCF_COVERAGE_PCT", 90)),  # 45/75/90 or fraction
         }])
 
-    # --- Citizens: gross → FHCF terms → pre-cap recovery -------------------------
+    # --- Citizens: gross -> FHCF terms -> pre-cap recovery -------------------------
     CITIZENS_NAME = getattr(cfg, "CITIZENS_COMPANY_NAME", "Citizens Property Insurance Corporation")
     citizens_gross = (
         citizens_insured_by_county[["County", "InsuredWindUSD"]]
@@ -901,7 +901,7 @@ def run_one_scenario(
     except Exception:
         pass
 
-    # 2) Fallback to config → normalize to get Retention/Limit
+    # 2) Fallback to config -> normalize to get Retention/Limit
     if terms_for_citizens is None or force_cfg:
         fb = _citizens_terms_fallback_row(cfg)
         fb_norm = normalize_fhcf_terms(fb)
@@ -959,7 +959,7 @@ def run_one_scenario(
             market_share_df=market_share_df,
             company_keys_df=company_keys,
             industry_insured_wind_pre_fhcf_usd=industry_pre,
-            issue_year=surplus_year,   # <— add this
+            issue_year=surplus_year,   # <- add this
         )
 
         # Subtract cat-bond recovery from NetWindUSD (company×county)
@@ -987,7 +987,7 @@ def run_one_scenario(
         cat_diag = {"bond_diag": pd.DataFrame(), "catbond_payout_total": 0.0, "catbond_attachment_hits": 0}
 
             
-    # --- 7) Flood → NFIP recovery -----------------------------------
+    # --- 7) Flood -> NFIP recovery -----------------------------------
     flood_nfip = pd.DataFrame()
     flood_nfip_view = pd.DataFrame()
     nfip_capital_summary = {"paid_total": 0.0, "pool_cap": 0.0, "pool_used": 0.0, "borrowed": 0.0}
@@ -1257,7 +1257,7 @@ def run_one_scenario(
             if surv_keys:
                 base = base[base["StatEntityKey"].astype(str).isin(surv_keys)].copy()
 
-        # Map key → display name (first seen), then group base by key
+        # Map key -> display name (first seen), then group base by key
         name_by_key = (
             base.groupby("StatEntityKey", as_index=False)
                 .agg({"Company": "first"})
@@ -1476,7 +1476,7 @@ def run_one_scenario(
         "insured_citizens_wind_pre_usd": float(insured_citizens_wind_pre_usd),
         "insured_flood_pre_usd":         float(insured_flood_pre_usd),
 
-        # Wind (pre → post FHCF)
+        # Wind (pre -> post FHCF)
         "private_allocated_wind":  private_alloc,
         "private_wind_after_fhcf": private_after_fhcf,
         "citizens_wind_after_fhcf": citizens_wind_after_fhcf,

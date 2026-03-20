@@ -1,5 +1,5 @@
 """
-flood.py — NFIP (flood) branch
+flood.py - NFIP (flood) branch
 ------------------------------
 
 Implements the flood side of the risk propagation model, aligned with the

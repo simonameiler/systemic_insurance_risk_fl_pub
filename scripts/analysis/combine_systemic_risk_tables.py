@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 """
-Combine baseline, climate, and policy systemic risk probability tables.
+combine_systemic_risk_tables.py - Combine baseline, climate, and policy systemic risk tables
 """
 import pandas as pd
 from pathlib import Path
@@ -117,7 +118,7 @@ if __name__ == "__main__":
             missing_files.append(file_path.name)
     
     if missing_files:
-        print(f"⚠️  Missing input files: {', '.join(missing_files)}")
+        print(f"[WARNING] Missing input files: {', '.join(missing_files)}")
         print("    Run the notebook cells to generate these files first.")
     else:
         # Combine tables

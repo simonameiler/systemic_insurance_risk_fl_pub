@@ -1,5 +1,5 @@
 """
-market_exit.py — Private insurer market exit scenarios
+market_exit.py - Private insurer market exit scenarios
 ------------------------------------------------------
 
 Models realistic market withdrawal under stress, with exposure transfer to Citizens.
@@ -36,21 +36,21 @@ MARKET_EXIT_PRESETS = {
     "MODERATE": {
         "citizens_target_share": 0.25,  # +10pp to Citizens
         "exit_mechanism": "uniform",    # Uniform reduction of private market
-        "citizens_absorption_rate": 0.85,  # 85% of exited exposure → Citizens, 15% → uninsured
+        "citizens_absorption_rate": 0.85,  # 85% of exited exposure -> Citizens, 15% -> uninsured
         "description": "Moderate exit: continuation of 2022-2024 trend through 2030",
     },
     "MAJOR": {
         "citizens_target_share": 0.40,  # +25pp to Citizens
         "exit_mechanism": "stress_based",  # Exit based on company stress metrics
         "stress_threshold_percentile": 0.65,  # Top 35% stressed companies exit
-        "citizens_absorption_rate": 0.75,  # 75% → Citizens, 25% → uninsured
+        "citizens_absorption_rate": 0.75,  # 75% -> Citizens, 25% -> uninsured
         "description": "Major exit: post-catastrophe market restructuring by 2035",
     },
     "EXTREME": {
         "citizens_target_share": 0.55,  # +40pp to Citizens
         "exit_mechanism": "stress_based",
         "stress_threshold_percentile": 0.50,  # Top 50% stressed companies exit
-        "citizens_absorption_rate": 0.70,  # 70% → Citizens, 30% → uninsured
+        "citizens_absorption_rate": 0.70,  # 70% -> Citizens, 30% -> uninsured
         "coastal_bias": 1.5,  # Coastal counties 1.5x more likely to lose coverage
         "description": "Extreme exit: private market collapse by 2045",
     },
@@ -231,7 +231,7 @@ def _uniform_exit(
     Uniform reduction of private market with geographic bias.
     
     Strategy:
-    1. Calculate total TIV needed to transfer from private → Citizens
+    1. Calculate total TIV needed to transfer from private -> Citizens
     2. Apply geographic bias (coastal counties lose more coverage)
     3. Transfer (absorption_rate × reduction) to Citizens, rest goes uninsured
     """
@@ -247,7 +247,7 @@ def _uniform_exit(
     
     # Total needed removal from private (accounting for absorption rate)
     # If absorption_rate = 0.8, then to transfer $100 to Citizens, we remove $125 from private
-    # (80% → Citizens, 20% → uninsured)
+    # (80% -> Citizens, 20% -> uninsured)
     total_removal_needed = needed_transfer / absorption_rate
     
     # Geographic bias: coastal counties lose more
@@ -488,9 +488,9 @@ def adjust_group_capital_for_exits(
     >>> # GroupSurplusUSD = $300M (includes parent pool)
     >>> # Entity A ($100M) exits
     >>> 
-    >>> # Conservative: GroupSurplusUSD → $200M (lost A's contribution)
-    >>> # Aggressive: GroupSurplusUSD → $80M (only B+C remain, no parent)
-    >>> # Middle ground: GroupSurplusUSD → $200M (3→2 entities, scale by 2/3)
+    >>> # Conservative: GroupSurplusUSD -> $200M (lost A's contribution)
+    >>> # Aggressive: GroupSurplusUSD -> $80M (only B+C remain, no parent)
+    >>> # Middle ground: GroupSurplusUSD -> $200M (3->2 entities, scale by 2/3)
     """
     if not exiting_companies:
         return surplus_df.copy()
@@ -613,7 +613,7 @@ def adjust_citizens_capital_for_growth(
         
     Examples
     --------
-    >>> # 2024: $12B capital, 15% share → 40% share
+    >>> # 2024: $12B capital, 15% share -> 40% share
     >>> adjust_citizens_capital_for_growth(12e9, 0.15, 0.40, "proportional")
     {"citizens_capital_required_usd": 32.0B, "shortfall": 20.0B}
     

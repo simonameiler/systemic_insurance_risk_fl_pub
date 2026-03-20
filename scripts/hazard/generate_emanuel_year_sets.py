@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 """
-Generate Stochastic TC Year-Sets from Emanuel Event Sets
+generate_emanuel_year_sets.py - Generate stochastic TC year-sets from Emanuel event sets
 
 This script generates year-sets for Monte Carlo analysis using the Emanuel TC
 event sets with their observed annual frequency distributions.
@@ -393,7 +394,7 @@ def main():
     )
     
     print("\n" + "="*80)
-    print("✓ SUCCESS")
+    print("[OK] SUCCESS")
     print("="*80)
 
 

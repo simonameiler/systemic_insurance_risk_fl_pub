@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Climate Change + Building Codes Sensitivity Analysis (Wind/Flood Split)
+run_climate_buildingcode_sensitivity_windfloods.py - Climate change and building code sensitivity
 
 Research Question: How do building codes interact with climate change across
 different wind and flood reduction levels?
@@ -218,9 +218,9 @@ def run_climate_buildingcode_sensitivity(
         metadata_file = actual_dir / 'sensitivity_metadata.json'
         with open(metadata_file, 'w') as f:
             json.dump(metadata, f, indent=2)
-        print(f"\n✓ Saved metadata: {metadata_file}")
+        print(f"\n[OK] Saved metadata: {metadata_file}")
     
-    print(f"\n✓ Sensitivity run complete: Wind {int(wind_reduction*100)}% / Flood {int(flood_reduction*100)}%")
+    print(f"\n[OK] Sensitivity run complete: Wind {int(wind_reduction*100)}% / Flood {int(flood_reduction*100)}%")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Run Monte Carlo simulations for all historical hurricane scenarios.
+run_historical_scenarios_mc.py - Run Monte Carlo simulations for historical hurricanes
 
 This script runs 200 MC iterations for each of the 8 historical scenarios:
 - great_miami
@@ -142,7 +142,7 @@ def run_scenario_mc(scenario_name, n_iter=200, seed=42, out_dir=None):
     summary = _compute_summary(df_clean)
     summary.to_csv(run_dir / "summary.csv", index=False)
     
-    print(f"\n✅ Completed: {scenario_name} → {run_dir}")
+    print(f"\n[OK] Completed: {scenario_name} -> {run_dir}")
     print(f"   Iterations: {iterations_file}")
     print(f"   Summary: {run_dir / 'summary.csv'}")
     
@@ -169,13 +169,13 @@ def build_uncertainty_report(mc_dirs, out_file=None):
     for mc_dir in mc_dirs:
         iterations_csv = mc_dir / "iterations.csv"
         if not iterations_csv.exists():
-            print(f"⚠️  Warning: {iterations_csv} not found, skipping")
+            print(f"[WARNING] Warning: {iterations_csv} not found, skipping")
             continue
         df = pd.read_csv(iterations_csv)
         all_iterations.append(df)
     
     if not all_iterations:
-        print("❌ No iterations found!")
+        print("[ERROR] No iterations found!")
         return None
     
     combined_df = pd.concat(all_iterations, ignore_index=True)
@@ -208,7 +208,7 @@ def build_uncertainty_report(mc_dirs, out_file=None):
         nfip_fl_premium_base=nfip_premium,
     )
     
-    print(f"\n✅ Report complete: {out_file}")
+    print(f"\n[OK] Report complete: {out_file}")
     return out_file
 
 
@@ -266,7 +266,7 @@ def main():
     # Validate all scenarios exist
     for scen in scenarios_to_run:
         if scen not in SCENARIOS:
-            print(f"❌ Unknown scenario: {scen}")
+            print(f"[ERROR] Unknown scenario: {scen}")
             print(f"   Available: {list(SCENARIOS.keys())}")
             return 1
     
@@ -284,7 +284,7 @@ def main():
             )
             mc_dirs.append(run_dir)
         except Exception as e:
-            print(f"\n❌ Failed to run {scen}:")
+            print(f"\n[ERROR] Failed to run {scen}:")
             print(f"   {e}")
             traceback.print_exc()
             continue
@@ -302,7 +302,7 @@ def main():
         try:
             report_file = build_uncertainty_report(mc_dirs)
         except Exception as e:
-            print(f"\n❌ Failed to build report:")
+            print(f"\n[ERROR] Failed to build report:")
             print(f"   {e}")
             traceback.print_exc()
             return 1

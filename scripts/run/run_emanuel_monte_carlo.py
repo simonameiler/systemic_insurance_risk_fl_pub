@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-Run Monte Carlo analysis with Emanuel TC event sets.
+run_emanuel_monte_carlo.py - Run Monte Carlo analysis with Emanuel TC event sets
 
 This script runs the insurance risk model using precomputed Emanuel TC impacts
 and generated year-sets. It follows the same stochastic TC workflow as 
@@ -114,7 +114,7 @@ Examples:
         year_sets_csv = impact_dir / "year_sets_N10000_seed42.csv"
     
     if not year_sets_csv.exists():
-        print(f"❌ ERROR: Year-sets file not found: {year_sets_csv}")
+        print(f"[ERROR] ERROR: Year-sets file not found: {year_sets_csv}")
         print(f"   Generate year-sets first:")
         if args.year_sets_file:
             print(f"   python scripts/hazard/generate_emanuel_year_sets_subset.py --event_set {args.event_set} --year_start 1995 --year_end 2014")
@@ -125,7 +125,7 @@ Examples:
     # Check for event metadata
     metadata_csv = impact_dir / "event_metadata.csv"
     if not metadata_csv.exists():
-        print(f"❌ ERROR: Event metadata not found: {metadata_csv}")
+        print(f"[ERROR] ERROR: Event metadata not found: {metadata_csv}")
         print(f"   Precompute impacts first:")
         print(f"   python scripts/hazard/precompute_emanuel_tc_impacts.py --event_set {args.event_set}")
         sys.exit(1)
@@ -142,11 +142,11 @@ Examples:
     policy_scenario_config = None
     if args.policy:
         if args.policy not in cfg.POLICY_SCENARIOS:
-            print(f"❌ ERROR: Unknown policy scenario '{args.policy}'")
+            print(f"[ERROR] ERROR: Unknown policy scenario '{args.policy}'")
             print(f"   Available: {list(cfg.POLICY_SCENARIOS.keys())}")
             sys.exit(1)
         policy_scenario_config = cfg.POLICY_SCENARIOS[args.policy]
-        print(f"🎯 Applying policy scenario: {args.policy}")
+        print(f"Applying policy scenario: {args.policy}")
         
         # Override loss reduction if specified
         if args.wind_loss_reduction is not None or args.flood_loss_reduction is not None:
@@ -160,9 +160,9 @@ Examples:
                     policy_scenario_config["params"]["flood_loss_reduction"] = args.flood_loss_reduction
                     print(f"   Overriding flood loss reduction: {args.flood_loss_reduction:.1%}")
             else:
-                print(f"⚠️  WARNING: --wind/flood_loss_reduction only applies to building_codes policies (ignored)")
+                print(f"[WARNING] WARNING: --wind/flood_loss_reduction only applies to building_codes policies (ignored)")
     else:
-        print(f"🎯 Running baseline (no policy changes)")
+        print(f"Running baseline (no policy changes)")
     
     # Create run label
     if args.run_label:
@@ -216,7 +216,7 @@ Examples:
             policy_scenario_config=policy_scenario_config,
         )
         
-        print(f"\n✅ Monte Carlo complete!")
+        print(f"\n[OK] Monte Carlo complete!")
         print(f"   Results: {out_dir}")
         print()
         

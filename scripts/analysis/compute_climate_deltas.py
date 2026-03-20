@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-Compute climate change deltas from GCM ensemble and apply to ERA5 baseline.
+compute_climate_deltas.py - Compute climate change deltas from GCM ensemble
 
 This script:
 1. Loads return_period_summary.csv from all MC runs (ERA5 + GCMs)
@@ -152,13 +152,13 @@ def load_mc_results(mc_root):
         
         iterations_file = run_dir / 'iterations.csv'
         if not iterations_file.exists():
-            print(f"⚠️  Skipping {run_dir.name}: no iterations.csv")
+            print(f"[WARNING] Skipping {run_dir.name}: no iterations.csv")
             continue
         
         # Parse model and period
         model, period = parse_event_set_info(run_dir.name)
         if model is None:
-            print(f"⚠️  Skipping {run_dir.name}: could not parse model/period")
+            print(f"[WARNING] Skipping {run_dir.name}: could not parse model/period")
             continue
         
         time_category = get_period_category(period) if model != 'era5' else 'reanalysis'
@@ -167,13 +167,13 @@ def load_mc_results(mc_root):
         try:
             df_iterations = pd.read_csv(iterations_file)
         except Exception as e:
-            print(f"⚠️  Error loading {iterations_file}: {e}")
+            print(f"[WARNING] Error loading {iterations_file}: {e}")
             continue
         
         # Compute annual average metrics
         df_metrics = compute_annual_average_metrics(df_iterations)
         if df_metrics is None:
-            print(f"⚠️  Skipping {run_dir.name}: could not compute metrics")
+            print(f"[WARNING] Skipping {run_dir.name}: could not compute metrics")
             continue
         
         # Add metadata
@@ -183,7 +183,7 @@ def load_mc_results(mc_root):
         df_metrics['run_dir'] = run_dir.name
         
         results.append(df_metrics)
-        print(f"✓ Loaded {run_dir.name}: {model}/{period} ({time_category}, {len(df_metrics)} metrics)")
+        print(f"[OK] Loaded {run_dir.name}: {model}/{period} ({time_category}, {len(df_metrics)} metrics)")
     
     if not results:
         raise ValueError(f"No valid MC results found in {mc_root}")
@@ -191,7 +191,7 @@ def load_mc_results(mc_root):
     # Combine all results
     all_results = pd.concat(results, ignore_index=True)
     
-    print(f"\n📊 Loaded {len(results)} MC runs:")
+    print(f"\nLoaded {len(results)} MC runs:")
     print(f"   Models: {sorted(all_results['model'].unique())}")
     print(f"   Periods: {sorted(all_results['period'].unique())}")
     print(f"   Time categories: {sorted(all_results['time_category'].unique())}")
@@ -226,7 +226,7 @@ def compute_deltas_by_gcm(df):
         hist_data = model_data[model_data['period'] == '20thcal']
         
         if hist_data.empty:
-            print(f"⚠️  Model {model}: No historical (20thcal) data, skipping")
+            print(f"[WARNING] Model {model}: No historical (20thcal) data, skipping")
             continue
         
         # Get all future periods for this model
@@ -236,7 +236,7 @@ def compute_deltas_by_gcm(df):
         ]['period'].unique()
         
         if len(future_periods) == 0:
-            print(f"⚠️  Model {model}: No future periods found, skipping")
+            print(f"[WARNING] Model {model}: No future periods found, skipping")
             continue
         
         print(f"   {model}: historical=20thcal, future={list(future_periods)}")
@@ -284,7 +284,7 @@ def compute_deltas_by_gcm(df):
     
     deltas_df = pd.DataFrame(deltas)
     
-    print(f"\n✓ Computed deltas: {len(deltas_df)} rows")
+    print(f"\n[OK] Computed deltas: {len(deltas_df)} rows")
     print(f"   Models: {deltas_df['model'].nunique()}")
     print(f"   Metrics: {deltas_df['metric'].nunique()}")
     
@@ -310,7 +310,7 @@ def aggregate_deltas_ensemble(deltas_df, method='absolute'):
     """
     delta_col = 'delta_absolute' if method == 'absolute' else 'delta_relative'
     
-    print(f"\n📊 Aggregating {method} deltas across ensemble...")
+    print(f"\nAggregating {method} deltas across ensemble...")
     
     # Group by pathway, time_category, and metric
     grouped = deltas_df.groupby(['pathway', 'time_category', 'metric'])
@@ -339,7 +339,7 @@ def aggregate_deltas_ensemble(deltas_df, method='absolute'):
     
     ensemble_df = pd.DataFrame(ensemble)
     
-    print(f"✓ Ensemble statistics computed: {len(ensemble_df)} rows")
+    print(f"[OK] Ensemble statistics computed: {len(ensemble_df)} rows")
     print(f"   Pathways: {sorted(ensemble_df['pathway'].unique())}")
     print(f"   Time categories: {sorted(ensemble_df['time_category'].unique())}")
     
@@ -358,7 +358,7 @@ def apply_deltas_to_era5(era5_data, ensemble_deltas, method='absolute'):
     Returns:
         DataFrame with scaled ERA5 results (median, p10, p90)
     """
-    print(f"\n🔧 Applying {method} deltas to ERA5...")
+    print(f"\nApplying {method} deltas to ERA5...")
     
     scaled = []
     
@@ -408,7 +408,7 @@ def apply_deltas_to_era5(era5_data, ensemble_deltas, method='absolute'):
     
     scaled_df = pd.DataFrame(scaled)
     
-    print(f"✓ Applied deltas: {len(scaled_df)} rows")
+    print(f"[OK] Applied deltas: {len(scaled_df)} rows")
     
     return scaled_df
 
@@ -428,14 +428,14 @@ def validate_gcm_era5_alignment(all_results):
     era5_data = all_results[all_results['model'] == 'era5']
     
     if era5_data.empty:
-        print("⚠️  No ERA5 data found, skipping alignment validation")
+        print("[WARNING] No ERA5 data found, skipping alignment validation")
         return pd.DataFrame()
     
     # Get GCM historical data (20thcal)
     gcm_hist = all_results[all_results['period'] == '20thcal']
     
     if gcm_hist.empty:
-        print("⚠️  No GCM historical (20thcal) data found, skipping alignment validation")
+        print("[WARNING] No GCM historical (20thcal) data found, skipping alignment validation")
         return pd.DataFrame()
     
     alignment = []
@@ -475,7 +475,7 @@ def validate_gcm_era5_alignment(all_results):
     alignment_df = pd.DataFrame(alignment)
     
     if not alignment_df.empty:
-        print(f"✓ Alignment validation: {len(alignment_df)} comparisons")
+        print(f"[OK] Alignment validation: {len(alignment_df)} comparisons")
         
         # Summary statistics
         print(f"\n📈 Bias Summary (median across all metrics):")
@@ -510,7 +510,7 @@ def compare_absolute_vs_relative(scaled_abs, scaled_rel):
         comparison['scaled_median_rel'] * 100
     )
     
-    print(f"✓ Comparison created: {len(comparison)} rows")
+    print(f"[OK] Comparison created: {len(comparison)} rows")
     
     return comparison
 
@@ -549,7 +549,7 @@ def main():
     deltas = compute_deltas_by_gcm(all_results)
     
     if deltas.empty:
-        print("\n❌ No deltas computed. Check that you have both historical and future GCM runs.")
+        print("\n[ERROR] No deltas computed. Check that you have both historical and future GCM runs.")
         return
     
     deltas_file = out_dir / 'climate_deltas_by_gcm.csv'
@@ -572,7 +572,7 @@ def main():
     era5_data = all_results[all_results['model'] == 'era5']
     
     if era5_data.empty:
-        print("\n⚠️  No ERA5 data found. Cannot apply deltas to baseline.")
+        print("\n[WARNING] No ERA5 data found. Cannot apply deltas to baseline.")
         return
     
     # 7. Apply deltas to ERA5 - ABSOLUTE
@@ -594,7 +594,7 @@ def main():
     print(f"💾 Saved: {comparison_file}")
     
     print("\n" + "=" * 80)
-    print("✅ CLIMATE DELTA ANALYSIS COMPLETE")
+    print("[OK] CLIMATE DELTA ANALYSIS COMPLETE")
     print("=" * 80)
     print(f"\nOutput directory: {out_dir}")
     print(f"\nKey files:")
@@ -605,7 +605,7 @@ def main():
     print(f"  5. {scaled_abs_file.name} - ERA5 scaled (absolute)")
     print(f"  6. {scaled_rel_file.name} - ERA5 scaled (relative)")
     print(f"  7. {comparison_file.name} - Method comparison")
-    print("\n📊 Next steps:")
+    print("\nNext steps:")
     print("  - Review gcm_era5_alignment.csv to check model bias")
     print("  - Compare absolute vs relative scaling in comparison file")
     print("  - Visualize results using scaled ERA5 files")

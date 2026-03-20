@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 """
-Combine and reorganize probabilistic loss and institutional data tables.
+combine_probabilistic_tables.py - Combine probabilistic loss and institutional data tables
 """
 import pandas as pd
 from pathlib import Path

@@ -1,15 +1,19 @@
-# loader.py — Data loading utilities for exposure, premium base, Citizens, and NFIP
-# -----------------------------------------------------------------------------#
-# Public API
-#   - load_fhcf_county_exposure
-#   - load_market_share
-#   - load_private_premium_base_from_market_share_xlsx
-#   - load_citizens_premium_base
-#   - load_nfip_county_exposure
-#   - load_nfip_policy_coverage
-#   - load_citizens_county
-# -----------------------------------------------------------------------------
+"""
+loader.py - Data loading utilities for exposure, premium base, Citizens, and NFIP
+----------------------------------------------------------------------------------
 
+Provides functions to load and parse data files required by the risk model.
+
+Public API
+----------
+- load_fhcf_county_exposure
+- load_market_share
+- load_private_premium_base_from_market_share_xlsx
+- load_citizens_premium_base
+- load_nfip_county_exposure
+- load_nfip_policy_coverage
+- load_citizens_county
+"""
 from __future__ import annotations
 
 import pandas as pd
@@ -34,7 +38,7 @@ def _norm_county_series(series: pd.Series) -> pd.Series:
     return series.astype(str).map(_norm_base).map(_strip_suffix)
 
 def _norm_fips_series(series: pd.Series) -> pd.Series:
-    """Robust: accepts strings or floats (12061.0) → 5-digit FIPS ('12061')."""
+    """Robust: accepts strings or floats (12061.0) -> 5-digit FIPS ('12061')."""
     s = pd.to_numeric(series, errors="coerce")
     return s.apply(lambda x: pd.NA if pd.isna(x) else str(int(x)).zfill(5)).astype("string")
 
@@ -102,7 +106,7 @@ def _fl_xwalk(county_xwalk: pd.DataFrame) -> pd.DataFrame:
     return xw[["County", "county_fips"]]
 
 # =============================================================================
-# FHCF — County exposure
+# FHCF - County exposure
 # =============================================================================
 
 def load_fhcf_county_exposure(path, sheet_name=0, header_row=4):
@@ -257,7 +261,7 @@ def _read_market_share_premiums_usd(
         })
         .copy()
     )
-    # $000 → USD
+    # $000 -> USD
     out["DirectPremiumUSD"] = (
         pd.to_numeric(out["DirectPremium_thousands"], errors="coerce")
           .fillna(0.0).astype(float) * 1_000.0
@@ -353,7 +357,7 @@ def load_market_share(
     return core[cols]
 
 # =============================================================================
-# Citizens — Premium base
+# Citizens - Premium base
 # =============================================================================
 
 def load_citizens_premium_base(
@@ -404,7 +408,7 @@ def load_citizens_premium_base(
     return citizens_premium_base
 
 # =============================================================================
-# NFIP — Exposure (coverage) & policies
+# NFIP - Exposure (coverage) & policies
 # =============================================================================
 
 def load_nfip_county_exposure(
@@ -602,7 +606,7 @@ def load_nfip_fl_premium_base(
 
 
 # =============================================================================
-# Citizens — County view snapshot (exposure & premiums)
+# Citizens - County view snapshot (exposure & premiums)
 # =============================================================================
 
 def _coerce_numeric(series: pd.Series) -> pd.Series:
@@ -739,7 +743,7 @@ def load_citizens_county(
                 # final fallback: latest date in the filtered dataset
                 snap = df[df["as_of"] == df["as_of"].max()].copy()
         else:
-            # no as_of provided → use latest date
+            # no as_of provided -> use latest date
             snap = df[df["as_of"] == df["as_of"].max()].copy()
 
         # Ensure 'county_fips' column exists even when no crosswalk is provided

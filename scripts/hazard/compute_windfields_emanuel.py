@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 """
-Script to load Kerry Emanuel TC tracks and compute wind fields using CLIMADA
+compute_windfields_emanuel.py - Compute wind fields from Kerry Emanuel TC tracks
 Processes a single synthetic event set - designed for parallel execution
 """
 
@@ -27,7 +28,7 @@ def create_centroids():
     cent = Centroids.from_pnt_bounds(
         (FL_BOUNDS['min_lon'], FL_BOUNDS['min_lat'], 
          FL_BOUNDS['max_lon'], FL_BOUNDS['max_lat']), 
-        res=120/3600  # 120 arcsec = 1/30 degree ≈ 3.7 km resolution
+        res=120/3600  # 120 arcsec = 1/30 degree ~ 3.7 km resolution
     )
     LOGGER.info(f"Created {cent.size} centroids")
     return cent

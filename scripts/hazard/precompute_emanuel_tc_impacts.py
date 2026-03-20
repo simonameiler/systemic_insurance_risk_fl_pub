@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 """
-Precompute County-Level Impacts for Kerry Emanuel TC Event Sets
+precompute_emanuel_tc_impacts.py - Precompute county-level impacts for Emanuel TC event sets
 
 This script:
 1. Loads a specified Emanuel TC hazard set (from Sherlock cluster)
@@ -577,9 +578,9 @@ if __name__ == "__main__":
     
     try:
         process_event_set(event_set_name)
-        print("\n✓ SUCCESS\n")
+        print("\n[OK] SUCCESS\n")
     except Exception as e:
-        print(f"\n✗ ERROR: {str(e)}\n")
+        print(f"\n[FAIL] ERROR: {str(e)}\n")
         import traceback
         traceback.print_exc()
         sys.exit(1)

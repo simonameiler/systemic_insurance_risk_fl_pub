@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-Variance decomposition: hazard variability vs. parameter uncertainty.
+run_variance_decomposition.py - Variance decomposition analysis
 
 Tests the claim: "In probabilistic assessment, outcome variability is
 primarily driven by differences in synthetic event realizations rather
@@ -8,14 +8,14 @@ than parameter perturbations."
 
 Two complementary analyses
 --------------------------
-A) Reference run   – existing 10K-season run with full parameter sampling.
-B) Fixed-param run – 10K seasons, identical year-sets, all stochastic
+A) Reference run   - existing 10K-season run with full parameter sampling.
+B) Fixed-param run - 10K seasons, identical year-sets, all stochastic
                      parameters pinned to their means:
-                       • SAMPLE_EXPOSURE = False  (no TIV perturbation)
-                       • Wind-share Beta concentration → 10 000 (≈ deterministic)
-                     Compare  Var(B) / Var(A)  ≈ 1  ⇒  hazard dominates.
+                       * SAMPLE_EXPOSURE = False  (no TIV perturbation)
+                       * Wind-share Beta concentration -> 10 000 (~ deterministic)
+                     Compare  Var(B) / Var(A)  ~ 1  ⇒  hazard dominates.
 
-C) Nested MC       – M seasons × K parameter draws per season.
+C) Nested MC       - M seasons × K parameter draws per season.
                      Decomposes total variance into between-season (hazard)
                      and within-season (parameters) via one-way ANOVA:
                        Var_total = Var_between(Ȳ_m) + E_m[Var_within(Y_mk)]
@@ -110,7 +110,7 @@ def _set_fixed_params():
     saved["SAMPLE_EXPOSURE"] = getattr(cfg, "SAMPLE_EXPOSURE", True)
     cfg.SAMPLE_EXPOSURE = False
 
-    # 2. Wind-share: crank Beta concentration → near-deterministic
+    # 2. Wind-share: crank Beta concentration -> near-deterministic
     saved["DEFAULT_WIND_SHARE_CONCENTRATION"] = cfg.DEFAULT_WIND_SHARE_CONCENTRATION
 
     saved["EVENT_WIND_SHARE_PARAMS"] = {
@@ -216,7 +216,7 @@ def run_fixed_params(year_sets: pd.DataFrame,
 
         df = pd.DataFrame(rows)
         df.to_csv(run_dir / "iterations.csv", index=False)
-        print(f"  Fixed-param run → {run_dir}  ({len(df)} years)")
+        print(f"  Fixed-param run -> {run_dir}  ({len(df)} years)")
         return run_dir
     finally:
         _restore_params(saved)
@@ -297,7 +297,7 @@ def run_nested_mc(year_sets: pd.DataFrame,
         for i, yid in enumerate(selected_ids):
             stems = year_events[yid]
             for k in range(K):
-                # Fresh rng per draw — each (season, draw) gets unique randomness
+                # Fresh rng per draw - each (season, draw) gets unique randomness
                 draw_seed = int(master_rng.integers(0, 2**31))
                 draw_rng = np.random.default_rng(draw_seed)
 
@@ -313,7 +313,7 @@ def run_nested_mc(year_sets: pd.DataFrame,
 
         df = pd.DataFrame(rows)
         df.to_csv(run_dir / "iterations.csv", index=False)
-        print(f"  Nested MC → {run_dir}  ({len(df)} rows)")
+        print(f"  Nested MC -> {run_dir}  ({len(df)} rows)")
         return run_dir
     finally:
         _mce._USE_STOCHASTIC_EVENTS = False
@@ -338,7 +338,7 @@ def analyze(ref_dir: Path | None,
         Nested MC run (M × K).
     """
     print("\n" + "=" * 80)
-    print("VARIANCE DECOMPOSITION — RESULTS")
+    print("VARIANCE DECOMPOSITION - RESULTS")
     print("=" * 80)
 
     # ---- Comparison A vs B: Var(fixed) / Var(reference) ----
@@ -372,8 +372,8 @@ def analyze(ref_dir: Path | None,
         summary_df = pd.DataFrame(summary_rows)
         out_csv = (fixed_dir / "variance_comparison_AB.csv")
         summary_df.to_csv(out_csv, index=False)
-        print(f"\n  Saved → {out_csv}")
-        print("  Interpretation: B/A ≈ 1 means hazard dominates; "
+        print(f"\n  Saved -> {out_csv}")
+        print("  Interpretation: B/A ~ 1 means hazard dominates; "
               "(1 − B/A) is the parameter contribution.")
 
     # ---- Nested MC: one-way ANOVA decomposition ----
@@ -423,8 +423,8 @@ def analyze(ref_dir: Path | None,
         anova_df = pd.DataFrame(anova_rows)
         out_csv = nested_dir / "variance_decomposition_nested.csv"
         anova_df.to_csv(out_csv, index=False)
-        print(f"\n  Saved → {out_csv}")
-        print("  Interpretation: η² ≈ 1 means between-season (hazard) dominates.")
+        print(f"\n  Saved -> {out_csv}")
+        print("  Interpretation: η² ~ 1 means between-season (hazard) dominates.")
 
         # Within-season spread by damage quantile
         print("\n  Within-season CV by damage quantile:")

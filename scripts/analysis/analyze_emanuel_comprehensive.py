@@ -1,5 +1,6 @@
+#!/usr/bin/env python3
 """
-Comprehensive analysis of Emanuel TC Monte Carlo runs.
+analyze_emanuel_comprehensive.py - Comprehensive analysis of Emanuel TC Monte Carlo runs
 Evaluates loss composition, institutional stress, insured/uninsured ratios, and nonlinearities.
 """
 
@@ -449,11 +450,11 @@ class EmanuelAnalyzer:
         if issues_found:
             print(f"\nFound {len(issues_found)} potential issues:\n")
             for issue in issues_found[:20]:  # Show first 20
-                print(f"  • {issue}")
+                print(f"  * {issue}")
             if len(issues_found) > 20:
                 print(f"  ... and {len(issues_found) - 20} more issues")
         else:
-            print("\n✓ No major data quality issues detected")
+            print("\n[OK] No major data quality issues detected")
     
     def generate_comparison_table(self):
         """Generate a comprehensive comparison table."""

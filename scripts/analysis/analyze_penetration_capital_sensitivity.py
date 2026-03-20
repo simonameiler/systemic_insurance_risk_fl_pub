@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-Analyze Penetration Capital Sensitivity Results
+analyze_penetration_capital_sensitivity.py - Analyze penetration capital sensitivity results
 ===============================================
 
 Analyzes Monte Carlo results across different capital scaling multipliers
@@ -110,7 +110,7 @@ def load_sensitivity_results(results_dir: Path = Path("results/mc_runs")) -> pd.
     
     combined = pd.concat(all_results, ignore_index=True)
     
-    print(f"✓ Loaded {len(sensitivity_dirs)} sensitivity runs")
+    print(f"[OK] Loaded {len(sensitivity_dirs)} sensitivity runs")
     print(f"  Multipliers: {sorted(combined['capital_multiplier'].unique())}")
     print(f"  Total iterations: {len(combined):,}")
     
@@ -146,7 +146,7 @@ def load_baseline_results(baseline_path: Path = None) -> pd.DataFrame:
     df = pd.read_csv(iterations_file)
     df["capital_multiplier"] = 0.0  # Mark as baseline (no multiplier)
     
-    print(f"✓ Loaded baseline: {len(df)} iterations")
+    print(f"[OK] Loaded baseline: {len(df)} iterations")
     
     return df
 
@@ -302,7 +302,7 @@ def plot_defaults_vs_multiplier(
     plt.savefig(output_dir / "defaults_vs_multiplier.png", dpi=300, bbox_inches="tight")
     plt.close()
     
-    print(f"  ✓ Saved: defaults_vs_multiplier.png")
+    print(f"  [OK] Saved: defaults_vs_multiplier.png")
 
 
 def plot_stress_probability_curve(
@@ -331,7 +331,7 @@ def plot_stress_probability_curve(
     plt.savefig(output_dir / "stress_probability_curve.png", dpi=300, bbox_inches="tight")
     plt.close()
     
-    print(f"  ✓ Saved: stress_probability_curve.png")
+    print(f"  [OK] Saved: stress_probability_curve.png")
 
 
 def plot_figa_vs_multiplier(
@@ -360,7 +360,7 @@ def plot_figa_vs_multiplier(
     plt.savefig(output_dir / "figa_vs_multiplier.png", dpi=300, bbox_inches="tight")
     plt.close()
     
-    print(f"  ✓ Saved: figa_vs_multiplier.png")
+    print(f"  [OK] Saved: figa_vs_multiplier.png")
 
 
 def plot_combined_dashboard(
@@ -427,7 +427,7 @@ def plot_combined_dashboard(
     plt.savefig(output_dir / "sensitivity_dashboard.png", dpi=300, bbox_inches="tight")
     plt.close()
     
-    print(f"  ✓ Saved: sensitivity_dashboard.png")
+    print(f"  [OK] Saved: sensitivity_dashboard.png")
 
 
 # =============================================================================
@@ -512,15 +512,15 @@ def main():
     print("[5/6] Saving results...")
     
     sensitivity_summary.to_csv(output_dir / "summary_table.csv", index=False)
-    print(f"  ✓ Saved: summary_table.csv")
+    print(f"  [OK] Saved: summary_table.csv")
     
     with open(output_dir / "baseline_stats.json", "w") as f:
         json.dump(baseline_stats, f, indent=2)
-    print(f"  ✓ Saved: baseline_stats.json")
+    print(f"  [OK] Saved: baseline_stats.json")
     
     with open(output_dir / "optimal_multiplier.json", "w") as f:
         json.dump(optimal_info, f, indent=2)
-    print(f"  ✓ Saved: optimal_multiplier.json")
+    print(f"  [OK] Saved: optimal_multiplier.json")
     
     # Generate plots
     print("[6/6] Generating figures...")
@@ -534,14 +534,14 @@ def main():
     print("=" * 80)
     print("ANALYSIS COMPLETE")
     print("=" * 80)
-    print(f"\n📊 KEY FINDING:")
+    print(f"\nKEY FINDING:")
     print(f"   To maintain baseline default rates under MAJOR penetration increase,")
     print(f"   insurers need capital reserves to scale {optimal_info['optimal_multiplier_combined']:.2f}x faster than exposure.")
     print(f"\n   This means:")
-    print(f"   • If exposure increases by 20%, capital must increase by {optimal_info['optimal_multiplier_combined']*20:.0f}%")
-    print(f"   • Linear scaling (1.0x) is INSUFFICIENT")
-    print(f"   • Required capital scaling is {optimal_info['optimal_multiplier_combined']:.1f}x proportional growth")
-    print(f"\n📁 Results saved to: {output_dir}")
+    print(f"   * If exposure increases by 20%, capital must increase by {optimal_info['optimal_multiplier_combined']*20:.0f}%")
+    print(f"   * Linear scaling (1.0x) is INSUFFICIENT")
+    print(f"   * Required capital scaling is {optimal_info['optimal_multiplier_combined']:.1f}x proportional growth")
+    print(f"\nResults saved to: {output_dir}")
     print("=" * 80)
     
     return 0

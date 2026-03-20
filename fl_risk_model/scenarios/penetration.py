@@ -1,5 +1,5 @@
 """
-penetration.py — Insurance penetration increase scenarios
+penetration.py - Insurance penetration increase scenarios
 ---------------------------------------------------------
 
 Models improved insurance take-up through policy interventions:
@@ -8,7 +8,7 @@ Models improved insurance take-up through policy interventions:
 - Private market expansion (new policies)
 
 Design Principles:
-1. **Positive adaptation**: More coverage → better risk pooling
+1. **Positive adaptation**: More coverage -> better risk pooling
 2. **Program-specific**: Model actual policy levers (NFIP, Citizens, private)
 3. **Geographic targeting**: Focus increases on high-risk coastal areas
 4. **Capital scaling**: Adjust surplus for larger/smaller books
@@ -147,7 +147,7 @@ def apply_penetration_increase_scenario(
     baseline_wind_penetration = 0.40  # Beta(4,6) mean = 40% insured
     baseline_flood_penetration = 0.11  # FEMA NFIP 2025 FL average: 10.6%
     
-    # --- 1. Citizens Depopulation (Citizens → Private) ---
+    # --- 1. Citizens Depopulation (Citizens -> Private) ---
     target_citizens_share = config["citizens_share_target"]
     private_new, citizens_new, depopulation_amt = _apply_citizens_depopulation(
         private_exp=private_exp,
@@ -579,11 +579,11 @@ def adjust_surplus_for_penetration(
     use "proportional" or "sqrt" to reflect capital raising.
     
     Example:
-        Baseline: TIV=$100B, Surplus=$10B → Stress ratio = 10:1
+        Baseline: TIV=$100B, Surplus=$10B -> Stress ratio = 10:1
         After 11.8% exposure increase with no surplus adjustment:
-            TIV=$111.8B, Surplus=$10B → Stress ratio = 11.18:1 (worse)
+            TIV=$111.8B, Surplus=$10B -> Stress ratio = 11.18:1 (worse)
         After 11.8% exposure increase with proportional adjustment:
-            TIV=$111.8B, Surplus=$11.18B → Stress ratio = 10:1 (maintained)
+            TIV=$111.8B, Surplus=$11.18B -> Stress ratio = 10:1 (maintained)
     """
     if method == "none" or abs(exposure_change_pct) < 0.001:
         return {
@@ -599,8 +599,8 @@ def adjust_surplus_for_penetration(
     exposure_multiplier = 1.0 + (exposure_change_pct / 100.0)
     
     # Apply capital multiplier to get actual capital growth
-    # capital_multiplier = 1.0 → proportional growth
-    # capital_multiplier > 1.0 → capital grows faster than exposure
+    # capital_multiplier = 1.0 -> proportional growth
+    # capital_multiplier > 1.0 -> capital grows faster than exposure
     capital_growth_factor = 1.0 + (exposure_multiplier - 1.0) * capital_multiplier
     
     for idx, row in surplus_adjusted.iterrows():

@@ -1,5 +1,5 @@
 """
-citizens.py — Citizens (wind) branch
+citizens.py - Citizens (wind) branch
 ------------------------------------
 
 Implements the Citizens side of the wind branch, aligned with the Methods:

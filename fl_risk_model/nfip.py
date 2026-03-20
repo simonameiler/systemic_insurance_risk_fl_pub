@@ -1,12 +1,11 @@
-# fl_risk_model/nfip.py
 """
-nfip.py — NFIP payouts and payout-rate helpers
-----------------------------------------------
+nfip.py - NFIP payouts and payout-rate helpers
+-----------------------------------------------
 
 Implements utilities to:
 1) load NFIP penetration rates by county,
 2) carve out insured flood losses from total flood losses using NFIP penetration rates.
-3) Load county–year NFIP claims paid totals from a normalized CSV.
+3) Load county-year NFIP claims paid totals from a normalized CSV.
 4) Extract the latest year present in a claims table.
 5) Build **county payout rates** using recent-history weighting, winsorization,
    capping, and Empirical-Bayes shrinkage toward the statewide rate.
@@ -28,7 +27,7 @@ Notes
 -----
 - Money is USD. Rates are unitless in [0,1].
 - Coverage base is **FloodTIV** (coverage in force).
-- We prefer **county_fips** for joins; fall back to County name → FIPS via `county_xwalk`.
+- We prefer **county_fips** for joins; fall back to County name -> FIPS via `county_xwalk`.
 """
 
 from __future__ import annotations
@@ -212,7 +211,7 @@ def carveout_flood_from_penetration(water_df, pen_df, xwalk=None,
     bad = (w["county_fips"] == "00000") | (w["county_fips"].isna())
     if bad.any():
         examples = sorted(w.loc[bad, "County"].dropna().unique().tolist()[:10])
-        raise RuntimeError(f"Could not map County→FIPS for {bad.sum()} rows. Examples: {examples}")
+        raise RuntimeError(f"Could not map County->FIPS for {bad.sum()} rows. Examples: {examples}")
 
     # 5) Proceed with penetration join...
     p = pen_df[["county_fips","NFIP_r_eff"]].copy()
@@ -268,7 +267,7 @@ def carveout_flood_from_penetration(water_df, pen_df, xwalk=None,
 
 def load_nfip_claims_county_year(path: str) -> pd.DataFrame:
     """
-    Load a county–year NFIP claims CSV and normalize schema.
+    Load a county-year NFIP claims CSV and normalize schema.
 
     Parameters
     ----------
@@ -322,7 +321,7 @@ def aggregate_nfip_claims(
 ) -> pd.DataFrame:
     """
     Return county-level NFIP paid claims (USD) using FIXED_YEAR or 5y EWA.
-    Output columns: ['county_fips', 'nfip_paid_total_usd']  ← matches tests
+    Output columns: ['county_fips', 'nfip_paid_total_usd']  <- matches tests
     """
     from pathlib import Path
     import numpy as np
@@ -399,7 +398,7 @@ def latest_year_in(df: pd.DataFrame) -> int:
 def make_nfip_payout_rates(
     claims_cy: pd.DataFrame,       # from load_nfip_claims_county_year
     flood_tiv: pd.DataFrame,       # ['County','FloodTIV'] or may include 'county_fips'
-    county_xwalk: pd.DataFrame,    # ['County','county_fips'] for names→FIPS
+    county_xwalk: pd.DataFrame,    # ['County','county_fips'] for names->FIPS
     window_years: int = 5,
     end_year: int | None = None,
     weighting: str = "exp",        # {'uniform','exp'}
@@ -431,7 +430,7 @@ def make_nfip_payout_rates(
           - must have 'FloodTIV'
           - if missing 'county_fips', we join via `county_xwalk`
     county_xwalk : pandas.DataFrame
-        Name→FIPS crosswalk with ['County','county_fips'].
+        Name->FIPS crosswalk with ['County','county_fips'].
     window_years : int, default 5
         Number of trailing years to include.
     end_year : int or None, default None
@@ -465,13 +464,13 @@ def make_nfip_payout_rates(
         years = np.arange(start_year, end_year + 1)
         k = np.log(2) / max(half_life_years, 0.1)  # avoid divide-by-zero
         w_map = {y: float(np.exp(-k * (end_year - y))) for y in years}
-    else:  # 'uniform' or anything else → treat as uniform
+    else:  # 'uniform' or anything else -> treat as uniform
         w_map = {int(y): 1.0 for y in claims["year"].dropna().unique()}
 
     claims["w"] = claims["year"].map(w_map).fillna(0.0)
     claims["paid_w"] = claims["nfip_paid_total_usd"] * claims["w"]
 
-    # Normalize County→FIPS and attach current FloodTIV
+    # Normalize County->FIPS and attach current FloodTIV
     xw = county_xwalk.copy()
     xw["County"] = xw["County"].astype(str).str.strip()
     xw["county_fips"] = xw["county_fips"].astype(str).str.zfill(5)

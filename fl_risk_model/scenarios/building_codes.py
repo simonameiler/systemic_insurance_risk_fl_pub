@@ -1,5 +1,5 @@
 """
-building_codes.py — Building code improvement scenarios
+building_codes.py - Building code improvement scenarios
 -------------------------------------------------------
 
 Models loss reduction from improved building standards:
@@ -9,7 +9,7 @@ Models loss reduction from improved building standards:
 - Enhanced code enforcement
 
 Design Principles:
-1. **Positive adaptation**: Stronger buildings → lower losses
+1. **Positive adaptation**: Stronger buildings -> lower losses
 2. **Evidence-based**: Loss reduction factors from empirical studies (IBHS, FLASH, FEMA)
 3. **Wind-focused**: Great Miami is primarily wind event
 4. **Conservative calibration**: Use lower bound of literature estimates
@@ -43,7 +43,7 @@ BUILDING_CODE_PRESETS = {
         "flood_loss_reduction": 0.05,  # 5% loss reduction
         "retrofit_rate": 0.15,  # 15% of pre-2002 stock retrofitted
         "new_construction_rate": 0.06,  # ~2% annual × 3 years
-        "timeline_years": 3,  # 2024 → 2027
+        "timeline_years": 3,  # 2024 -> 2027
         "description": "Minimal improvements + code enforcement (2027 projection)",
         "references": "Enhanced FL Building Code enforcement, limited voluntary retrofits",
     },
@@ -53,7 +53,7 @@ BUILDING_CODE_PRESETS = {
         "flood_loss_reduction": 0.10,  # 10% loss reduction
         "retrofit_rate": 0.25,  # 25% of pre-2002 stock retrofitted
         "new_construction_rate": 0.12,  # ~2% annual × 6 years
-        "timeline_years": 6,  # 2024 → 2030
+        "timeline_years": 6,  # 2024 -> 2030
         "description": "Partial retrofit + new construction (2030 projection)",
         "references": "IBHS FORTIFIED (lower bound), FL Building Code enforcement improvements",
     },
@@ -63,7 +63,7 @@ BUILDING_CODE_PRESETS = {
         "flood_loss_reduction": 0.25,  # 25% loss reduction
         "retrofit_rate": 0.50,  # 50% retrofitted
         "new_construction_rate": 0.32,  # ~2% annual × 16 years
-        "timeline_years": 16,  # 2024 → 2040
+        "timeline_years": 16,  # 2024 -> 2040
         "description": "Aggressive retrofit program + stricter codes (2040 projection)",
         "references": "IBHS FORTIFIED (midpoint), FLASH study modern codes",
     },
@@ -73,7 +73,7 @@ BUILDING_CODE_PRESETS = {
         "flood_loss_reduction": 0.40,  # 40% loss reduction
         "retrofit_rate": 0.75,  # 75% retrofitted
         "new_construction_rate": 0.52,  # ~2% annual × 26 years
-        "timeline_years": 26,  # 2024 → 2050
+        "timeline_years": 26,  # 2024 -> 2050
         "description": "Full stock turnover + enhanced standards (2050 projection)",
         "references": "IBHS FORTIFIED + FLASH (upper bound), widespread elevation",
     },

@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-Sensitivity analysis: insured fraction.
+run_insured_fraction_sensitivity.py - Sensitivity analysis for insured fraction
 
 Sweeps the insured fraction from 0.1 to 0.5 (default: 0.40 from Beta(4,6))
 and replays all 10,000 synthetic seasons for each value.  This tests how
@@ -8,11 +8,11 @@ sensitive systemic-risk metrics are to the assumed share of wind damage
 that falls on insured vs. uninsured/underinsured households.
 
 The underinsured share of the household portion is held at 0.30 (mean of
-Beta(3,7)) throughout, so only the insured ↔ uninsured split changes.
+Beta(3,7)) throughout, so only the insured <-> uninsured split changes.
 
 Usage
 -----
-    # Run all fractions (0.1–0.5 in steps of 0.1)
+    # Run all fractions (0.1-0.5 in steps of 0.1)
     python run_insured_fraction_sensitivity.py
 
     # Run specific fractions
@@ -153,13 +153,13 @@ def run_sweep(fractions: list[float],
         df_frac = pd.DataFrame(rows)
         frac_csv = run_dir / f"iterations_frac_{frac:.2f}.csv"
         df_frac.to_csv(frac_csv, index=False)
-        print(f"  Saved → {frac_csv}  ({len(df_frac)} rows)")
+        print(f"  Saved -> {frac_csv}  ({len(df_frac)} rows)")
 
     # Reset
     cfg.FIXED_INSURED_FRAC = None
     _mce._USE_STOCHASTIC_EVENTS = False
 
-    print(f"\n  All results → {run_dir}")
+    print(f"\n  All results -> {run_dir}")
     return run_dir
 
 
@@ -173,7 +173,7 @@ def analyze(results_dir: Path):
     fractions = rc["fractions"]
 
     print("=" * 80)
-    print("INSURED FRACTION SENSITIVITY — RESULTS")
+    print("INSURED FRACTION SENSITIVITY - RESULTS")
     print("=" * 80)
     print(f"  Source: {results_dir}")
     print(f"  Fractions: {fractions}")
@@ -274,7 +274,7 @@ def analyze(results_dir: Path):
     summary_df = pd.DataFrame(summary_rows)
     summary_path = results_dir / "sensitivity_summary.csv"
     summary_df.to_csv(summary_path, index=False)
-    print(f"\n  Summary → {summary_path}")
+    print(f"\n  Summary -> {summary_path}")
 
     # ── Tail comparison (P99) ──
     print(f"\n  99th percentile comparison:")

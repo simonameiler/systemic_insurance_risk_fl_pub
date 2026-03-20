@@ -1,6 +1,6 @@
-
+#!/usr/bin/env python3
 """
-Build per-event, per-county impact records for Florida from Gori et al. (2025) synthetic hazard mats.
+build_per_event_impacts.py - Build per-event impacts from Gori et al. hazard mats
 
 Inputs (paths can be changed below):
 - maxwindmat_ncep_reanal.mat    -> variable: maxwindmat  [counties x events], wind speed (m/s)

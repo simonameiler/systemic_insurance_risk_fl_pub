@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-Run multiple policy scenarios with Emanuel TC event sets.
+run_emanuel_policy_suite.py - Run multiple policy scenarios with Emanuel TC event sets
 
 This script runs Monte Carlo analysis across multiple policy scenarios
 using Emanuel TC events. Useful for policy comparison studies.
@@ -99,11 +99,11 @@ Examples:
     metadata_csv = impact_dir / "event_metadata.csv"
     
     if not year_sets_csv.exists():
-        print(f"❌ ERROR: Year-sets file not found: {year_sets_csv}")
+        print(f"[ERROR] ERROR: Year-sets file not found: {year_sets_csv}")
         sys.exit(1)
     
     if not metadata_csv.exists():
-        print(f"❌ ERROR: Event metadata not found: {metadata_csv}")
+        print(f"[ERROR] ERROR: Event metadata not found: {metadata_csv}")
         sys.exit(1)
     
     # Determine policy list
@@ -118,7 +118,7 @@ Examples:
     # Validate policies
     for policy in policy_list:
         if policy != "baseline" and policy not in cfg.POLICY_SCENARIOS:
-            print(f"❌ ERROR: Unknown policy scenario '{policy}'")
+            print(f"[ERROR] ERROR: Unknown policy scenario '{policy}'")
             print(f"   Available: {list(cfg.POLICY_SCENARIOS.keys())}")
             sys.exit(1)
     
@@ -169,10 +169,10 @@ Examples:
                 policy_scenario_config=policy_config,
             )
             results[policy] = out_dir
-            print(f"✅ {policy} complete → {out_dir}")
+            print(f"[OK] {policy} complete -> {out_dir}")
             
         except Exception as e:
-            print(f"❌ {policy} FAILED: {e}")
+            print(f"[ERROR] {policy} FAILED: {e}")
             results[policy] = None
     
     # Summary
@@ -184,9 +184,9 @@ Examples:
     print(f"\nResults:")
     for policy, path in results.items():
         if path:
-            print(f"  ✅ {policy}: {path}")
+            print(f"  [OK] {policy}: {path}")
         else:
-            print(f"  ❌ {policy}: FAILED")
+            print(f"  [ERROR] {policy}: FAILED")
     print()
     
     # Restore original config

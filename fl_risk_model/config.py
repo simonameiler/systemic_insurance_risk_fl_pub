@@ -102,22 +102,22 @@ SAMPLE_SURPLUS = False
 EXPOSURE_COV = 0.15       # Coefficient of variation for TIV sampling
 SURPLUS_COV = 0.15        # CoV for surplus sampling
 
-# Insured fraction ~ Beta(4,6) → mean 0.40
+# Insured fraction ~ Beta(4,6) -> mean 0.40
 INSURED_ALPHA = 4
 INSURED_BETA  = 6
 
 # Override: set to a float (e.g. 0.3) to bypass Beta sampling and use a
-# fixed insured fraction for sensitivity analysis.  None → use Beta(α, β).
+# fixed insured fraction for sensitivity analysis.  None -> use Beta(α, β).
 FIXED_INSURED_FRAC = None
 
-# Underinsured share of the household fraction ~ Beta(3,7) → mean 0.30
+# Underinsured share of the household fraction ~ Beta(3,7) -> mean 0.30
 UNDER_HH_ALPHA = 3
 UNDER_HH_BETA  = 7
 
 # NOTE: RBC proxy factors removed (DO_RBC, RBC_FROM_RESERVES_FACTOR, RBC_FROM_PREMIUMS_FACTOR)
 # These were planned features that were never implemented.
 
-# FHCF contract‐year multipliers (2023–24 contract)
+# FHCF contract‐year multipliers (2023-24 contract)
 FHCF_RET_MULTIPLES    = {90: 6.0732, 75: 7.2878, 45: 12.1464}
 FHCF_PAYOUT_MULTIPLE  = 11.2368
 FHCF_LAE_FACTOR       = 1.10
@@ -213,7 +213,7 @@ else:
     SYNTHETIC_YEAR_SETS_CSV = SYNTHETIC_EVENT_DIR / "year_sets_N10000_seed42.csv"  # Local should NOT have lambda1.5
 SYNTHETIC_EVENT_METADATA_CSV = SYNTHETIC_EVENT_DIR / "event_metadata.csv"
 
-# Scenario → list of event file stems (without .csv) to combine in ONE season
+# Scenario -> list of event file stems (without .csv) to combine in ONE season
 SCENARIOS = {
     # a) Great Miami Hurricane (1926)
     "great_miami": ["1926255N15314"],
@@ -284,11 +284,11 @@ RUNTIME_WIND_SHARE_OVERRIDES: dict[str, float] = {}
 # Higher concentration than single events reflects reduced uncertainty from averaging
 COMPOSITE_WIND_SHARE_PARAMS = {
     # Andrew hits first, then Great Miami
-    # Weighted: (109*0.875 + 157*0.70)/266 ≈ 0.77
+    # Weighted: (109*0.875 + 157*0.70)/266 ~ 0.77
     "andrew_then_gm": {"mean": 0.77, "concentration": 25},
     
     # Great Miami hits first, then Andrew
-    # Weighted: (170*0.70 + 96*0.875)/266 ≈ 0.76
+    # Weighted: (170*0.70 + 96*0.875)/266 ~ 0.76
     "gm_then_andrew": {"mean": 0.76, "concentration": 25},
     
     # Great Miami hitting twice (same event, tightest uncertainty)

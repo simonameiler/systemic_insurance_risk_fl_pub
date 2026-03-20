@@ -1,8 +1,20 @@
-# fl_risk_model/branches/uninsured.py
+"""
+uninsured.py - Uninsured losses branch
+-----------------------------------------
+
+Handles tracking of uninsured damages at the county level.
+
+Public API
+----------
+- (work in progress)
+"""
 from __future__ import annotations
+
 from typing import Optional, Dict, Tuple
+
 import numpy as np
 import pandas as pd
+
 from fl_risk_model import config as cfg
 
 # -----------------------------

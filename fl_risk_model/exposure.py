@@ -1,5 +1,5 @@
 """
-exposure.py — Exposure matrix construction for Florida insurance entities
+exposure.py - Exposure matrix construction for Florida insurance entities
 -----------------------------------------------------------------------
 
 This module assembles exposure inputs for the risk propagation model:
@@ -486,7 +486,7 @@ def build_exposure_matrix(
             if nfip_df is None:
                 nfip_df = pd.DataFrame()
 
-            # Normalize coverage column → FloodTIV
+            # Normalize coverage column -> FloodTIV
             if "FloodTIV" not in nfip_df.columns:
                 cov_col = next(
                     (c for c in nfip_df.columns
@@ -514,7 +514,7 @@ def build_exposure_matrix(
                     nfip_df["County"] = nfip_df["County"].astype(str)
                     nfip_df = nfip_df[["County", "FloodTIV"]].copy()
                 else:
-                    # Still no join key → empty
+                    # Still no join key -> empty
                     nfip_df = pd.DataFrame(columns=["county_fips", "FloodTIV"])
 
         except Exception as e:
@@ -613,13 +613,13 @@ def build_wind_exposures_alt_company_county(
     covered_counties = set(alt_priv["County"].unique().tolist())
     fhcf["is_covered"] = fhcf["County"].isin(covered_counties)
 
-    # 6) For covered counties → we will trust alt_priv directly
+    # 6) For covered counties -> we will trust alt_priv directly
     priv_cov = alt_priv.copy()
 
     # initialize so it's always defined
     fallback_priv = pd.DataFrame(columns=["County","Company","TIV","StatEntityKey"])
 
-    # 7) For uncovered counties → fallback
+    # 7) For uncovered counties -> fallback
     uncovered = fhcf.loc[~fhcf["is_covered"], ["County","CountyTIV"]].copy()
     if not uncovered.empty:
         # attach Citizens
@@ -706,7 +706,7 @@ def build_wind_exposures_alt_company_county(
     )
     citizens_exposure["TIV_sampled"] = _sample_nonneg(citizens_exposure["TIV"])
 
-    # 11) Mass-balance QA on all counties (DIAGNOSTIC ONLY — NO MUTATION)
+    # 11) Mass-balance QA on all counties (DIAGNOSTIC ONLY - NO MUTATION)
 
     def _recon_private(_priv_cov: pd.DataFrame, _fallback_priv: pd.DataFrame) -> pd.DataFrame:
         """Sum private TIV by county from workbook-covered + fallback blocks."""

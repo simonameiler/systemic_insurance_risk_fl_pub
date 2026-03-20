@@ -1,5 +1,5 @@
 """
-fhcf.py — Florida Hurricane Catastrophe Fund helpers
+fhcf.py - Florida Hurricane Catastrophe Fund helpers
 ----------------------------------------------------
 
 This module standardizes FHCF contract terms and applies recoveries to
@@ -24,8 +24,8 @@ Conventions
 Config
 ------
 Relies on the following constants from fl_risk_model.config:
-- FHCF_RET_MULTIPLES : dict[int, float]   # mapping coverage % → retention multiple
-- FHCF_PAYOUT_MULTIPLE : float            # payout multiple × FHCFPremium → LimitUSD
+- FHCF_RET_MULTIPLES : dict[int, float]   # mapping coverage % -> retention multiple
+- FHCF_PAYOUT_MULTIPLE : float            # payout multiple × FHCFPremium -> LimitUSD
 - FHCF_LAE_FACTOR : float                 # applied multiplicatively to recoveries
 """
 
@@ -70,9 +70,9 @@ def _norm_pct_to_int_0_100(x) -> int:
 
     Examples
     --------
-    0.9 → 90
-    90  → 90
-    '75' → 75
+    0.9 -> 90
+    90  -> 90
+    '75' -> 75
     """
     try:
         val = float(x)
@@ -273,7 +273,7 @@ def normalize_fhcf_terms(terms: pd.DataFrame) -> pd.DataFrame:
 
     prem = pd.to_numeric(t["FHCFPremium"], errors="coerce").fillna(0.0)
 
-    # Normalize coverage: fractions → percent; then snap to {45,75,90}
+    # Normalize coverage: fractions -> percent; then snap to {45,75,90}
     cov_raw = pd.to_numeric(t["CoveragePct"], errors="coerce")
     cov_pct = np.where(cov_raw.notna() & (cov_raw <= 1.0), cov_raw * 100.0, cov_raw)
     cov_pct = pd.Series(cov_pct, index=t.index).fillna(0.0).clip(0, 100)
@@ -353,7 +353,7 @@ def apply_fhcf_recovery(loss_df: pd.DataFrame, terms_df: pd.DataFrame) -> pd.Dat
     t["RetentionUSD"] = _to_float(t["RetentionUSD"])
     t["LimitUSD"] = _to_float(t["LimitUSD"])
 
-    # Left-join: companies without terms → zero recovery
+    # Left-join: companies without terms -> zero recovery
     df = df.merge(t, on="Company", how="left")
 
     # Excess over retention (floor at zero)

@@ -1,6 +1,6 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
-Penetration Capital Sensitivity Analysis - Monte Carlo Runner
+run_penetration_capital_sensitivity.py - Monte Carlo runner for penetration capital sensitivity
 =============================================================
 
 Sensitivity analysis to find the optimal capital scaling factor needed
@@ -11,7 +11,7 @@ Research Question:
     to maintain baseline default rates when penetration increases?
 
 Experimental Design:
-    - Fixed: Penetration increase to MAJOR level (40→60% wind, 11→30% flood)
+    - Fixed: Penetration increase to MAJOR level (40->60% wind, 11->30% flood)
     - Varying: Capital scaling multiplier [1.0x, 1.2x, 1.4x, 1.6x, 1.8x, 2.0x, 2.5x, 3.0x]
     - Target: Find multiplier where defaults match baseline
     

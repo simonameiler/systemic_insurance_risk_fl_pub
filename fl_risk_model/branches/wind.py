@@ -1,5 +1,5 @@
 """
-wind.py — Private wind branch: gross losses, insured allocation, FHCF recovery
+wind.py - Private wind branch: gross losses, insured allocation, FHCF recovery
 -----------------------------------------------------------------------------
 
 Implements the wind side of the risk propagation model for private carriers.

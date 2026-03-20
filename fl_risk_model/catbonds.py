@@ -1,8 +1,22 @@
-# fl_risk_model/catbond.py
+"""
+catbonds.py - Catastrophe bond pricing and recovery calculations
+------------------------------------------------------------------
+
+Parses catastrophe bond terms and computes recovery rates for triggering
+events. Implements event-linked recovery calculations for ILS instruments.
+
+Public API
+----------
+- CatBond (dataclass)
+- parse_cat_bond_terms
+- compute_cat_bond_recovery
+"""
 from __future__ import annotations
+
 import re
 from dataclasses import dataclass
 from typing import Tuple, Dict, Any, Optional, List
+
 import pandas as pd
 import numpy as np
 
@@ -136,7 +150,7 @@ def apply_catbond_recovery(
     company_keys_df: pd.DataFrame,
     *,
     industry_insured_wind_pre_fhcf_usd: Optional[float] = None,
-    issue_year: Optional[int] = None,   # <— NEW
+    issue_year: Optional[int] = None,   # <- NEW
 ) -> Tuple[pd.DataFrame, dict]:
     """
     Returns (payout_by_company_county_df, diag)

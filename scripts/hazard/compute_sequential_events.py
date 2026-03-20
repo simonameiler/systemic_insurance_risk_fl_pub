@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-compute_sequential_events.py
+compute_sequential_events.py - Compute damage from sequential hurricane events
 
-Compute physically realistic total damage from sequential hurricane events by:
+Computes physically realistic total damage from sequential hurricane events by:
   1. Running Event 1 on original exposure
   2. Degrading exposure state (subtract destroyed value)
   3. Running Event 2 on degraded exposure
@@ -18,9 +18,6 @@ Run as script to generate composite event CSVs:
 
 Or import functions for custom scenarios:
     from scripts.hazard.compute_sequential_events import compute_sequential_impact
-
-Author: FL Risk Model Team
-Date: November 2025
 """
 
 import os
@@ -100,9 +97,9 @@ def compute_sequential_impact(
     Compute realistic total damage from two sequential events.
     
     Workflow:
-      1. Run Event 1 → get point-level impact (building losses)
+      1. Run Event 1 -> get point-level impact (building losses)
       2. Degrade exposure: value[i] -= impact1[i] for each location i
-      3. Run Event 2 on degraded exposure → get capped impact
+      3. Run Event 2 on degraded exposure -> get capped impact
       4. Return: composite_impact = event1_impact + event2_impact
     
     Parameters
@@ -246,7 +243,7 @@ def compute_sequential_impact(
         n_violations = violations.sum()
         
         if n_violations > 0:
-            print(f"      ⚠️  WARNING: {n_violations} points where Event2 > Remaining!")
+            print(f"      [WARNING] WARNING: {n_violations} points where Event2 > Remaining!")
             print(f"      {'Idx':<6} {'Remaining $':<15} {'Event2 Dmg':<15} {'Excess $':<15}")
             print(f"      {'-'*60}")
             violation_idx = np.where(violations)[0][:5]  # Show first 5
@@ -256,7 +253,7 @@ def compute_sequential_impact(
                 excess = dmg2 - remain
                 print(f"      {idx:<6} ${remain:>13,.0f} ${dmg2:>13,.0f} ${excess:>13,.0f}")
         else:
-            print(f"      ✓ All Event 2 damages ≤ remaining exposure (physically valid)")
+            print(f"      [OK] All Event 2 damages ≤ remaining exposure (physically valid)")
         
         # Show top 10 Event 2 damages and compare to original Event 2 standalone
         print(f"\n      Top 10 Event 2 impacts (on degraded vs original exposure):")
@@ -476,7 +473,7 @@ def generate_composite_scenarios(
             county_df.to_csv(output_path, index=False)
             
             if verbose:
-                print(f"       ✓ Wrote: {output_path.name}")
+                print(f"       [OK] Wrote: {output_path.name}")
             
             # Store results
             results[scenario_name] = {
@@ -491,7 +488,7 @@ def generate_composite_scenarios(
             })
             
         except Exception as e:
-            print(f"       ✗ Failed: {e}")
+            print(f"       [FAIL] Failed: {e}")
             continue
     
     # Write diagnostics summary
@@ -502,8 +499,8 @@ def generate_composite_scenarios(
         
         if verbose:
             print(f"\n{'='*70}")
-            print(f"✓ Generated {len(results)}/{len(scenarios)} scenarios")
-            print(f"✓ Diagnostics: {diag_path}")
+            print(f"[OK] Generated {len(results)}/{len(scenarios)} scenarios")
+            print(f"[OK] Diagnostics: {diag_path}")
             print('='*70)
             print("\nSummary:")
             print(diag_df[['scenario_name', 'composite_total', 'savings_vs_naive', 'savings_pct']]
@@ -652,10 +649,10 @@ def plot_sequential_comparison(
 def main():
     """
     Generate the four requested composite scenarios:
-      a) Great Miami → Andrew
-      b) Andrew → Great Miami
-      c) Great Miami → Great Miami
-      d) Irma → Irma
+      a) Great Miami -> Andrew
+      b) Andrew -> Great Miami
+      c) Great Miami -> Great Miami
+      d) Irma -> Irma
     """
     
     print("\n" + "="*70)
@@ -737,6 +734,7 @@ def main():
     
     storm_ids = [
         "1926255N15314",  # Great Miami
+        "1928250N14343",  # Lake Okeechobee
         "1992230N11325",  # Andrew
         "2017242N16333",  # Irma
     ]
@@ -813,7 +811,7 @@ def main():
     #         print(f"  Skipping plot for {scenario_name}: {e}")
     
     print("\n" + "="*70)
-    print("✓ Done!")
+    print("[OK] Done!")
     print("="*70)
     print(f"\nGenerated {len(results)} composite event CSVs in:")
     print(f"  {HAZARD_OUTPUT_DIR}/")

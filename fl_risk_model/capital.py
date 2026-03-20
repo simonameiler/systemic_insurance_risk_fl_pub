@@ -1,22 +1,26 @@
-# capital.py — Capital depletion, group support, and Citizens capital parsing
-# -----------------------------------------------------------------------------
-# This module loads statutory surplus for private insurers (with optional group
-# metadata), applies scenario losses to deplete surplus, optionally samples
-# surplus for MC, computes intragroup capital contributions, and parses
-# Citizens’ surplus from a simple CSV. It mirrors the Methods specification:
-# - Private insurer capital from NAIC/S&P filings (Surplus as Regards Policyholders)
-# - Group support: pooled group surplus – sum(entity) with a global contribution rate
-# - Ruin/default: negative post-loss surplus (and optionally RBC threshold)
-# - Citizens capital: latest-year surplus from annual statements
-#
-# Public API:
-#   load_surplus_data
-#   load_surplus_data_with_groups
-#   apply_losses_to_surplus
-#   apply_group_capital_contributions
-#   load_citizens_capital_row_from_csv
-# -----------------------------------------------------------------------------
+"""
+capital.py - Capital depletion, group support, and Citizens capital parsing
+----------------------------------------------------------------------------
 
+Loads statutory surplus for private insurers (with optional group metadata),
+applies scenario losses to deplete surplus, optionally samples surplus for MC,
+computes intragroup capital contributions, and parses Citizens' surplus from
+a simple CSV.
+
+Mirrors the Methods specification:
+- Private insurer capital from NAIC/S&P filings (Surplus as Regards Policyholders)
+- Group support: pooled group surplus - sum(entity) with a global contribution rate
+- Ruin/default: negative post-loss surplus (and optionally RBC threshold)
+- Citizens capital: latest-year surplus from annual statements
+
+Public API
+----------
+- load_surplus_data
+- load_surplus_data_with_groups
+- apply_losses_to_surplus
+- apply_group_capital_contributions
+- load_citizens_capital_row_from_csv
+"""
 from __future__ import annotations
 
 import os
@@ -281,7 +285,7 @@ def load_surplus_data_with_groups(
     )
     if entity_surplus_col is None:
         raise KeyError(
-            f"Could not find ENTITY SURPLUS → 'Surplus as Regards Policyholders ($000)' for year {year}."
+            f"Could not find ENTITY SURPLUS -> 'Surplus as Regards Policyholders ($000)' for year {year}."
         )
 
     group_surplus_col = (
@@ -353,7 +357,7 @@ def apply_losses_to_surplus(
     surplus_df : pd.DataFrame
         Expected columns include ['Company','SurplusUSD'] and (optionally) ['StatEntityKey'].
     losses_df : pd.DataFrame
-        Columns ['Company','TotalLossUSD'] — scenario total loss (USD), net of prior recoveries.
+        Columns ['Company','TotalLossUSD'] - scenario total loss (USD), net of prior recoveries.
     rbc_df : pd.DataFrame, optional
         Columns should include ['StatEntityKey','RBCReq'] or ['Company','RBCReq'].
     rbc_affects_ruinflag : bool, default True

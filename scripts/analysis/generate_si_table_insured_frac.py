@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate SI LaTeX table for insured fraction sensitivity analysis.
+generate_si_table_insured_frac.py - Generate SI LaTeX table for insured fraction sensitivity
 
 Outputs a table showing mean values (in $B) and relative change vs. the
 reference fraction (f=0.4, Beta(4,6) mean) for all 15 output metrics,
@@ -17,7 +17,7 @@ import pandas as pd
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
-# Metrics — trimmed to SI-table subset (matches variance-decomposition groups)
+# Metrics - trimmed to SI-table subset (matches variance-decomposition groups)
 # ---------------------------------------------------------------------------
 METRICS = [
     # (column_name, label, group)
@@ -31,7 +31,7 @@ METRICS = [
     ("largest_entity_deficit_usd",   "Largest entity deficit",           "Capital / defaults"),
 ]
 
-# Metrics that are counts rather than USD amounts — formatted differently (not /1e9)
+# Metrics that are counts rather than USD amounts - formatted differently (not /1e9)
 COUNT_METRICS = {"defaults_post"}
 
 FRACS = [0.1, 0.2, 0.3, 0.4, 0.5]
@@ -187,7 +187,7 @@ def main():
         out_path = Path(args.out)
         out_path.parent.mkdir(parents=True, exist_ok=True)
         out_path.write_text(table)
-        print(f"\nWrote LaTeX table → {out_path}")
+        print(f"\nWrote LaTeX table -> {out_path}")
     else:
         print("\n" + "=" * 70)
         print("LATEX TABLE")
