@@ -9,7 +9,7 @@ Flow (aligned with Methods)
    - Citizens exposure is loaded via loader.load_citizens_county (County View + FIPS).
    NOTE: market_share_df may include 'StatEntityKey'; ignored for allocation but kept for metadata.
 2) Load county wind damages (USD).
-3) CARVE-OUT at county level (insured/underinsured/uninsured) [uninsured branch WIP].
+3) CARVE-OUT at county level (insured/underinsured/uninsured).
 4) PRE-SPLIT insured wind by Citizens/Private share of county TIV.
 5) PRIVATE: allocate private share by exposure -> FHCF (using keyed terms) -> apply seasonal industry cap (pro-rata).
 6) CITIZENS: allocate Citizens share (County View) -> FHCF (using keyed terms) -> Citizens capital hit.

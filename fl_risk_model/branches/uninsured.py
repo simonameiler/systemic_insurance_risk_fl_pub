@@ -6,7 +6,8 @@ Handles tracking of uninsured damages at the county level.
 
 Public API
 ----------
-- (work in progress)
+- apply_gross_carveout_wind: Split wind losses into insured/underinsured/uninsured
+- apply_gross_carveout_flood: Split flood losses into insured/underinsured/uninsured
 """
 from __future__ import annotations
 
