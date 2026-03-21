@@ -331,7 +331,7 @@ def _load_event_df(path: Path) -> pd.DataFrame:
     return out
 
 
-def _sample_wind_share(event_key: str, rng: np.random.Generator, use_climate_scaling: bool = False) -> float:
+def _sample_wind_share(event_key: str, rng: np.random.Generator, use_future: bool = False) -> float:
     """
     Sample wind share for a single event.
     
@@ -343,14 +343,14 @@ def _sample_wind_share(event_key: str, rng: np.random.Generator, use_climate_sca
     Args:
         event_key: Event identifier (e.g., "1926255N15314")
         rng: Random number generator
-        use_climate_scaling: If True, use future climate parameters (empirically-adjusted)
+        use_future: If True, use future climate wind/water parameters (Gori SSP245)
     
     Returns:
         Wind share (0-1)
     """
     if DEFAULT_WIND_SHARE_MODE == "beta":
         # Select parameter dictionary based on climate scenario
-        if use_climate_scaling:
+        if use_future:
             params = EVENT_WIND_SHARE_PARAMS_FUTURE.get(event_key)
             # Fall back to present-day if future not defined
             if params is None:
@@ -359,8 +359,8 @@ def _sample_wind_share(event_key: str, rng: np.random.Generator, use_climate_sca
             params = EVENT_WIND_SHARE_PARAMS.get(event_key)
         
         if params is None:
-            # Fall back to default (use future default if climate scaling enabled)
-            mean = DEFAULT_WIND_SHARE_MEAN_FUTURE if use_climate_scaling else DEFAULT_WIND_SHARE_MEAN
+            # Fall back to default (use future default if future enabled)
+            mean = DEFAULT_WIND_SHARE_MEAN_FUTURE if use_future else DEFAULT_WIND_SHARE_MEAN
             concentration = DEFAULT_WIND_SHARE_CONCENTRATION
         else:
             mean = params["mean"]
@@ -757,7 +757,7 @@ def _combine_events_for_scenario(scenario_name: str, event_stems: List[str], rng
         
         # Sample wind share (use future parameters if future wind share enabled)
         use_future_wind_share = getattr(cfg, "USE_FUTURE_WIND_SHARE", False)
-        w_share = _sample_wind_share(stem, rng, use_climate_scaling=use_future_wind_share)
+        w_share = _sample_wind_share(stem, rng, use_future=use_future_wind_share)
         sampled[stem] = w_share
         
         # Apply county-specific redistribution if enabled
@@ -1236,11 +1236,7 @@ def run_monte_carlo(n_iter: int = N_ITER,
     if run_label:
         run_dir = out_dir / f"{run_label}_{ts}"
     else:
-        # Check if climate scaling is on to auto-label
-        if getattr(cfg, "USE_CLIMATE_SCALING", False):
-            run_dir = out_dir / f"hazard_mix_climate2050_{ts}"
-        else:
-            run_dir = out_dir / f"hazard_mix_baseline_{ts}"
+        run_dir = out_dir / f"hazard_mix_baseline_{ts}"
     
     run_dir.mkdir(parents=True, exist_ok=True)
 
@@ -1293,7 +1289,6 @@ def run_policy_scenarios_mc(hazard_scenario: str = "great_miami",
                            n_iter: int = 200,
                            seed: int = RNG_SEED,
                            out_dir: Path = OUT_DIR,
-                           climate_scaling: bool = False,
                            group_support_eligibility_threshold: float = 10.0) -> Path:
     """
     Run Monte Carlo analysis for specific hazard with multiple policy interventions.
@@ -1310,29 +1305,13 @@ def run_policy_scenarios_mc(hazard_scenario: str = "great_miami",
         Random seed
     out_dir : Path
         Output directory
-    climate_scaling : bool
-        Whether to apply climate change damage scaling
     group_support_eligibility_threshold : float, default=10.0
         Group-to-Entity surplus ratio threshold for intragroup capital support eligibility
-        Whether to apply climate change scaling
         
     Returns:
     --------
     Path : Directory containing results
     """
-    # Set climate scaling toggle
-    original_climate_setting = getattr(cfg, "USE_CLIMATE_SCALING", False)
-    cfg.USE_CLIMATE_SCALING = climate_scaling
-    
-    # DEPRECATED: climate_scaling via damage factors is no longer supported.
-    # Use direct GCM event sets for future climate runs instead.
-    if climate_scaling:
-        raise NotImplementedError(
-            "climate_scaling=True is no longer supported. "
-            "Use direct GCM event sets (e.g., FL_canesm_ssp245cal) instead of damage scaling factors. "
-            "See run_climate_buildingcode_sensitivity_windfloods.py for the recommended approach."
-        )
-    
     # Load policy scenario configs
     if policy_scenarios is None:
         policy_scenarios = getattr(cfg, "GREAT_MIAMI_POLICY_RUN", {}).get("policy_scenarios", ["baseline"])
@@ -1354,9 +1333,8 @@ def run_policy_scenarios_mc(hazard_scenario: str = "great_miami",
     
     # Create descriptive directory name
     # Include first policy scenario to avoid collisions when running parallel array jobs
-    climate_label = "climate2050" if climate_scaling else "baseline"
     policy_label = policy_scenarios[0] if len(policy_scenarios) == 1 else "multi"
-    run_dir = out_dir / f"policy_{hazard_scenario}_{climate_label}_{policy_label}_{ts}"
+    run_dir = out_dir / f"policy_{hazard_scenario}_{policy_label}_{ts}"
     run_dir.mkdir(parents=True, exist_ok=True)
     
     # Save run configuration
@@ -1365,7 +1343,6 @@ def run_policy_scenarios_mc(hazard_scenario: str = "great_miami",
         "policy_scenarios": policy_scenarios,
         "n_iter": n_iter,
         "seed": seed,
-        "climate_scaling": climate_scaling,
         "timestamp": ts,
     }
     with open(run_dir / "run_config.json", "w") as f:
@@ -1434,9 +1411,6 @@ def run_policy_scenarios_mc(hazard_scenario: str = "great_miami",
     # Summary by policy scenario
     summary = _compute_summary(df_clean, group_by="policy_scenario")
     summary.to_csv(run_dir / "summary_by_policy.csv", index=False)
-    
-    # Restore original climate setting
-    cfg.USE_CLIMATE_SCALING = original_climate_setting
     
     return run_dir
 
@@ -1575,7 +1549,6 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
                                   seed: int = RNG_SEED,
                                   out_dir: Path = OUT_DIR,
                                   run_label: str | None = None,
-                                  climate_scaling: bool = False,
                                   future_wind_share: bool = False,
                                   policy_scenario_config: dict | None = None,
                                   group_support_eligibility_threshold: float = 10.0) -> Path:
@@ -1597,8 +1570,6 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
         Output directory root
     run_label : str, optional
         Custom label for output directory (e.g., 'stochastic_baseline')
-    climate_scaling : bool
-        Whether to apply climate change damage scaling (OBSOLETE - not used for Emanuel runs)
     future_wind_share : bool
         Whether to use future climate wind/water attribution (77% wind vs 84.6% present)
         Based on Gori et al. SSP245 end-of-century projections (×0.908 multiplier)
@@ -1634,18 +1605,9 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
         
         dbg(f"STOCHASTIC TC MONTE CARLO: {year_sets_csv}")
         
-        # Set climate scaling and future wind share flags
-        original_climate = getattr(cfg, "USE_CLIMATE_SCALING", False)
+        # Set future wind share flag
         original_future_wind = getattr(cfg, "USE_FUTURE_WIND_SHARE", False)
-        cfg.USE_CLIMATE_SCALING = climate_scaling
         cfg.USE_FUTURE_WIND_SHARE = future_wind_share
-        
-        # DEPRECATED: climate_scaling via damage factors is no longer supported.
-        if climate_scaling:
-            raise NotImplementedError(
-                "climate_scaling=True is no longer supported. "
-                "Use direct GCM event sets (e.g., FL_canesm_ssp245cal) instead of damage scaling factors."
-            )
         
         # Load year-sets
         year_sets = pd.read_csv(year_sets_csv)
@@ -1673,12 +1635,11 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
         
         # Setup output directory
         ts = time.strftime("%Y%m%d_%H%M%S")
-        climate_label = "climate2050" if climate_scaling else "baseline"
         
         if run_label:
             run_dir = out_dir / f"{run_label}_{ts}"
         else:
-            run_dir = out_dir / f"stochastic_tc_{climate_label}_{ts}"
+            run_dir = out_dir / f"stochastic_tc_{ts}"
         
         run_dir.mkdir(parents=True, exist_ok=True)
         
@@ -1687,7 +1648,6 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
             "mode": "stochastic_tc",
             "year_sets_csv": str(year_sets_csv),
             "n_years": total_years,
-            "climate_scaling": climate_scaling,
             "seed": seed,
             "policy_scenario_config": policy_scenario_config,  # Save for diagnostics
             "timestamp": ts,
@@ -1774,9 +1734,6 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
         # Compute return periods and percentiles
         _compute_return_period_metrics(df_clean, run_dir)
         
-        # Restore original climate setting
-        cfg.USE_CLIMATE_SCALING = original_climate
-        
         return run_dir
     
     finally:
@@ -1858,8 +1815,7 @@ def run_stochastic_policy_analysis(policy_scenarios: list | None = None,
                                    year_sets_csv: Path | str | None = None,
                                    n_years: int | None = None,
                                    seed: int = RNG_SEED,
-                                   out_dir: Path = OUT_DIR,
-                                   climate_scaling: bool = False) -> dict:
+                                   out_dir: Path = OUT_DIR) -> dict:
     """
     Run stochastic TC Monte Carlo for multiple policy scenarios.
     
@@ -1879,8 +1835,6 @@ def run_stochastic_policy_analysis(policy_scenarios: list | None = None,
         Random seed
     out_dir : Path
         Output directory root
-    climate_scaling : bool
-        Whether to apply climate change scaling
     
     Returns:
     --------
@@ -1907,8 +1861,7 @@ def run_stochastic_policy_analysis(policy_scenarios: list | None = None,
         policy_config = policy_configs[policy_name]
         
         # Generate label
-        climate_label = "climate2050" if climate_scaling else "baseline"
-        run_label = f"stochastic_{climate_label}_{policy_name}"
+        run_label = f"stochastic_{policy_name}"
         
         # Run stochastic MC with this policy
         output_dir = run_stochastic_tc_monte_carlo(
@@ -1917,7 +1870,6 @@ def run_stochastic_policy_analysis(policy_scenarios: list | None = None,
             seed=seed,
             out_dir=out_dir,
             run_label=run_label,
-            climate_scaling=climate_scaling,
             policy_scenario_config=policy_config
         )
         
@@ -1945,7 +1897,6 @@ if __name__ == "__main__":
     ap.add_argument("--seed", type=int, default=RNG_SEED, help="Random seed")
     ap.add_argument("--out", type=str, default=str(OUT_DIR), help="Output directory root")
     ap.add_argument("--hazard", type=str, default="great_miami", help="Hazard scenario for policy mode")
-    ap.add_argument("--climate", action="store_true", help="Apply climate change scaling (2050)")
     ap.add_argument("--label", type=str, default=None, 
                     help="Custom label for output directory (e.g., 'sensitivity_test', 'paper_v1')")
     ap.add_argument("--year_sets", type=str, default=None,
@@ -1961,7 +1912,6 @@ if __name__ == "__main__":
             n_iter=args.n_iter,
             seed=args.seed,
             out_dir=Path(args.out),
-            climate_scaling=args.climate,
         )
     elif args.mode == "stochastic":
         run_stochastic_tc_monte_carlo(
@@ -1970,7 +1920,6 @@ if __name__ == "__main__":
             seed=args.seed,
             out_dir=Path(args.out),
             run_label=args.label,
-            climate_scaling=args.climate,
         )
     elif args.mode == "stochastic_policy":
         # Parse policy list
@@ -1985,7 +1934,6 @@ if __name__ == "__main__":
             n_years=args.n_years,
             seed=args.seed,
             out_dir=Path(args.out),
-            climate_scaling=args.climate,
         )
     else:
         run_monte_carlo(
