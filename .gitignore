@@ -113,3 +113,9 @@ logs/
 # Helper scripts
 notebooks/clean_notebooks.py
 fl_risk_model/data/fl_per_event_impacts_future_ssp245.csv
+
+# Local test metadata (use cluster files for production)
+fl_risk_model/data/hazard/emanuel/*/all_events.csv
+fl_risk_model/data/hazard/emanuel/*/annual_frequencies.csv
+fl_risk_model/data/hazard/emanuel/*/event_metadata.csv
+fl_risk_model/data/hazard/emanuel/*/year_sets*.csv
