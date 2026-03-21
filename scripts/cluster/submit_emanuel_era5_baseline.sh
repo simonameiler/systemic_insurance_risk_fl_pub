@@ -26,10 +26,13 @@ echo ""
 REPO_DIR="${HOME}/repos/systemic_insurance_risk_fl_pub"
 cd "${REPO_DIR}"
 
-# Activate conda environment
-echo "Activating conda environment..."
-module load anaconda3/2024.06
-source activate climada_env || conda activate climada_env
+# Activate conda environment (if not already active)
+if [[ "$CONDA_DEFAULT_ENV" != "climada_env" ]]; then
+    echo "Activating conda environment..."
+    source activate climada_env || conda activate climada_env
+else
+    echo "climada_env already active"
+fi
 
 # Verify Python and key packages
 echo "Python: $(which python)"

@@ -32,10 +32,13 @@ cd "${REPO_DIR}"
 echo "Pulling latest code..."
 git pull
 
-# Activate conda environment
-echo "Activating conda environment..."
-module load anaconda3/2024.06
-source activate climada_env || conda activate climada_env
+# Activate conda environment (if not already active)
+if [[ "$CONDA_DEFAULT_ENV" != "climada_env" ]]; then
+    echo "Activating conda environment..."
+    source activate climada_env || conda activate climada_env
+else
+    echo "climada_env already active"
+fi
 
 # Verify paths exist
 IMPACT_DIR="/home/groups/bakerjw/smeiler/climada_data/data/impact/impacts/FL_era5_reanalcal"
