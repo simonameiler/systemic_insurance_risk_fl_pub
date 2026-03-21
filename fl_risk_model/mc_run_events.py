@@ -515,6 +515,8 @@ def _load_county_adjustment_factors(use_future=False):
     if 'county_name' in df.columns and 'fips' in df.columns:
         # New format (logarithmic contribution files)
         result = df[['fips', 'wind_share']].copy()
+        # Ensure fips is string type for consistent merging
+        result['fips'] = result['fips'].astype(str).str.zfill(5)
         # Calculate empirical mean (unweighted across counties)
         empirical_mean = result['wind_share'].mean()
         result['empirical_mean'] = empirical_mean
