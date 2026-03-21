@@ -503,7 +503,7 @@ def _load_county_adjustment_factors(use_future=False):
     else:
         if _COUNTY_ADJUSTMENT_FACTORS is not None:
             return _COUNTY_ADJUSTMENT_FACTORS
-        empirical_file = DATA_DIR / 'florida_empirical_hazard_attribution_p95.csv'
+        empirical_file = DATA_DIR / 'florida_log_contribution_p95_present.csv'
         cache_var_name = '_COUNTY_ADJUSTMENT_FACTORS'
         climate_period = '1980-2019'
     
@@ -514,7 +514,10 @@ def _load_county_adjustment_factors(use_future=False):
     # Wind share is already in 0-1 scale (not 0-100)
     if 'county_name' in df.columns and 'fips' in df.columns:
         # New format (logarithmic contribution files)
-        result = df[['fips', 'wind_share', 'empirical_mean']].copy()
+        result = df[['fips', 'wind_share']].copy()
+        # Calculate empirical mean (unweighted across counties)
+        empirical_mean = result['wind_share'].mean()
+        result['empirical_mean'] = empirical_mean
     else:
         # Legacy format (old empirical files) - for backwards compatibility
         # Create FIPS codes (Florida = 12)
