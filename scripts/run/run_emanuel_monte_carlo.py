@@ -77,9 +77,7 @@ Examples:
     ap.add_argument("--flood_loss_reduction", type=float, default=None,
                     help="Override flood loss reduction for building codes (0.0-1.0, e.g., 0.10 = 10%%)")
     
-    # Climate scaling and wind/water attribution
-    ap.add_argument("--climate_scaling", action="store_true",
-                    help="Apply climate change damage scaling (OBSOLETE - not used for Emanuel runs)")
+    # Wind/water attribution
     ap.add_argument("--future_wind_share", action="store_true",
                     help="Use future climate wind/water attribution (77%% wind vs 84.6%% present, Gori et al. SSP245 2081-2100)")
     
@@ -102,10 +100,10 @@ Examples:
         if is_sherlock:
             # On Sherlock - use research group storage
             # MODIFY THIS PATH for your cluster setup
-            impact_dir = Path("/home/groups/bakerjw/smeiler/climada_data/data/impact") / args.event_set
+            impact_dir = Path("/home/groups/bakerjw/smeiler/climada_data/data/impact/impacts") / args.event_set
         else:
             # Local - use DATA_DIR structure
-            impact_dir = cfg.DATA_DIR / "hazard" / "emanuel_impacts" / args.event_set
+            impact_dir = cfg.DATA_DIR / "hazard" / "emanuel" / args.event_set
     
     # Check for year-sets file
     if args.year_sets_file:
@@ -182,8 +180,6 @@ Examples:
         if args.year_sets_file and "19952014" in args.year_sets_file:
             run_label += "_19952014"
         
-        if args.climate_scaling:
-            run_label += "_climate2050"
         if args.future_wind_share:
             run_label += "_future_wind"
     
@@ -197,7 +193,6 @@ Examples:
     print(f"  Year-sets: {year_sets_csv}")
     print(f"  N years: {args.n_years or 'all (10,000)'}")
     print(f"  Policy scenario: {args.policy or 'baseline'}")
-    print(f"  Climate scaling: {args.climate_scaling}")
     print(f"  Future wind/water: {args.future_wind_share}")
     print(f"  Random seed: {args.seed}")
     print(f"  Output: {args.out}/{run_label}_TIMESTAMP")
@@ -211,7 +206,6 @@ Examples:
             seed=args.seed,
             out_dir=Path(args.out),
             run_label=run_label,
-            climate_scaling=args.climate_scaling,
             future_wind_share=args.future_wind_share,
             policy_scenario_config=policy_scenario_config,
         )
