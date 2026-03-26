@@ -5,15 +5,15 @@
 
 These scripts reproduce the main results of the paper:
 
-**Simona Meiler**(1,2), [co-authors]: *[Paper Title]*
+**Simona Meiler**(1), Steven I. Jackson (2), Kerry Emanuel (3), Noah S. Diffenbaugh (4), Jack W.
+Baker (1): *[Stress testing insurance market stability under climate-driven disaster risk]*
 
-Publication status: [under review / submitted to *Journal*]
+Publication status: [under review]
 
-(1) Institute for Environmental Decisions, ETH Zurich, Switzerland
-
-(2) Federal Office of Meteorology and Climatology MeteoSwiss, Switzerland
-
-Contact: [Simona Meiler](mailto:PLACEHOLDER@example.com)
+(1) Civil and Environmental Engineering, Stanford University, CA, USA
+(2) American Academy of Actuaries, Washington, DC, USA
+(3) Lorenz Center, Massachusetts Institute of Technology, Cambridge, Massachusetts, USA
+(4) Earth System Science, Stanford University, CA, USA
 
 ---
 
@@ -52,7 +52,7 @@ systemic_insurance_risk_fl_pub/
 │   └── data/                          ← input datasets (see Data Availability)
 │       ├── *.csv / *.xlsx             ← FHCF terms, Citizens, NFIP, county mappings, etc.
 │       ├── hazard/                    ← per-event impacts and historical scenarios
-│       │   ├── gori_data/             ← Gori et al. hazard matrices (Wind, Rain, Surge, EAD)
+│       │   ├── gori_data/             ← Gori et al. 2025 hazard matrices (Wind, Rain, Surge, EAD)
 │       │   ├── emanuel/               ← Kerry Emanuel TC event sets (ERA5 baseline)
 │       │   └── historical_events/     ← individual historical hurricane impact CSVs
 │       └── US_counties/               ← Florida county shapefiles
@@ -87,19 +87,6 @@ systemic_insurance_risk_fl_pub/
 │   │   └── setup_emanuel_metadata.py              ← event metadata for year-set generation
 │   │
 │   └── cluster/                       ← SLURM job submission scripts (Stanford Sherlock)
-│       ├── submit_emanuel_era5_baseline.sh         ← ERA5 baseline (10K years)
-│       ├── submit_emanuel_mc_sherlock.sh           ← generic Emanuel MC template
-│       ├── submit_emanuel_policy_suite_sherlock.sh ← policy suite runs
-│       ├── submit_policy_suite_parallel.sh         ← parallel policy launcher
-│       ├── submit_climate_buildingcode_sensitivity_windfloods.sh ← 65-job building code array
-│       ├── submit_climate_buildingcode_gcm_sensitivity.sh       ← 50-job GCM sensitivity array
-│       ├── submit_penetration_capital_sensitivity.sh ← 8-job capital multiplier array
-│       ├── submit_insured_fraction_sensitivity.sh  ← 5-job insured fraction sweep
-│       ├── submit_variance_decomposition.sh        ← variance decomposition runs
-│       ├── submit_precompute_emanuel_sherlock.sh   ← impact precomputation
-│       ├── submit_generate_emanuel_yearsets_sherlock.sh ← year-set generation
-│       ├── submit_windfields_emanuel_sherlock.sh   ← windfield computation
-│       └── test_emanuel_mc_quick.sh                ← quick 100-year validation test
 │
 ├── notebooks/                         ← reproduce all publication figures and tables
 │   ├── historical_scenario_analysis.ipynb         ← Fig. X, SI Table X, SI Fig. X
@@ -136,7 +123,7 @@ These scripts require [CLIMADA](https://github.com/CLIMADA-project/climada_pytho
 
 ### `scripts/cluster/`
 
-SLURM job submission scripts for the Stanford Sherlock HPC cluster (`serc` partition, `climada_env` conda environment).
+SLURM job submission scripts for the Stanford Sherlock HPC cluster - not included in this repository.
 
 ### `notebooks/`
 
@@ -156,8 +143,8 @@ cd systemic_insurance_risk_fl_pub
 pip install -e .
 ```
 
-The model is designed to run within a [CLIMADA](https://github.com/CLIMADA-project/climada_python) conda environment (v4.1+), which provides all required dependencies (numpy, pandas, scipy, matplotlib, h5py, etc.).
-CLIMADA itself is only needed for hazard preprocessing (`scripts/hazard/`); the core risk model and Monte Carlo runs do not depend on it.
+The model is designed to run within a [CLIMADA](https://github.com/CLIMADA-project/climada_python) conda environment (v6.1.0+), which provides all required dependencies (numpy, pandas, scipy, matplotlib, h5py, etc.).
+CLIMADA itself is only needed for hazard preprocessing (`scripts/hazard/`); we used v6.1.0, develop; the core risk model and Monte Carlo runs do not depend on it.
 
 ---
 
@@ -179,33 +166,17 @@ Pre-computed results used in the notebooks are stored in `results/`.
 
 **Included in the repository**: FHCF contract terms, Citizens Property Insurance county data, NFIP claims and penetration rates, county mappings, per-event impacts, catastrophe bond terms, and historical hurricane scenario impacts.
 
-**Proprietary** (contact authors): Florida OIR company-level exposure data (`FL HO Market Share Report_6.10.25.xlsx`), statutory surplus capital data (`20250805 FL Surplus Capital, Group v Entity.xlsx`). See `fl_risk_model/config.py` for details.
+**Proprietary** (contact authors): Florida company-level wind exposure data, statutory surplus capital data. See `fl_risk_model/config.py` for details.
 
-**External**: Kerry Emanuel TC track sets (contact [Prof. Kerry Emanuel](https://eapsweb.mit.edu/people/emanuel)).  Gori et al. hazard matrices (see [Gori et al., 2022](https://doi.org/10.1038/s41467-022-33194-3)).
+**External**: The synthetic TC data from the MIT model are proprietary and owned by WindRiskTech L.L.C., a company that provides hurricane risk assessments to clients worldwide. Due to proprietary restrictions, these datasets are not publicly archived. However, researchers interested in accessing the data for scientific purposes can contact WindRiskTech L.L.C. at info@windrisktech.com, subject to a non-redistribution agreement.
 
 ---
 
 ## Requirements
 
-- Python 3.9+ (recommended: use the CLIMADA conda environment)
-- [CLIMADA](https://github.com/CLIMADA-project/climada_python) v4.1+ (only for hazard preprocessing)
-- HPC cluster (for computationally demanding Monte Carlo runs; SLURM scripts target Stanford Sherlock)
-
----
-
-## Citation
-
-If you use this code, please cite:
-
-```bibtex
-@article{meiler2026florida,
-  title   = {{[Paper Title]}},
-  author  = {Meiler, Simona and [co-authors]},
-  journal = {[Journal]},
-  year    = {2026},
-  doi     = {PLACEHOLDER}
-}
-```
+- Python 3.11+ (recommended: use the CLIMADA conda environment)
+- [CLIMADA](https://github.com/CLIMADA-project/climada_python) v6.1.0+ (only for hazard preprocessing)
+- HPC cluster
 
 ---
 
