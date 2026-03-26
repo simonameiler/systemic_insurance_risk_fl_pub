@@ -270,12 +270,16 @@ EVENT_WIND_SHARE_PARAMS = {
 # Default for events without specific parameters
 # Empirical county mean (Gori-weighted P95): 84.6% wind (range: 72.4-92.5%, n=67 counties)
 DEFAULT_WIND_SHARE_MEAN = 0.846  # Present: 84.6% wind (P95 extremes, Gori-weighted method)
-DEFAULT_WIND_SHARE_MEAN_FUTURE = 0.758  # Future: 75.8% wind (P95 extremes, ×0.908 multiplier)
-DEFAULT_WIND_SHARE_MEAN_FULL = 0.790  # Sensitivity: 79.02% wind (log contribution, full distribution)
 DEFAULT_WIND_SHARE_CONCENTRATION = 10
 
-DEFAULT_WIND_SHARE_MODE = "beta"  # "beta", "uniform", or "triangular" (legacy)
-DEFAULT_WIND_SHARE_BOUNDS = (0.65, 0.85)  # Only used if mode != "beta"
+# Wind share bounds used by runner.py branch fallback (wind.py, flood.py)
+EVENT_WIND_SHARE_BOUNDS = {
+    "1926255N15314": (0.60, 0.80),  # Great Miami
+    "1992230N11325": (0.80, 0.95),  # Andrew
+    "1928250N14343": (0.20, 0.40),  # Lake Okeechobee
+    "2017242N16333": (0.40, 0.60),  # Irma
+}
+DEFAULT_WIND_SHARE_BOUNDS = (0.65, 0.85)
 
 # MC will populate this per iteration, e.g. {"1926255N15314": 0.72, "1992230N11325": 0.85}
 RUNTIME_WIND_SHARE_OVERRIDES: dict[str, float] = {}
@@ -299,42 +303,6 @@ COMPOSITE_WIND_SHARE_PARAMS = {
 }
 
 # --------------------------------------------------------------------------------------
-# Future Climate Wind/Water Attribution Parameters (NEW)
-# --------------------------------------------------------------------------------------
-# Empirically-derived adjustment based on SSP2-4.5 climate projections (2070-2100)
-# Analysis of florida_future_scaling_factors_p95.csv shows:
-#   - Present (NCEP 1980-2019): 83.5% wind share
-#   - Future (SSP2-4.5): 75.8% wind share
-#   - Multiplicative ratio: 0.908 (wind decreases to 90.8% of present value)
-#
-# Rationale: Water hazards (rain + surge) increase relatively more than wind under
-# climate change, leading to a shift in wind/water attribution. We apply this
-# multiplicative adjustment (×0.908) to all present-day baseline parameters.
-#
-# Statistical validation: Multiplicative scaling has 10× lower coefficient of
-# variation (CV=0.035) compared to additive shifts (CV=0.352), indicating more
-# consistent relative changes across Florida counties.
-
-# Future wind/water attribution for single events
-EVENT_WIND_SHARE_PARAMS_FUTURE = {
-    "1926255N15314": {"mean": 0.636, "concentration": 10},   # Great Miami: 70% × 0.908 = 63.6%
-    "1992230N11325": {"mean": 0.795, "concentration": 10},   # Andrew: 87.5% × 0.908 = 79.5%
-    "1928250N14343": {"mean": 0.272, "concentration": 8},    # Lake Okeechobee: 30% × 0.908 = 27.2%
-    "2017242N16333": {"mean": 0.454, "concentration": 10},   # Irma: 50% × 0.908 = 45.4%
-}
-
-# Future wind/water attribution for composite scenarios
-COMPOSITE_WIND_SHARE_PARAMS_FUTURE = {
-    "andrew_then_gm": {"mean": 0.699, "concentration": 25},   # 77% × 0.908 = 69.9%
-    "gm_then_andrew": {"mean": 0.690, "concentration": 25},   # 76% × 0.908 = 69.0%
-    "double_gm": {"mean": 0.636, "concentration": 30},        # 70% × 0.908 = 63.6%
-    "double_irma": {"mean": 0.454, "concentration": 30},      # 50% × 0.908 = 45.4%
-}
-
-# Legacy: Standard deviation for normal sampling (deprecated, replaced by Beta)
-COMPOSITE_WIND_SHARE_UNCERTAINTY = 0.03  # ±3% standard deviation (not used if mode="beta")
-
-# --------------------------------------------------------------------------------------
 # County-specific wind/water redistribution
 # --------------------------------------------------------------------------------------
 # Toggle to enable spatial heterogeneity in wind/water splits while preserving overall share
@@ -353,23 +321,6 @@ COMPOSITE_WIND_SHARE_UNCERTAINTY = 0.03  # ±3% standard deviation (not used if 
 # For stochastic TC analysis (full event distribution), use mean attribution instead
 USE_COUNTY_REDISTRIBUTION = True  # Set to True to enable
 COUNTY_ATTRIBUTION_MODE = "p95"   # "p95" for extreme events, "mean" for stochastic full distribution
-
-# --------------------------------------------------------------------------------------
-# Climate change damage scaling
-# --------------------------------------------------------------------------------------
-# Apply county-specific damage scaling for future climate (SSP2-4.5, mid-century)
-# Uses empirical scaling factors derived from Gori et al. hazard projections
-# 
-# How it works:
-#   1. Load county-specific damage scaling factors (e.g., 1.15x for Miami-Dade)
-#   2. Multiply baseline event losses by these factors
-#   3. Represents increase in TC damage due to climate change
-#
-# Data source: florida_future_damage_scaling_factors.csv
-#   Based on Gori et al. (2022) damage functions applied to CLIMADA TC projections
-#   P95 represents extreme events (95th percentile hazard changes)
-#   Typical range: 1.0x to 3.2x (0% to 220% increase)
-USE_CLIMATE_SCALING = False  # Set to True to enable future climate scaling (default: False for current climate)
 
 # --------------------------------------------------------------------------------------
 # Policy Scenario Configurations for Monte Carlo Analysis
@@ -472,7 +423,6 @@ GREAT_MIAMI_POLICY_RUN = {
     "hazard_scenario": "great_miami",  # Which hazard event from SCENARIOS
     "policy_scenarios": ["baseline", "market_exit_moderate", "penetration_major", "building_codes_major"],
     "n_iter": 200,  # Monte Carlo iterations per policy scenario
-    "climate_scaling": False,  # Set True for 2050 climate runs
 }
 
 # MC controls and output

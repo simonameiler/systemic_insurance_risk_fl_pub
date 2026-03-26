@@ -151,7 +151,6 @@ def run_climate_buildingcode_sensitivity(
                 year_sets_csv=year_sets_csv,
                 n_years=10000,
                 policy_scenario_config=policy_scenario_config,
-                climate_scaling=False,  # Using GCM impacts directly, not damage scaling
                 run_label=run_label,
                 seed=seed
             )
@@ -164,7 +163,6 @@ def run_climate_buildingcode_sensitivity(
         
     else:
         # Climate scaling approach
-        enable_climate = climate_scenario != "era5"
         
         # Parse climate scenario for run label
         if climate_scenario == "era5":
@@ -193,7 +191,6 @@ def run_climate_buildingcode_sensitivity(
         run_stochastic_tc_monte_carlo(
             n_years=10000,
             policy_scenario_config=policy_scenario_config,
-            climate_scaling=enable_climate,
             run_label=run_label,
             seed=seed
         )

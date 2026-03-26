@@ -26,8 +26,6 @@ DATA SOURCES:
 
 OUTPUT FILES:
 1. florida_log_contribution_p95_present.csv - Present climate, P95 extremes
-2. florida_log_contribution_p95_future.csv - Future climate (pooled 5 GCMs), P95 extremes
-3. florida_log_contribution_full_present.csv - Present climate, full distribution
 """
 
 import pandas as pd
@@ -43,15 +41,10 @@ COUNTY_REGION_FILE = DATA_DIR / "county_region.csv"
 
 # Output files
 OUTPUT_P95_PRESENT = DATA_DIR / "florida_log_contribution_p95_present.csv"
-OUTPUT_P95_FUTURE = DATA_DIR / "florida_log_contribution_p95_future.csv"
-OUTPUT_FULL_PRESENT = DATA_DIR / "florida_log_contribution_full_present.csv"
 
 # Gori coefficients (Southeast region)
 GORI_COASTAL = {'wind': 5.21, 'rain': 0.52, 'surge': 0.62}
 GORI_INLAND = {'wind': 4.38, 'rain': 0.45, 'surge': 0.0}
-
-# Future climate models (SSP245)
-FUTURE_GCMS = ['canesm', 'cnrm6', 'ecearth6', 'ipsl6', 'miroc6']
 
 PERCENTILE = 95
 FLORIDA_STCODE = 12
@@ -313,93 +306,6 @@ def process_present_climate():
     df_p95.to_csv(OUTPUT_P95_PRESENT, index=False)
     print(f"  Saved: {OUTPUT_P95_PRESENT}")
     
-    # Generate full distribution file
-    print(f"\nGenerating full distribution attribution...")
-    df_full = generate_county_attribution(wind_share, None, county_fps, idx_to_fips)
-    avg_wind_full = df_full['wind_share'].mean()
-    print(f"  Average wind share (Full): {100*avg_wind_full:.2f}%")
-    
-    df_full.to_csv(OUTPUT_FULL_PRESENT, index=False)
-    print(f"  Saved: {OUTPUT_FULL_PRESENT}")
-    
-    return avg_wind_p95, avg_wind_full
-
-
-def process_future_climate():
-    """Process future climate (pooled GCMs, SSP245)."""
-    print("\n" + "="*70)
-    print("PROCESSING FUTURE CLIMATE (Pooled 5 GCMs)")
-    print("="*70)
-    
-    # Load Florida counties
-    fl_indices, county_fps, fips_to_idx, idx_to_fips = load_florida_counties()
-    is_coastal = load_coastal_classification(county_fps)
-    
-    # Load and pool hazard data from 5 GCMs
-    print("\nLoading hazard data from 5 GCMs...")
-    
-    wind_pooled = []
-    rain_pooled = []
-    surge_pooled = []
-    
-    for gcm in FUTURE_GCMS:
-        print(f"  Loading {gcm}...")
-        
-        wind_file = GORI_DATA_DIR / "Wind" / f"maxwindmat_{gcm}_ssp245cal.mat"
-        rain_file = GORI_DATA_DIR / "Rain" / f"ptot_rain_county_{gcm}_ssp245.mat"
-        surge_file = GORI_DATA_DIR / "Surge" / f"maxelev_coastcounty_{gcm}_ssp245.mat"
-        
-        wind = load_mat_hazard(wind_file, fl_indices, 'maxwindmat', transpose=True)
-        rain = load_mat_hazard(rain_file, fl_indices, 'ptot_mat')
-        
-        surge_mat = loadmat(surge_file)
-        surge_var = 'scounty_mhhw' if 'scounty_mhhw' in surge_mat else 'scounty'
-        surge = load_mat_hazard(surge_file, fl_indices, surge_var)
-        
-        wind_pooled.append(wind)
-        rain_pooled.append(rain)
-        surge_pooled.append(surge)
-    
-    # Concatenate along event axis
-    wind_all = np.concatenate(wind_pooled, axis=1)
-    rain_all = np.concatenate(rain_pooled, axis=1)
-    surge_all = np.concatenate(surge_pooled, axis=1)
-    
-    n_counties, n_events = wind_all.shape
-    print(f"  Pooled: {n_counties} FL counties × {n_events} events (5 GCMs)")
-    
-    # Calculate logarithmic contributions
-    print("\nCalculating logarithmic contributions...")
-    wind_share = calculate_log_contributions(wind_all, rain_all, surge_all, is_coastal)
-    
-    # Calculate compound hazard for P95 selection
-    compound = np.zeros_like(wind_all)
-    for i in range(n_counties):
-        if is_coastal[i]:
-            compound[i, :] = (
-                GORI_COASTAL['wind'] * np.log(np.maximum(wind_all[i, :], 1e-9)) +
-                GORI_COASTAL['rain'] * np.log(rain_all[i, :] + 1.0) +
-                GORI_COASTAL['surge'] * surge_all[i, :]
-            )
-        else:
-            compound[i, :] = (
-                GORI_INLAND['wind'] * np.log(np.maximum(wind_all[i, :], 1e-9)) +
-                GORI_INLAND['rain'] * np.log(rain_all[i, :] + 1.0)
-            )
-    
-    # Generate P95 extreme events file
-    print(f"\nGenerating P95 extreme events attribution...")
-    extreme_mask = identify_extreme_events(wind_share, compound, percentile=PERCENTILE)
-    n_extreme_total = extreme_mask.sum()
-    print(f"  Total extreme events: {n_extreme_total:,} / {wind_all.size:,}")
-    
-    df_p95 = generate_county_attribution(wind_share, extreme_mask, county_fps, idx_to_fips)
-    avg_wind_p95 = df_p95['wind_share'].mean()
-    print(f"  Average wind share (P95): {100*avg_wind_p95:.2f}%")
-    
-    df_p95.to_csv(OUTPUT_P95_FUTURE, index=False)
-    print(f"  Saved: {OUTPUT_P95_FUTURE}")
-    
     return avg_wind_p95
 
 
@@ -418,10 +324,7 @@ def main():
     print(f"  - P{PERCENTILE} extreme events per county")
     
     # Process present climate
-    avg_present_p95, avg_present_full = process_present_climate()
-    
-    # Process future climate
-    avg_future_p95 = process_future_climate()
+    avg_present_p95 = process_present_climate()
     
     # Summary
     print("\n" + "="*70)
@@ -429,20 +332,10 @@ def main():
     print("="*70)
     print(f"\nPresent Climate (NCEP):")
     print(f"  P95 extremes:      {100*avg_present_p95:.2f}% wind")
-    print(f"  Full distribution: {100*avg_present_full:.2f}% wind")
-    
-    print(f"\nFuture Climate (SSP245, pooled 5 GCMs):")
-    print(f"  P95 extremes:      {100*avg_future_p95:.2f}% wind")
-    
-    print(f"\nClimate change multiplier:")
-    multiplier = avg_future_p95 / avg_present_p95
-    print(f"  {100*avg_future_p95:.2f}% / {100*avg_present_p95:.2f}% = {multiplier:.4f}")
     
     print("\n" + "="*70)
     print("FILES GENERATED:")
     print(f"  1. {OUTPUT_P95_PRESENT}")
-    print(f"  2. {OUTPUT_P95_FUTURE}")
-    print(f"  3. {OUTPUT_FULL_PRESENT}")
     print("="*70)
 
 

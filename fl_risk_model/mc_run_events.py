@@ -15,14 +15,11 @@ Key Features
 - Full insurance waterfall: primary insurers -> FHCF -> FIGA -> Citizens
 - NFIP flood losses with federal backstop tracking
 
-Wind/Water Split Modes
-----------------------
-1. UNIFORM (default): Same wind share applied to all counties
-2. COUNTY-SPECIFIC: Spatially heterogeneous splits based on NCEP climatology
-   - Preserves overall wind share from Beta distribution
-   - Adds county-specific deviations from NCEP p95 mean
-   - Example: 70% baseline + Miami-Dade deviation (+4.3%) = 74.3% for Miami-Dade
-   - Enable with: USE_COUNTY_REDISTRIBUTION = True in config
+Wind/Water Split
+----------------
+Wind shares are sampled from event-specific Beta distributions, then
+county-specific redistribution preserves the overall share while adding
+spatial heterogeneity based on NCEP p95 climatology.
 
 Composite Scenarios
 -------------------
@@ -134,27 +131,8 @@ EVENT_WIND_SHARE_PARAMS = getattr(cfg, "EVENT_WIND_SHARE_PARAMS", {
     "2017242N16333": {"mean": 0.50, "concentration": 10},
 })
 
-# Future climate wind share parameters (empirically-adjusted for SSP2-4.5)
-EVENT_WIND_SHARE_PARAMS_FUTURE = getattr(cfg, "EVENT_WIND_SHARE_PARAMS_FUTURE", {
-    "1926255N15314": {"mean": 0.636, "concentration": 10},   # Great Miami: 70% × 0.908
-    "1992230N11325": {"mean": 0.795, "concentration": 10},   # Andrew: 87.5% × 0.908
-    "1928250N14343": {"mean": 0.272, "concentration": 8},    # Lake Okeechobee: 30% × 0.908
-    "2017242N16333": {"mean": 0.454, "concentration": 10},   # Irma: 50% × 0.908
-})
-
-# Legacy bounds (for backward compatibility if mode != "beta")
-EVENT_WIND_SHARE_BOUNDS = getattr(cfg, "EVENT_WIND_SHARE_BOUNDS", {
-    "1926255N15314": (0.60, 0.80),  # Great Miami
-    "1992230N11325": (0.80, 0.95),  # Andrew
-    "1928250N14343": (0.20, 0.40),  # Lake Okeechobee
-    "2017242N16333": (0.40, 0.60),  # Irma
-})
-
-DEFAULT_WIND_SHARE_MODE = getattr(cfg, "DEFAULT_WIND_SHARE_MODE", "beta")  # "beta", "uniform", or "triangular"
 DEFAULT_WIND_SHARE_MEAN = getattr(cfg, "DEFAULT_WIND_SHARE_MEAN", 0.846)  # Empirical: 84.6% wind (p95 extreme events, Gori-weighted)
-DEFAULT_WIND_SHARE_MEAN_FUTURE = getattr(cfg, "DEFAULT_WIND_SHARE_MEAN_FUTURE", 0.846)  # Future: same as present (no future data for p95)
 DEFAULT_WIND_SHARE_CONCENTRATION = getattr(cfg, "DEFAULT_WIND_SHARE_CONCENTRATION", 10)
-DEFAULT_WIND_SHARE_BOUNDS = getattr(cfg, "DEFAULT_WIND_SHARE_BOUNDS", (0.65, 0.85))
 
 # Composite wind share parameters (Beta distribution)
 COMPOSITE_WIND_SHARE_PARAMS = getattr(cfg, "COMPOSITE_WIND_SHARE_PARAMS", {
@@ -164,16 +142,7 @@ COMPOSITE_WIND_SHARE_PARAMS = getattr(cfg, "COMPOSITE_WIND_SHARE_PARAMS", {
     "double_irma": {"mean": 0.50, "concentration": 30},
 })
 
-# Future climate composite parameters
-COMPOSITE_WIND_SHARE_PARAMS_FUTURE = getattr(cfg, "COMPOSITE_WIND_SHARE_PARAMS_FUTURE", {
-    "andrew_then_gm": {"mean": 0.699, "concentration": 25},   # 77% × 0.908
-    "gm_then_andrew": {"mean": 0.690, "concentration": 25},   # 76% × 0.908
-    "double_gm": {"mean": 0.636, "concentration": 30},        # 70% × 0.908
-    "double_irma": {"mean": 0.454, "concentration": 30},      # 50% × 0.908
-})
 
-# Legacy uncertainty parameter (deprecated)
-COMPOSITE_WIND_SHARE_UNCERTAINTY = getattr(cfg, "COMPOSITE_WIND_SHARE_UNCERTAINTY", 0.03)
 
 # County-specific wind/water redistribution toggle
 USE_COUNTY_REDISTRIBUTION = bool(getattr(cfg, "USE_COUNTY_REDISTRIBUTION", False))
@@ -331,54 +300,30 @@ def _load_event_df(path: Path) -> pd.DataFrame:
     return out
 
 
-def _sample_wind_share(event_key: str, rng: np.random.Generator, use_future: bool = False) -> float:
+def _sample_wind_share(event_key: str, rng: np.random.Generator) -> float:
     """
-    Sample wind share for a single event.
-    
-    Supports multiple sampling modes:
-    - "beta": Beta distribution with mean and concentration (recommended)
-    - "uniform": Uniform over bounds (legacy)
-    - "triangular": Triangular over bounds (legacy)
+    Sample wind share for a single event from a Beta distribution.
     
     Args:
         event_key: Event identifier (e.g., "1926255N15314")
         rng: Random number generator
-        use_future: If True, use future climate wind/water parameters (Gori SSP245)
     
     Returns:
         Wind share (0-1)
     """
-    if DEFAULT_WIND_SHARE_MODE == "beta":
-        # Select parameter dictionary based on climate scenario
-        if use_future:
-            params = EVENT_WIND_SHARE_PARAMS_FUTURE.get(event_key)
-            # Fall back to present-day if future not defined
-            if params is None:
-                params = EVENT_WIND_SHARE_PARAMS.get(event_key)
-        else:
-            params = EVENT_WIND_SHARE_PARAMS.get(event_key)
-        
-        if params is None:
-            # Fall back to default (use future default if future enabled)
-            mean = DEFAULT_WIND_SHARE_MEAN_FUTURE if use_future else DEFAULT_WIND_SHARE_MEAN
-            concentration = DEFAULT_WIND_SHARE_CONCENTRATION
-        else:
-            mean = params["mean"]
-            concentration = params["concentration"]
-        
-        # Convert mean + concentration to alpha, beta parameters
-        alpha = mean * concentration
-        beta_param = (1 - mean) * concentration
-        return float(rng.beta(alpha, beta_param))
+    params = EVENT_WIND_SHARE_PARAMS.get(event_key)
     
+    if params is None:
+        mean = DEFAULT_WIND_SHARE_MEAN
+        concentration = DEFAULT_WIND_SHARE_CONCENTRATION
     else:
-        # Legacy modes: uniform or triangular (no climate adjustment)
-        a, b = EVENT_WIND_SHARE_BOUNDS.get(event_key, DEFAULT_WIND_SHARE_BOUNDS)
-        a, b = (min(a, b), max(a, b))
-        if DEFAULT_WIND_SHARE_MODE == "triangular":
-            mode = (2*a + b)/3.0
-            return float(rng.triangular(a, mode, b))
-        return float(rng.uniform(a, b))
+        mean = params["mean"]
+        concentration = params["concentration"]
+    
+    # Convert mean + concentration to alpha, beta parameters
+    alpha = mean * concentration
+    beta_param = (1 - mean) * concentration
+    return float(rng.beta(alpha, beta_param))
 
 
 def _inject_damage_loaders(wind_df: pd.DataFrame, water_df: pd.DataFrame) -> None:
@@ -480,32 +425,15 @@ def _prepare_common_inputs():
 
 # Cache county adjustment factors (loaded once per run)
 _COUNTY_ADJUSTMENT_FACTORS = None
-_COUNTY_ADJUSTMENT_FACTORS_FUTURE = None
 
-def _load_county_adjustment_factors(use_future=False):
-    """Load county-specific wind/water deviations from empirical data (cached).
+def _load_county_adjustment_factors():
+    """Load county-specific wind/water deviations from empirical data (cached)."""
+    global _COUNTY_ADJUSTMENT_FACTORS
     
-    Parameters:
-    -----------
-    use_future : bool
-        If True, load future climate factors (SSP2-4.5, 2070-2100)
-        If False, load present climate factors (1980-2019)
-    """
-    global _COUNTY_ADJUSTMENT_FACTORS, _COUNTY_ADJUSTMENT_FACTORS_FUTURE
+    if _COUNTY_ADJUSTMENT_FACTORS is not None:
+        return _COUNTY_ADJUSTMENT_FACTORS
     
-    # Determine which cached variable and file to use
-    if use_future:
-        if _COUNTY_ADJUSTMENT_FACTORS_FUTURE is not None:
-            return _COUNTY_ADJUSTMENT_FACTORS_FUTURE
-        empirical_file = DATA_DIR / 'florida_log_contribution_p95_future.csv'
-        cache_var_name = '_COUNTY_ADJUSTMENT_FACTORS_FUTURE'
-        climate_period = 'SSP2-4.5 2070-2100'
-    else:
-        if _COUNTY_ADJUSTMENT_FACTORS is not None:
-            return _COUNTY_ADJUSTMENT_FACTORS
-        empirical_file = DATA_DIR / 'florida_log_contribution_p95_present.csv'
-        cache_var_name = '_COUNTY_ADJUSTMENT_FACTORS'
-        climate_period = '1980-2019'
+    empirical_file = DATA_DIR / 'florida_log_contribution_p95_present.csv'
     
     # Load the file
     df = pd.read_csv(empirical_file)
@@ -555,34 +483,21 @@ def _load_county_adjustment_factors(use_future=False):
         result['empirical_mean'] = empirical_mean
     
     # Cache the result
-    if use_future:
-        _COUNTY_ADJUSTMENT_FACTORS_FUTURE = result
-    else:
-        _COUNTY_ADJUSTMENT_FACTORS = result
+    _COUNTY_ADJUSTMENT_FACTORS = result
     
-    dbg(f"[County Redistribution] Loaded {len(result)} counties from {climate_period}")
+    dbg(f"[County Redistribution] Loaded {len(result)} counties")
     
-    return _COUNTY_ADJUSTMENT_FACTORS_FUTURE if use_future else _COUNTY_ADJUSTMENT_FACTORS
+    return _COUNTY_ADJUSTMENT_FACTORS
 
-def _apply_county_redistribution(base_df: pd.DataFrame, baseline_wind_share: float, rng: np.random.Generator, use_future_climate: bool = False):
+def _apply_county_redistribution(base_df: pd.DataFrame, baseline_wind_share: float, rng: np.random.Generator):
     """
     Apply county-specific wind/water redistribution that PRESERVES overall wind share.
     
-    Improved algorithm:
-    -------------------
+    Algorithm:
+    ----------
     1. Load empirical county-specific wind shares (from actual FLOIR/NFIP data)
     2. Scale all county shares proportionally so that loss-weighted mean = baseline
     3. This preserves relative differences between counties while hitting target share
-    
-    Example:
-    --------
-    - Miami-Dade empirical: 87.8% wind, Escambia empirical: 78.9% wind
-    - Empirical mean (unweighted): 84.6%
-    - Target baseline: 70.0%
-    - Scaling factor: 70.0 / 78.75 = 0.889
-    - Miami-Dade adjusted: 85.1 × 0.889 = 75.6%
-    - Escambia adjusted: 77.9 × 0.889 = 69.2%
-    - Loss-weighted mean will equal exactly 70.0%
     
     Data source: florida_log_contribution_p95_present.csv
       - Based on logarithmic contribution method (Gori et al. 2022)
@@ -594,14 +509,13 @@ def _apply_county_redistribution(base_df: pd.DataFrame, baseline_wind_share: flo
     base_df : DataFrame with columns ['County', 'TotalLossUSD', 'countyfp']
     baseline_wind_share : float, target overall wind share (e.g., 0.70 for Great Miami)
     rng : Random generator (unused here, but kept for interface consistency)
-    use_future_climate : bool, whether to use future climate county factors (default: False)
     
     Returns:
     --------
     wind_df : DataFrame with ['County', 'WindDamageUSD']
     water_df : DataFrame with ['County', 'WaterDamageUSD']
     """
-    factors = _load_county_adjustment_factors(use_future=use_future_climate)
+    factors = _load_county_adjustment_factors()
     
     # Copy input data
     df = base_df.copy()
@@ -704,15 +618,10 @@ def _combine_events_for_scenario(scenario_name: str, event_stems: List[str], rng
         
         # Sample wind share for composite scenarios
         # Use Beta distribution centered at weighted average with tighter concentration
-        # Select parameter dictionary based on climate scenario (wind/water attribution)
-        use_future_wind_share = getattr(cfg, "USE_FUTURE_WIND_SHARE", False)
-        if use_future_wind_share and scenario_name in COMPOSITE_WIND_SHARE_PARAMS_FUTURE:
-            params = COMPOSITE_WIND_SHARE_PARAMS_FUTURE[scenario_name]
-        elif scenario_name in COMPOSITE_WIND_SHARE_PARAMS:
+        if scenario_name in COMPOSITE_WIND_SHARE_PARAMS:
             params = COMPOSITE_WIND_SHARE_PARAMS[scenario_name]
         else:
             # Fallback: use the stored wind share value directly (from tuple)
-            # This shouldn't happen if config is properly set up
             params = None
         
         if params is not None:
@@ -730,10 +639,8 @@ def _combine_events_for_scenario(scenario_name: str, event_stems: List[str], rng
         
         # Apply county-specific redistribution if enabled
         if USE_COUNTY_REDISTRIBUTION:
-            use_future_wind_share = getattr(cfg, "USE_FUTURE_WIND_SHARE", False)
-            wind_df, water_df = _apply_county_redistribution(base, w_share, rng, use_future_climate=use_future_wind_share)
+            wind_df, water_df = _apply_county_redistribution(base, w_share, rng)
         else:
-            # Uniform split across all counties
             wind_df = base.assign(WindDamageUSD=base["TotalLossUSD"] * w_share)[["County", "WindDamageUSD"]]
             water_df = base.assign(WaterDamageUSD=base["TotalLossUSD"] * (1.0 - w_share))[["County", "WaterDamageUSD"]]
         
@@ -755,14 +662,12 @@ def _combine_events_for_scenario(scenario_name: str, event_stems: List[str], rng
             raise FileNotFoundError(f"Missing event CSV: {p}")
         base = _load_event_df(p)
         
-        # Sample wind share (use future parameters if future wind share enabled)
-        use_future_wind_share = getattr(cfg, "USE_FUTURE_WIND_SHARE", False)
-        w_share = _sample_wind_share(stem, rng, use_future=use_future_wind_share)
+        w_share = _sample_wind_share(stem, rng)
         sampled[stem] = w_share
         
         # Apply county-specific redistribution if enabled
         if USE_COUNTY_REDISTRIBUTION:
-            wind_part, water_part = _apply_county_redistribution(base, w_share, rng, use_future_climate=use_future_wind_share)
+            wind_part, water_part = _apply_county_redistribution(base, w_share, rng)
         else:
             # Uniform split across all counties
             wind_part = base.assign(WindDamageUSD=base["TotalLossUSD"] * w_share)[["County","WindDamageUSD"]]
@@ -1549,7 +1454,6 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
                                   seed: int = RNG_SEED,
                                   out_dir: Path = OUT_DIR,
                                   run_label: str | None = None,
-                                  future_wind_share: bool = False,
                                   policy_scenario_config: dict | None = None,
                                   group_support_eligibility_threshold: float = 10.0) -> Path:
     """
@@ -1570,9 +1474,6 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
         Output directory root
     run_label : str, optional
         Custom label for output directory (e.g., 'stochastic_baseline')
-    future_wind_share : bool
-        Whether to use future climate wind/water attribution (77% wind vs 84.6% present)
-        Based on Gori et al. SSP245 end-of-century projections (×0.908 multiplier)
     policy_scenario_config : dict, optional
         Policy scenario configuration from cfg.POLICY_SCENARIOS
         If provided, applies policy intervention to all years
@@ -1604,10 +1505,6 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
             )
         
         dbg(f"STOCHASTIC TC MONTE CARLO: {year_sets_csv}")
-        
-        # Set future wind share flag
-        original_future_wind = getattr(cfg, "USE_FUTURE_WIND_SHARE", False)
-        cfg.USE_FUTURE_WIND_SHARE = future_wind_share
         
         # Load year-sets
         year_sets = pd.read_csv(year_sets_csv)

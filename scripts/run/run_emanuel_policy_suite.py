@@ -165,7 +165,6 @@ Examples:
                 seed=args.seed,
                 out_dir=Path(args.out),
                 run_label=run_label,
-                climate_scaling=False,
                 policy_scenario_config=policy_config,
             )
             results[policy] = out_dir

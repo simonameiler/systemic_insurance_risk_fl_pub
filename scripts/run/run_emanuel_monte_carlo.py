@@ -77,10 +77,6 @@ Examples:
     ap.add_argument("--flood_loss_reduction", type=float, default=None,
                     help="Override flood loss reduction for building codes (0.0-1.0, e.g., 0.10 = 10%%)")
     
-    # Wind/water attribution
-    ap.add_argument("--future_wind_share", action="store_true",
-                    help="Use future climate wind/water attribution (77%% wind vs 84.6%% present, Gori et al. SSP245 2081-2100)")
-    
     # Output configuration
     ap.add_argument("--out", type=str, default="results/emanuel_mc_runs",
                     help="Output directory root")
@@ -179,9 +175,6 @@ Examples:
         # Add year range suffix if using subset year sets
         if args.year_sets_file and "19952014" in args.year_sets_file:
             run_label += "_19952014"
-        
-        if args.future_wind_share:
-            run_label += "_future_wind"
     
     # Print configuration
     print("="*80)
@@ -193,7 +186,6 @@ Examples:
     print(f"  Year-sets: {year_sets_csv}")
     print(f"  N years: {args.n_years or 'all (10,000)'}")
     print(f"  Policy scenario: {args.policy or 'baseline'}")
-    print(f"  Future wind/water: {args.future_wind_share}")
     print(f"  Random seed: {args.seed}")
     print(f"  Output: {args.out}/{run_label}_TIMESTAMP")
     print()
@@ -206,7 +198,6 @@ Examples:
             seed=args.seed,
             out_dir=Path(args.out),
             run_label=run_label,
-            future_wind_share=args.future_wind_share,
             policy_scenario_config=policy_scenario_config,
         )
         

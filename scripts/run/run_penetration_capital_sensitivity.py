@@ -130,7 +130,6 @@ def run_mc_with_capital_multiplier(
         n_years=n_years,
         seed=seed,
         policy_scenario_config=policy_scenario_config,
-        climate_scaling=False,
         out_dir=Path("results/mc_runs"),
         run_label=run_label,
     )
