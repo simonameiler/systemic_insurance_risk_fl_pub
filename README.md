@@ -6,7 +6,7 @@
 These scripts reproduce the main results of the paper:
 
 **Simona Meiler**(1), Steven I. Jackson (2), Kerry Emanuel (3), Noah S. Diffenbaugh (4), Jack W.
-Baker (1): *[Stress testing insurance market stability under climate-driven disaster risk]*
+Baker (1): *Stress testing insurance market stability under climate-driven disaster risk*
 
 Publication status: [under review]
 
@@ -53,7 +53,7 @@ systemic_insurance_risk_fl_pub/
 │       ├── *.csv / *.xlsx             ← FHCF terms, Citizens, NFIP, county mappings, etc.
 │       ├── hazard/                    ← per-event impacts and historical scenarios
 │       │   ├── gori_data/             ← Gori et al. 2025 hazard matrices (Wind, Rain, Surge, EAD)
-│       │   ├── emanuel/               ← Kerry Emanuel TC event sets (ERA5 baseline)
+│       │   ├── emanuel/               ← Kerry Emanuel TC event sets
 │       │   └── historical_events/     ← individual historical hurricane impact CSVs
 │       └── US_counties/               ← Florida county shapefiles
 │
@@ -164,11 +164,13 @@ Pre-computed results used in the notebooks are stored in `results/`.
 
 ## Data availability
 
-**Included in the repository**: FHCF contract terms, Citizens Property Insurance county data, NFIP claims and penetration rates, county mappings, per-event impacts, catastrophe bond terms, and historical hurricane scenario impacts.
+**Included in the repository**: FHCF contract terms, Citizens Property Insurance county data, NFIP claims and penetration rates, county mappings, per-event county-level impacts, catastrophe bond terms, historical hurricane scenario impacts (generated via a CLIMADA workflow from IBTrACS tracks), and wind/water hazard attribution tables (derived from the Gori et al. simulations below).
 
 **Proprietary** (contact authors): Florida company-level wind exposure data, statutory surplus capital data. See `fl_risk_model/config.py` for details.
 
-**External**: The synthetic TC data from the MIT model are proprietary and owned by WindRiskTech L.L.C., a company that provides hurricane risk assessments to clients worldwide. Due to proprietary restrictions, these datasets are not publicly archived. However, researchers interested in accessing the data for scientific purposes can contact WindRiskTech L.L.C. at info@windrisktech.com, subject to a non-redistribution agreement.
+**External — Gori et al. (2025) hazard data**: The synthetic tropical cyclone hazard and damage simulations from Gori et al., (2025) used in this study to derive county-wide empirical wind/flood loss attribution are publicly available from DesignSafe-CI: Gori, A. (2025). "Tropical Cyclone Synthetic Hazard and Damage Simulations", in *Sensitivity of TC risk to storm climatology change and socioeconomic growth*. DesignSafe-CI. [https://doi.org/10.17603/ds2-0jkm-h487](https://doi.org/10.17603/ds2-0jkm-h487). The raw .mat files (wind, rain, surge, and expected annual damage matrices) should be placed in `fl_risk_model/data/hazard/gori_data/`.
+
+**External — Emanuel TC event sets**: The synthetic TC data from the MIT model are proprietary and owned by WindRiskTech L.L.C., a company that provides hurricane risk assessments to clients worldwide. Due to proprietary restrictions, these datasets are not publicly archived. However, researchers interested in accessing the data for scientific purposes can contact WindRiskTech L.L.C. at info@windrisktech.com, subject to a non-redistribution agreement. Precomputed per-event impacts should be placed in `fl_risk_model/data/hazard/emanuel/`.
 
 ---
 
