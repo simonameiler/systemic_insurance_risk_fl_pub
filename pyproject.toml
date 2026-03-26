@@ -7,7 +7,7 @@ name = "fl-risk-model"
 version = "1.0.0"
 description = "Florida Systemic Insurance Risk Model - Stress testing financial stability under climate change"
 readme = "README.md"
-license = {text = "Apache-2.0"}
+license = {text = "GPL-3.0-or-later"}
 requires-python = ">=3.9"
 authors = [
     {name = "Simona Meiler", email = "PLACEHOLDER@example.com"}
@@ -24,7 +24,7 @@ keywords = [
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
