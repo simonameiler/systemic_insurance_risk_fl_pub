@@ -38,7 +38,7 @@ systemic_insurance_risk_fl_pub/
 │   ├── nfip.py                        ← NFIP payouts and Empirical-Bayes payout rates
 │   ├── utils.py                       ← county name normalization helper
 │   │
-│   ├── branches/                      ← risk waterfall implementation
+│   ├── branches/                      ← risk propagation implementation
 │   │   ├── wind.py                    ← private wind losses by company × county + FHCF
 │   │   ├── citizens.py                ← Citizens Property Insurance wind losses + FHCF
 │   │   ├── flood.py                   ← NFIP flood losses and recoveries
@@ -61,7 +61,7 @@ systemic_insurance_risk_fl_pub/
 │   ├── run/                           ← Monte Carlo run scripts
 │   │   ├── run_emanuel_monte_carlo.py             ← baseline MC with Emanuel TC event sets
 │   │   ├── run_emanuel_policy_suite.py            ← side-by-side policy scenario comparisons
-│   │   ├── run_historical_scenarios_mc.py         ← 8 historical scenarios (200 MC iterations)
+│   │   ├── run_historical_scenarios_mc.py         ← 8 historical scenarios
 │   │   ├── run_climate_buildingcode_sensitivity_windfloods.py  ← building code × climate sensitivity
 │   │   ├── run_penetration_capital_sensitivity.py ← capital multiplier sweep under penetration increase
 │   │   ├── run_insured_fraction_sensitivity.py    ← insured fraction sweep (0.1–0.5)
@@ -103,9 +103,9 @@ systemic_insurance_risk_fl_pub/
 
 ### `fl_risk_model/`
 
-Core Python package implementing a probabilistic catastrophe model for stress-testing Florida's property insurance system.
-The model simulates hurricane events through the full insurance waterfall: wind/flood exposure allocation, FHCF and NFIP recoveries, private insurer capital depletion, Citizens Property Insurance backstop, and catastrophe bond losses.
-Policy scenarios (market exit, penetration increase, building code improvements) modify the system state before simulation.
+Core Python package implementing a probabilistic risk propagation model for stress-testing Florida's property insurance system.
+The model simulates hurricane events through the full insurance market: wind/flood exposure allocation, FHCF and NFIP recoveries, private insurer capital depletion, Citizens Property Insurance backstop, and catastrophe bond losses.
+Stylized policy scenarios (market exit, penetration increase, building code improvements) modify the system state before simulation.
 
 ### `scripts/run/`
 
@@ -118,7 +118,7 @@ Post-processing scripts that read Monte Carlo output and produce summary tables,
 
 ### `scripts/hazard/`
 
-Preprocessing scripts that convert raw hazard data (Gori et al. matrices, Kerry Emanuel TC tracks) into per-event county-level impact tables consumed by the risk model.
+Preprocessing scripts that convert raw hazard data (IBTrACS, Kerry Emanuel TC tracks) into per-event county-level impact tables consumed by the risk model.
 These scripts require [CLIMADA](https://github.com/CLIMADA-project/climada_python) and, for windfield computation, an HPC cluster.
 
 ### `scripts/cluster/`
