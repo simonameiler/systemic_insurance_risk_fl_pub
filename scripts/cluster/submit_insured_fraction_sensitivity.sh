@@ -22,7 +22,7 @@ set -u
 FRACTIONS="${1:-0.1 0.2 0.3 0.4 0.5}"
 N_YEARS="${2:-}"
 
-PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl"
+PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl_pub"
 cd "${PROJECT_DIR}"
 mkdir -p logs
 
@@ -46,7 +46,7 @@ for FRAC in ${FRACTIONS}; do
         --time=48:00:00 \
         --mem=64G \
         --cpus-per-task=1 \
-        --partition=normal \
+        --partition=serc \
         --wrap="
 source \$(conda info --base)/etc/profile.d/conda.sh
 conda activate climada_env

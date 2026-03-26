@@ -5,7 +5,7 @@
 #SBATCH --time=48:00:00
 #SBATCH --mem=128G
 #SBATCH --cpus-per-task=1
-#SBATCH --partition=normal
+#SBATCH --partition=serc
 
 ################################################################################
 # Submit Emanuel TC Policy Suite on Sherlock
@@ -32,7 +32,7 @@ set -e  # Exit on error
 set -u  # Exit on undefined variable
 
 # Set up paths
-PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl"
+PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl_pub"
 cd ${PROJECT_DIR}
 
 # Create logs directory

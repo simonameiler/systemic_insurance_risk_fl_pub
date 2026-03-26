@@ -42,7 +42,7 @@ python -c "import fl_risk_model; print(f'fl_risk_model loaded from: {fl_risk_mod
 EVENT_SET="FL_era5_reanalcal"
 N_YEARS=10000
 SEED=42
-OUT_DIR="results/emanue_mc_pub"
+OUT_DIR="results/mc_runs"
 RUN_LABEL="era5_baseline"
 
 echo ""

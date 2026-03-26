@@ -67,7 +67,7 @@ python --version
 echo ""
 
 # Navigate to repo
-cd ~/repos/systemic_insurance_risk_fl || exit 1
+cd ~/repos/systemic_insurance_risk_fl_pub || exit 1
 
 #==============================================================================
 # Capital Multiplier Configuration

@@ -5,7 +5,7 @@
 #SBATCH --time=48:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=1
-#SBATCH --partition=normal
+#SBATCH --partition=serc
 
 ################################################################################
 # Variance Decomposition: hazard variability vs. parameter uncertainty
@@ -44,7 +44,7 @@ M="${2:-300}"
 K="${3:-50}"
 
 # Set up paths
-PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl"
+PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl_pub"
 cd "${PROJECT_DIR}"
 mkdir -p logs
 

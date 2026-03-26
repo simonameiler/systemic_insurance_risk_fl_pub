@@ -5,7 +5,7 @@
 #SBATCH --time=48:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=1
-#SBATCH --partition=normal
+#SBATCH --partition=serc
 
 ################################################################################
 # Submit Emanuel TC Monte Carlo analysis on Sherlock
@@ -44,7 +44,7 @@ echo "======================================================================"
 echo ""
 
 # Set up paths
-PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl"
+PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl_pub"
 cd ${PROJECT_DIR}
 
 # Create logs directory
@@ -146,11 +146,10 @@ echo "Started:       $(date)"
 echo ""
 
 # Build command
-CMD="python run_emanuel_monte_carlo.py"
+CMD="python scripts/run/run_emanuel_monte_carlo.py"
 CMD="$CMD --event_set $EVENT_SET"
 CMD="$CMD --impact_dir $IMPACT_DIR"
 CMD="$CMD --out $OUTPUT_ROOT"
-CMD="$CMD --fast_threshold 0"  # Full modeling for all years
 
 # Add policy if specified
 if [ -n "${POLICY:-}" ]; then

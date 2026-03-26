@@ -21,7 +21,7 @@ if ! command -v sbatch &> /dev/null; then
     echo ""
     echo "To use this script:"
     echo "  1. SSH to Sherlock: ssh <sunetid>@login.sherlock.stanford.edu"
-    echo "  2. Navigate to repo: cd ~/repos/systemic_insurance_risk_fl"
+    echo "  2. Navigate to repo: cd ~/repos/systemic_insurance_risk_fl_pub"
     echo "  3. Run: bash scripts/cluster/submit_policy_suite_parallel.sh FL_era5_reanalcal"
     exit 1
 fi

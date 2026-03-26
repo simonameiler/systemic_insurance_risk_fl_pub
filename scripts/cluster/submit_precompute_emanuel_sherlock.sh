@@ -30,7 +30,7 @@ source activate climada_env
 mkdir -p logs
 
 # Navigate to project directory
-cd $HOME/systemic_insurance_risk_fl
+cd $HOME/systemic_insurance_risk_fl_pub
 
 # Define all event sets (corresponding to processed windfields)
 EVENT_SETS=(

@@ -5,6 +5,7 @@
 #SBATCH --time=48:00:00
 #SBATCH --mem=64G
 #SBATCH --cpus-per-task=1
+#SBATCH --partition=serc
 #SBATCH --array=0-49
 
 ################################################################################
@@ -46,7 +47,7 @@ echo "======================================================================"
 echo ""
 
 # Set up paths
-PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl"
+PROJECT_DIR="${HOME}/repos/systemic_insurance_risk_fl_pub"
 cd ${PROJECT_DIR}
 
 # Create logs directory
