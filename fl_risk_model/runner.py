@@ -32,7 +32,7 @@ from pathlib import Path
 import datetime as _dt
 
 from fl_risk_model import config as cfg
-from fl_risk_model.utils import make_xwalk_from_tiger, norm_county_name
+from fl_risk_model.utils import norm_county_name
 
 from fl_risk_model.loader import (
     load_citizens_county,
@@ -43,7 +43,7 @@ from fl_risk_model.loader import (
     load_nfip_fl_premium_base,
     load_fhcf_county_exposure,
 )
-from fl_risk_model.exposure import build_wind_exposures, build_wind_exposures_alt_company_county
+from fl_risk_model.exposure import build_wind_exposures
 from fl_risk_model.branches.wind import load_wind_damage, allocate_insured_wind_to_private
 from fl_risk_model.branches.flood import load_water_damage_scenario 
 from fl_risk_model.branches.citizens import (
@@ -247,7 +247,6 @@ def _build_xwalk(county_xwalk, fhcf_county_df=None, statefp_default="12"):
 def _print_exposure_diagnostics(private_exp: pd.DataFrame,
                                     citizens_exp: pd.DataFrame,
                                     fhcf_county_df: pd.DataFrame,
-                                    mode_label: str,
                                     verbose: bool = False,
                                     show_mb: bool = False) -> None:
         """Lightweight, optional console diagnostics."""
@@ -256,7 +255,7 @@ def _print_exposure_diagnostics(private_exp: pd.DataFrame,
 
         # Small, readable sample
         cols = [c for c in ["County","Company","TIV","StatEntityKey"] if c in private_exp.columns]
-        print(f"[runner][{mode_label}] sample:", private_exp[cols].head(5).to_dict(orient="records"))
+        print(f"[runner] sample:", private_exp[cols].head(5).to_dict(orient="records"))
 
         # StatEntityKey coverage (only if present)
         if "StatEntityKey" in private_exp.columns:
@@ -373,51 +372,34 @@ def run_one_scenario(
                 ms = ms.rename(columns={cands[0]: "Share"})
 
     # Choose build path
-    mode = str(getattr(cfg, "EXPOSURE_METHOD", "topdown")).lower()
-    if mode == "topdown":
-        private_exp, citizens_exp = build_wind_exposures(
-            fhcf_county_df=fhcf_county_df,
-            market_share_df=ms,
-            citizens_csv_path=citizens_csv_path or cfg.CITIZENS_COUNTY_CSV,
-            citizens_as_of=citizens_as_of or cfg.CITIZENS_AS_OF,
-            citizens_products=citizens_products or cfg.CITIZENS_PRODUCTS,
-            county_xwalk=xwalk,
-            rng=rng,
-        )
+    private_exp, citizens_exp = build_wind_exposures(
+        fhcf_county_df=fhcf_county_df,
+        market_share_df=ms,
+        citizens_csv_path=citizens_csv_path or cfg.CITIZENS_COUNTY_CSV,
+        citizens_as_of=citizens_as_of or cfg.CITIZENS_AS_OF,
+        citizens_products=citizens_products or cfg.CITIZENS_PRODUCTS,
+        county_xwalk=xwalk,
+        rng=rng,
+    )
 
-        # Strict (but tolerant) mass-balance: FHCF ~ Private + Citizens
-        priv = private_exp.groupby("County", as_index=False)["TIV"].sum().rename(columns={"TIV":"Private"})
-        cit  = citizens_exp.groupby("County", as_index=False)["TIV"].sum().rename(columns={"TIV":"Citizens"})
-        chk = (fhcf_county_df[["County","CountyTIV"]]
-            .merge(priv, on="County", how="left")
-            .merge(cit, on="County", how="left")
-            .fillna(0))
-        tol = 1e-3
-        miss = (chk["CountyTIV"] - (chk["Private"] + chk["Citizens"])).abs()
-        if (miss > tol).any():
-            offenders = chk.loc[miss > tol, ["County","CountyTIV","Private","Citizens"]]
-            raise AssertionError(f"Top-down mass balance miss for {len(offenders)} counties;\n{offenders.head(8)}")
-
-    else:  # "bottomup"
-        private_exp, citizens_exp = build_wind_exposures_alt_company_county(
-            fhcf_path=str(cfg.EXPOSURE_FILE),
-            market_share_path=str(cfg.MARKET_SHARE_XLSX),
-            citizens_csv_path=str(cfg.CITIZENS_COUNTY_CSV),
-            citizens_as_of=cfg.CITIZENS_AS_OF,
-            citizens_products=cfg.CITIZENS_PRODUCTS,
-            company_county_workbook=str(cfg.EXPOSURE_BY_COUNTY_XLSX),
-            company_key_csv=str(cfg.COMPANY_KEYS),
-            county_xwalk=xwalk,     # keep if you want FIPS enforcement in Citizens
-            sample=None,            # defers to cfg.SAMPLE_EXPOSURE inside builder
-            cov=None,               # defers to cfg.EXPOSURE_COV inside builder
-        )
+    # Strict (but tolerant) mass-balance: FHCF ~ Private + Citizens
+    priv = private_exp.groupby("County", as_index=False)["TIV"].sum().rename(columns={"TIV":"Private"})
+    cit  = citizens_exp.groupby("County", as_index=False)["TIV"].sum().rename(columns={"TIV":"Citizens"})
+    chk = (fhcf_county_df[["County","CountyTIV"]]
+        .merge(priv, on="County", how="left")
+        .merge(cit, on="County", how="left")
+        .fillna(0))
+    tol = 1e-3
+    miss = (chk["CountyTIV"] - (chk["Private"] + chk["Citizens"])).abs()
+    if (miss > tol).any():
+        offenders = chk.loc[miss > tol, ["County","CountyTIV","Private","Citizens"]]
+        raise AssertionError(f"Top-down mass balance miss for {len(offenders)} counties;\n{offenders.head(8)}")
 
     # Optional diagnostics (silenced by default via config)
     _print_exposure_diagnostics(
         private_exp,
         citizens_exp,
         fhcf_county_df,
-        mode_label=("TOPDOWN" if mode == "topdown" else "BOTTOMUP"),
         verbose=getattr(cfg, "VERBOSE_EXPOSURE", False),
         show_mb=getattr(cfg, "PRINT_MASSBALANCE_TOP5", False),
     )
@@ -585,89 +567,6 @@ def run_one_scenario(
                     dbg(f"[SURPLUS ADJ] No adjustment (exposure change < 0.001%)")
             
             scenario_diagnostics["penetration"] = penetration_diag
-# --- OLD CODE BLOCK (to be deleted) ---
-    # ms = market_share_df.copy()
-    # if "Share" not in ms.columns:
-    #     yr = getattr(cfg, "MARKET_SHARE_YEAR", 2024)
-    #     exact = f"MarketShare{yr}"
-    #     if exact in ms.columns:
-    #         ms = ms.rename(columns={exact: "Share"})
-    #     else:
-    #         cands = [c for c in ms.columns if str(c).lower().startswith("marketshare")]
-    #         if cands:
-    #             ms = ms.rename(columns={cands[0]: "Share"})
-
-    # if cfg.EXPOSURE_METHOD == "topdown":
-    #     private_exp, citizens_exp = build_wind_exposures(
-    #         fhcf_county_df=fhcf_county_df,
-    #         market_share_df=ms,
-    #         citizens_csv_path=citizens_csv_path or cfg.CITIZENS_COUNTY_CSV,
-    #         citizens_as_of=citizens_as_of or cfg.CITIZENS_AS_OF,
-    #         citizens_products=citizens_products or cfg.CITIZENS_PRODUCTS,
-    #         county_xwalk=xwalk,
-    #         rng=rng,
-    #     )
-    
-    #     # after private_exp, citizens_exp are built
-    #     priv = private_exp.groupby("County", as_index=False)["TIV"].sum().rename(columns={"TIV":"Private"})
-    #     cit  = citizens_exp.groupby("County", as_index=False)["TIV"].sum().rename(columns={"TIV":"Citizens"})
-    #     fhcf = fhcf_county_df[["County","CountyTIV"]]
-    #     chk = fhcf.merge(priv, on="County", how="left").merge(cit, on="County", how="left").fillna(0)
-    #     chk["delta"] = chk["CountyTIV"] - (chk["Private"] + chk["Citizens"])
-    #     assert (chk["delta"].abs() <= 1e-3).all(), f"Top-down mass balance miss:\n{chk.loc[chk['delta'].abs()>1e-3].head()}"
-
-
-    # else: # "bottomup"
-    #     private_exp, citizens_exp = build_wind_exposures_alt_company_county(
-    #             fhcf_path=str(cfg.EXPOSURE_FILE),                  
-    #             market_share_path=str(cfg.MARKET_SHARE_XLSX),         
-    #             citizens_csv_path=str(cfg.CITIZENS_COUNTY_CSV),       
-    #             citizens_as_of=cfg.CITIZENS_AS_OF,
-    #             citizens_products=cfg.CITIZENS_PRODUCTS,
-    #             company_county_workbook=str(cfg.EXPOSURE_BY_COUNTY_XLSX),
-    #             company_key_csv=str(cfg.COMPANY_KEYS),
-    #             county_xwalk=xwalk,  # pass if you want to enforce FIPS attachment in Citizens
-    #             sample=None,        # uses cfg.SAMPLE_EXPOSURE
-    #             cov=None,           # uses cfg.EXPOSURE_COV
-    #     )
-    #     print("[runner] ALT private rows:", f"{len(private_exp):,}", "| citizens rows:", f"{len(citizens_exp):,}")
-
-    # if not private_exp.empty:
-    #     # Small, readable sample
-    #     cols = [c for c in ["County","Company","TIV","StatEntityKey"] if c in private_exp.columns]
-    #     print("[runner] ALT sample:", private_exp[cols].head(5).to_dict(orient="records"))
-
-    #     # Mapping coverage (guarded)
-    #     total = len(private_exp)
-    #     mapped = private_exp["StatEntityKey"].notna().sum() if "StatEntityKey" in private_exp.columns else 0
-    #     pct = (mapped/total*100) if total else 0.0
-    #     print(f"[check] StatEntityKey coverage: {mapped:,}/{total:,} ({pct:.1f}%)")
-
-    #     # Unmapped examples (guarded)
-    #     if "StatEntityKey" in private_exp.columns:
-    #         unmapped = (private_exp[private_exp["StatEntityKey"].isna()]
-    #                     .groupby("Company").size().sort_values(ascending=False).head(10))
-    #         if not unmapped.empty:
-    #             print("[check] Unmapped examples:")
-    #             print(unmapped)
-
-    #     # Sanity: no Citizens in private_exp
-    #     n_cit = private_exp["Company"].astype(str).str.contains(r"(?i)\bcitizen", na=False).sum()
-    #     if n_cit:
-    #         print(f"[WARN] Found {n_cit} Citizens rows in private_exp (should be 0).")
-
-    #     # Mass-balance snapshot: (Private + Citizens) vs FHCF CountyTIV
-    #     fhcf = load_fhcf_county_exposure(str(cfg.EXPOSURE_FILE))[["County","CountyTIV"]]
-    #     recon = (pd.concat([private_exp[["County","TIV"]], citizens_exp[["County","TIV"]]], ignore_index=True)
-    #             .groupby("County", as_index=False)["TIV"].sum()
-    #             .rename(columns={"TIV":"reconstructed"}))
-    #     cmp = fhcf.merge(recon, on="County", how="left").fillna({"reconstructed":0.0})
-    #     cmp["delta"] = cmp["CountyTIV"] - cmp["reconstructed"]
-    #     cmp["rel_gap_%"] = 100 * cmp["delta"].abs() / cmp["CountyTIV"].clip(lower=1)
-    #     print("[check] Largest rel. gaps (top 5):")
-    #     print(cmp.sort_values("rel_gap_%", ascending=False).head(5).to_string(index=False))
-    # else:
-    #     print("[runner] ALT private is empty - check workbook path and filters.")
 
     # --- 2) County-level wind damages
     county_wind = load_wind_damage(storm_name)  # ['County','WindDamageUSD']

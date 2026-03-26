@@ -18,9 +18,7 @@ PUBLIC DATA (included in fl_risk_model/data/):
 PROPRIETARY DATA (available on request):
 The following files contain proprietary Florida OIR data and must be
 obtained separately. Contact the authors for access instructions:
-- Exposures by Company and by County.xlsx - Company-level exposure data
 - FL Surplus Capital, Group v Entity.xlsx - Insurer capital data
-- Reserves for Homeowners in Florida.xlsx - Reserve data
 - FL HO Market Share Report.xlsx - Market share data
 """
 import os
@@ -40,13 +38,10 @@ FIXED_YEAR = 2024
 EXPOSURE_FILE     = DATA_DIR / "FHCF_2024_Exposure_byCounty.xlsx"
 
 # Proprietary data (must be obtained separately - contact authors or Florida OIR)
-EXPOSURE_BY_COUNTY_XLSX = DATA_DIR / "20250919 Exposures by Company and by County.xlsx"
 SURPLUS_FILE      = DATA_DIR / "20250805 FL Surplus Capital, Group v Entity.xlsx"
-RESERVES_FILE     = DATA_DIR / "20250827 Reserves for Homeowners in Florida.xlsx"
 MARKET_SHARE_XLSX = DATA_DIR / "FL HO Market Share Report_6.10.25.xlsx"
 
 MARKET_SHARE_YEAR = FIXED_YEAR
-EXPOSURE_METHOD = "topdown"  # or "bottomup"
 VERBOSE_EXPOSURE = False      # gate noisy per-county/company prints
 PRINT_MASSBALANCE_TOP5 = False  # gate the “Largest rel. gaps” table
 
@@ -432,7 +427,7 @@ MC_OUT_DIR = Path("results/mc_runs")  # IMPORTANT: must be a Path, not a string
 
 from pathlib import Path as _P
 def _p(x): return x if isinstance(x, _P) else _P(x)
-for _name in ("DATA_DIR","EXPOSURE_FILE","SURPLUS_FILE","RESERVES_FILE",
+for _name in ("DATA_DIR","EXPOSURE_FILE","SURPLUS_FILE",
               "MARKET_SHARE_XLSX","FHCF_TERMS_CSV","CATBONDS_CSV",
               "CITIZENS_COUNTY_CSV","CITIZENS_CAPITAL_CSV","NFIP_PENETRATION_CSV",
               "NFIP_POLICIES_CSV","NFIP_PREMIUM_BASE_CSV","COMPANY_KEYS"):

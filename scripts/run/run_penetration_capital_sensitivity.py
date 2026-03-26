@@ -53,7 +53,6 @@ from fl_risk_model.loader import (
 )
 from fl_risk_model.capital import load_surplus_data_with_groups
 from fl_risk_model.exposure import build_wind_exposures
-from fl_risk_model.utils import make_xwalk_from_tiger
 from fl_risk_model.scenarios.penetration import apply_penetration_increase_scenario
 import pandas as pd
 
