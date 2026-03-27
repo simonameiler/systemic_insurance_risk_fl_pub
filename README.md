@@ -69,7 +69,6 @@ systemic_insurance_risk_fl_pub/
 │   │
 │   ├── analysis/                      ← post-processing & table/figure generation
 │   │   ├── analyze_emanuel_comprehensive.py       ← loss composition, institutional stress analysis
-│   │   ├── analyze_penetration_capital_sensitivity.py ← optimal capital multiplier identification
 │   │   ├── build_scenario_report_with_uncertainty.py  ← Excel reports with uncertainty bands
 │   │   ├── combine_probabilistic_tables.py        ← unify probabilistic loss tables
 │   │   ├── combine_systemic_risk_tables.py        ← unify systemic risk comparison tables
@@ -95,8 +94,8 @@ systemic_insurance_risk_fl_pub/
 └── results/                           ← output directories (MC runs, figures, tables)
     ├── figures/
     ├── tables/
-    ├── mc_runs/
-    └── emanuel_mc_runs/
+    ├── climate_deltas/
+    └── mc_runs/
 ```
 
 ## Content
@@ -111,6 +110,7 @@ Stylized policy scenarios (market exit, penetration increase, building code impr
 
 Monte Carlo simulation scripts. Each script configures and launches `mc_run_events.run_stochastic_tc_monte_carlo()` with different parameter sweeps or event sets.
 Computationally demanding runs are designed for HPC execution via the corresponding SLURM scripts in `scripts/cluster/`.
+Three scripts produce the sensitivity analyses reported in the Supplementary Information tables: `run_insured_fraction_sensitivity.py` (insured wind fraction sweep), `run_penetration_capital_sensitivity.py` (capital adequacy under penetration increase), and `run_variance_decomposition.py` (hazard vs. parameter variance decomposition).
 
 ### `scripts/analysis/`
 

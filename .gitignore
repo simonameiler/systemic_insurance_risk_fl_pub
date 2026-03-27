@@ -114,6 +114,9 @@ logs/
 notebooks/clean_notebooks.py
 fl_risk_model/data/fl_per_event_impacts_future_ssp245.csv
 
+# Large generated data
+fl_risk_model/data/all_events.csv
+
 # Local test metadata (use cluster files for production)
 fl_risk_model/data/hazard/emanuel/*/all_events.csv
 fl_risk_model/data/hazard/emanuel/*/annual_frequencies.csv
