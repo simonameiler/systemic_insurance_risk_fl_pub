@@ -63,9 +63,8 @@ systemic_insurance_risk_fl_pub/
 │   │   ├── run_emanuel_policy_suite.py            ← side-by-side policy scenario comparisons
 │   │   ├── run_historical_scenarios_mc.py         ← 8 historical scenarios
 │   │   ├── run_climate_buildingcode_sensitivity_windfloods.py  ← building code × climate sensitivity
-│   │   ├── run_penetration_capital_sensitivity.py ← capital multiplier sweep under penetration increase
-│   │   ├── run_insured_fraction_sensitivity.py    ← insured fraction sweep (0.1–0.5)
-│   │   └── run_variance_decomposition.py          ← hazard vs. parameter variance decomposition
+│   │   ├── run_insured_fraction_sensitivity.py    ← insured fraction sweep (0.1–0.5), SI Table 6
+│   │   └── run_variance_decomposition.py          ← hazard vs. parameter variance decomposition, SI Table 7
 │   │
 │   ├── analysis/                      ← post-processing & table/figure generation
 │   │   ├── analyze_emanuel_comprehensive.py       ← loss composition, institutional stress analysis
@@ -88,8 +87,8 @@ systemic_insurance_risk_fl_pub/
 │   └── cluster/                       ← SLURM job submission scripts (Stanford Sherlock)
 │
 ├── notebooks/                         ← reproduce all publication figures and tables
-│   ├── historical_scenario_analysis.ipynb         ← Fig. X, SI Table X, SI Fig. X
-│   └── probabilistic_risk_analysis.ipynb          ← Fig. X–X, Table X, SI Tables X–X, SI Figs. X–X
+│   ├── historical_scenario_analysis.ipynb         ← Fig. 2, SI Table 3, SI Fig. 2
+│   └── probabilistic_risk_analysis.ipynb          ← Fig. 3-6, Table 1, SI Tables 4-5, SI Fig. 1
 │
 └── results/                           ← output directories (MC runs, figures, tables)
     ├── figures/
@@ -110,7 +109,7 @@ Stylized policy scenarios (market exit, penetration increase, building code impr
 
 Monte Carlo simulation scripts. Each script configures and launches `mc_run_events.run_stochastic_tc_monte_carlo()` with different parameter sweeps or event sets.
 Computationally demanding runs are designed for HPC execution via the corresponding SLURM scripts in `scripts/cluster/`.
-Three scripts produce the sensitivity analyses reported in the Supplementary Information tables: `run_insured_fraction_sensitivity.py` (insured wind fraction sweep), `run_penetration_capital_sensitivity.py` (capital adequacy under penetration increase), and `run_variance_decomposition.py` (hazard vs. parameter variance decomposition).
+Two scripts produce the sensitivity analyses reported in the Supplementary Information tables: `run_insured_fraction_sensitivity.py` (insured wind fraction sweep) and `run_variance_decomposition.py` (hazard vs. parameter variance decomposition).
 
 ### `scripts/analysis/`
 
@@ -166,7 +165,7 @@ Pre-computed results used in the notebooks are stored in `results/`.
 
 **Included in the repository**: FHCF contract terms, Citizens Property Insurance county data, NFIP claims and penetration rates, county mappings, per-event county-level impacts, catastrophe bond terms, historical hurricane scenario impacts (generated via a CLIMADA workflow from IBTrACS tracks), and wind/water hazard attribution tables (derived from the Gori et al. simulations below).
 
-**Proprietary** (contact authors): Florida company-level wind exposure data, statutory surplus capital data. See `fl_risk_model/config.py` for details.
+**Proprietary** (contact author): Florida company-level wind exposure data, statutory surplus capital data.
 
 **External — Gori et al. (2025) hazard data**: The synthetic tropical cyclone hazard and damage simulations from Gori et al., (2025) used in this study to derive county-wide empirical wind/flood loss attribution are publicly available from DesignSafe-CI: Gori, A. (2025). "Tropical Cyclone Synthetic Hazard and Damage Simulations", in *Sensitivity of TC risk to storm climatology change and socioeconomic growth*. DesignSafe-CI. [https://doi.org/10.17603/ds2-0jkm-h487](https://doi.org/10.17603/ds2-0jkm-h487). The raw .mat files (wind, rain, surge, and expected annual damage matrices) should be placed in `fl_risk_model/data/hazard/gori_data/`.
 
