@@ -132,7 +132,7 @@ Jupyter notebooks that reproduce all figures and tables in the publication from 
 
 ### `fl_risk_model/data/`
 
-Input data files. See **Data Availability** below for details on public vs. proprietary data.
+Input data files. See **Data Availability** below for details.
 
 ---
 
@@ -167,7 +167,7 @@ Pre-computed results used in the notebooks are stored in `results/`.
 
 **Included in the repository**: FHCF contract terms, Citizens Property Insurance county data, NFIP claims and penetration rates, county mappings, per-event county-level impacts, catastrophe bond terms, historical hurricane scenario impacts (generated via a CLIMADA workflow from IBTrACS tracks), and wind/water hazard attribution tables (derived from the Gori et al. simulations below).
 
-**Proprietary** (contact author): Florida company-level wind exposure data, statutory surplus capital data.
+**License required**: Florida company-level wind exposure data and statutory surplus capital data were retrieved from S\&P Capital IQ, which requires a commercial license.
 
 **External — Gori et al. (2025) hazard data**: The synthetic tropical cyclone hazard and damage simulations from Gori et al., (2025) used in this study to derive county-wide empirical wind/flood loss attribution are publicly available from DesignSafe-CI: Gori, A. (2025). "Tropical Cyclone Synthetic Hazard and Damage Simulations", in *Sensitivity of TC risk to storm climatology change and socioeconomic growth*. DesignSafe-CI. [https://doi.org/10.17603/ds2-0jkm-h487](https://doi.org/10.17603/ds2-0jkm-h487). The raw .mat files (wind, rain, surge, and expected annual damage matrices) should be placed in `fl_risk_model/data/hazard/gori_data/`.
 
