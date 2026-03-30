@@ -33,9 +33,9 @@ def combine_probabilistic_tables(loss_csv, institutional_csv, output_csv):
         "2050\nSSP5-8.5": "2050 ssp585",
         "2100\nSSP2-4.5": "2100 ssp245",
         "2100\nSSP5-8.5": "2100 ssp585",
-        "Market Exit": "Market Exit",
-        "Penetration": "Ins. Penetration",
-        "Building Codes": "Building Codes"
+        "market_exit": "Market Exit",
+        "penetration": "Ins. Penetration",
+        "building_codes": "Building Codes"
     }
     
     # Define the metrics to extract with their display names
@@ -129,7 +129,124 @@ def combine_probabilistic_tables(loss_csv, institutional_csv, output_csv):
     result_df.to_csv(output_csv, index=False)
     print(f"Combined table saved to: {output_csv}")
     
-    return result_df
+    return result_df, loss_df, inst_df
+
+
+def format_latex_val(mean, p10, p90):
+    """Format a value as 'X.X (X.X--X.X)' for LaTeX."""
+    return f"{mean:.1f} ({p10:.1f}--{p90:.1f})"
+
+
+def build_latex_table(loss_df, inst_df):
+    """Build LaTeX table matching the publication format."""
+
+    scenario_map = {
+        "Baseline\n(ERA5)": "Baseline",
+        "2050\nSSP2-4.5": "2050 SSP2-4.5",
+        "2050\nSSP5-8.5": "2050 SSP5-8.5",
+        "2100\nSSP2-4.5": "2100 SSP2-4.5",
+        "2100\nSSP5-8.5": "2100 SSP5-8.5",
+        "market_exit": "Market Exit",
+        "penetration": "Penetration",
+        "building_codes": "Building Codes",
+    }
+
+    # Loss decomposition metrics (order matches publication table)
+    loss_metrics = [
+        ("total_loss",    "Total loss"),
+        ("insured_wind",  "Insured wind -- private"),
+        ("citizens",      "Citizens wind"),
+        ("insured_flood", "Insured flood -- NFIP"),
+        ("wind_under",    "Un/underinsured wind"),
+        ("flood_under",   "Un/underinsured flood"),
+    ]
+
+    # Institutional stress metrics
+    inst_metrics = [
+        ("fhcf_shortfall",    "FHCF shortfall"),
+        ("figa_residual",     "FIGA residual"),
+        ("citizens_deficit",  "Citizens deficit"),
+        ("nfip_borrowed",     "NFIP Treasury borrowing"),
+    ]
+
+    scenarios = list(scenario_map.keys())
+
+    def _get_val(df, scenario, col):
+        row = df[df['Scenario'] == scenario]
+        if row.empty:
+            return "N/A"
+        return format_latex_val(
+            row[col].values[0],
+            row[f"{col}_p10"].values[0],
+            row[f"{col}_p90"].values[0],
+        )
+
+    def _row(label, df, col):
+        vals = [_get_val(df, s, col) for s in scenarios]
+        cells = " & ".join(vals)
+        return f"{label:<34s} & {cells} \\\\"
+
+    lines = [
+        r"\begin{landscape}",
+        r"\begin{table}[htb!]",
+        r"\centering",
+        r"\caption{\textbf{Loss decomposition and public institutional burden across climate and policy scenarios.}",
+        r"Values show expected annual losses and institutional burdens under present-day baseline conditions, future climate scenarios (2050 and 2100 under SSP2-4.5 and SSP5-8.5), and illustrative market and policy interventions evaluated under present-day climate forcing. Values are reported as means in billion USD with uncertainty ranges (10th--90th percentile) in parentheses.}",
+        r"\label{TabClimatePolicyLosses}",
+        r"",
+        r"\small",
+        r"\setlength{\tabcolsep}{4pt}",
+        r"",
+        r"\begin{tabular}{@{}l|l|llll|lll@{}}",
+        r"\toprule",
+        r"\textbf{Metric (USD B)} &",
+        r"\textbf{Baseline} &",
+        r"\textbf{2050 SSP2-4.5} &",
+        r"\textbf{2050 SSP5-8.5} &",
+        r"\textbf{2100 SSP2-4.5} &",
+        r"\textbf{2100 SSP5-8.5} &",
+        r"\textbf{Market Exit} &",
+        r"\textbf{Insurance Penetration} &",
+        r"\textbf{Building Codes} \\",
+        r"\midrule",
+        r"",
+        r"\multicolumn{9}{l}{\textit{Loss decomposition}} \\",
+    ]
+
+    for col, label in loss_metrics:
+        lines.append(_row(label, loss_df, col))
+
+    lines += [
+        r"",
+        r"\midrule",
+        r"\multicolumn{9}{l}{\textit{Institutional stress}} \\",
+    ]
+
+    # Total public burden row (summed)
+    burden_cols = ["fhcf_shortfall", "figa_residual", "citizens_deficit", "nfip_borrowed"]
+    burden_vals = []
+    for s in scenarios:
+        row = inst_df[inst_df['Scenario'] == s]
+        if row.empty:
+            burden_vals.append("N/A")
+        else:
+            m = sum(row[c].values[0] for c in burden_cols)
+            p10 = sum(row[f"{c}_p10"].values[0] for c in burden_cols)
+            p90 = sum(row[f"{c}_p90"].values[0] for c in burden_cols)
+            burden_vals.append(format_latex_val(m, p10, p90))
+    lines.append(f"{'Total public burden':<34s} & {' & '.join(burden_vals)} \\\\")
+
+    for col, label in inst_metrics:
+        lines.append(_row(label, inst_df, col))
+
+    lines += [
+        r"",
+        r"\bottomrule",
+        r"\end{tabular}",
+        r"\end{table}",
+    ]
+
+    return "\n".join(lines)
 
 
 if __name__ == "__main__":
@@ -142,8 +259,14 @@ if __name__ == "__main__":
     output_csv = tables_path / "probabilistic_combined_table.csv"
     
     # Combine tables
-    df = combine_probabilistic_tables(loss_csv, institutional_csv, output_csv)
+    df, loss_df, inst_df = combine_probabilistic_tables(loss_csv, institutional_csv, output_csv)
     
     # Display preview
     print("\nPreview of combined table:")
     print(df.to_string(index=False))
+
+    # Build and write LaTeX table
+    latex = build_latex_table(loss_df, inst_df)
+    tex_path = tables_path / "probabilistic_combined_table.tex"
+    tex_path.write_text(latex)
+    print(f"\nWrote LaTeX table -> {tex_path}")

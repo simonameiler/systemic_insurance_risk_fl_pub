@@ -384,11 +384,233 @@ def build_report_with_uncertainty(iterations_csv, out_xlsx, fhcf_cap, nfip_fl_pr
     
     _autosize(desc_ws, max_width=100)
     
-    # Save
+    # Save Excel
     wb.save(out_xlsx)
     print(f"✅ Saved uncertainty report: {out_xlsx}")
     print(f"   - 7 sheets: Mean, Std Dev, CV%, p5, p95, Median, Metric dictionary")
     print(f"   - {len(metric_definitions)} metrics × {len(col_order)} scenarios")
+
+    # Also save comprehensive CSV in publication format:
+    #   Category, Metric, Scenario1, Scenario2, ...
+    #   Values as "mean (p5-p95)" with human-readable formatting
+    csv_path = Path(out_xlsx).with_name("comprehensive_metrics_all_scenarios.csv")
+
+    csv_col_order = [
+        "Great Miami", "Andrew", "Lake Okeechobee", "Irma",
+        "Great Miami then Andrew", "Andrew then Great Miami",
+        "Double Great Miami", "Double Irma",
+    ]
+
+    # CSV metric definitions: (category_or_None, metric_name_or_None, extractor, fmt_type)
+    # category_or_None != None means section header row
+    _SEC = "SECTION"
+    csv_metrics = [
+        (_SEC, "LOSS DECOMPOSITION", None, None),
+        (None, "Total Loss (USD)",
+         lambda r: _total_damage(r), "usd"),
+        (None, "Insured Wind - Private (USD)",
+         lambda r: _get(r, "wind_insured_private_usd", np.nan), "usd"),
+        (None, "Citizens Wind (USD)",
+         lambda r: _get(r, "wind_insured_citizens_usd", np.nan), "usd"),
+        (None, "Insured Flood - NFIP (USD)",
+         lambda r: _get(r, "flood_insured_capped_usd", np.nan), "usd"),
+        (None, "Un/Underinsured Wind (USD)",
+         lambda r: _get(r, "wind_underinsured_usd") + _get(r, "wind_uninsured_usd"), "usd"),
+        (None, "Un/Underinsured Flood (USD)",
+         lambda r: _get(r, "flood_un_derinsured_usd", np.nan), "usd"),
+
+        (_SEC, "INSTITUTIONAL STRESS", None, None),
+        (None, "Total Public Burden (USD)",
+         lambda r: (_get(r, "citizens_residual_deficit_usd")
+                    + _get(r, "figa_residual_deficit_usd")
+                    + _get(r, "nfip_borrowed_usd")
+                    + _get(r, "fhcf_shortfall_usd")), "usd"),
+        (None, "FHCF Shortfall (USD)",
+         lambda r: _get(r, "fhcf_shortfall_usd", np.nan), "usd"),
+        (None, "FIGA Residual (USD)",
+         lambda r: _get(r, "figa_residual_deficit_usd", np.nan), "usd"),
+        (None, "Citizens Deficit (USD)",
+         lambda r: _get(r, "citizens_residual_deficit_usd", np.nan), "usd"),
+        (None, "NFIP Treasury Borrowing (USD)",
+         lambda r: _get(r, "nfip_borrowed_usd", np.nan), "usd"),
+
+        (_SEC, "CAPITAL AND DEFAULT ASSESSMENT", None, None),
+        (None, "Private Defaults Post-Group (#)",
+         lambda r: _get(r, "defaults_post", np.nan), "count"),
+        (None, "Largest Single-Entity Deficit (USD)",
+         lambda r: _get(r, "largest_entity_deficit_usd", np.nan), "usd"),
+
+        (_SEC, "STRESS RATIOS", None, None),
+        (None, "FHCF Utilization Factor",
+         lambda r: ((_get(r, "fhcf_recovery_private_usd")
+                     + _get(r, "fhcf_recovery_citizens_usd")) / fhcf_cap
+                    if fhcf_cap else np.nan), "ratio"),
+        (None, "Citizens Assessment Stress Factor",
+         lambda r: (_get(r, "citizens_residual_deficit_usd")
+                    / (_get(r, "citizens_tier1_capacity_usd")
+                       + _get(r, "citizens_tier2_capacity_usd"))
+                    if (_get(r, "citizens_tier1_capacity_usd", 0)
+                        + _get(r, "citizens_tier2_capacity_usd", 0)) > 0
+                    else np.nan), "ratio"),
+        (None, "FIGA Stress Factor",
+         lambda r: (_get(r, "figa_residual_deficit_usd")
+                    / (_get(r, "figa_residual_deficit_usd")
+                       + _get(r, "figa_collected_usd"))
+                    if (_get(r, "figa_residual_deficit_usd", 0)
+                        + _get(r, "figa_collected_usd", 0)) > 0
+                    else np.nan), "ratio"),
+        (None, "NFIP Florida Stress Factor",
+         lambda r: (_get(r, "nfip_claims_paid_usd")
+                    / _get(r, "nfip_fl_premium_base_usd")
+                    if _get(r, "nfip_fl_premium_base_usd", 0) > 0
+                    else np.nan), "ratio"),
+    ]
+
+    # Formatters: mean (p5-p95)
+    def _fmt_usd(med, p5, p95):
+        def _b(v):
+            return f"${v / 1e9:.1f}B"
+        return f"{_b(med)} ({_b(p5)}-{_b(p95)})"
+
+    def _fmt_count(med, p5, p95):
+        return f"{int(round(med))} ({int(round(p5))}-{int(round(p95))})"
+
+    def _fmt_ratio(med, p5, p95):
+        return f"{med:.2f} ({p5:.2f}-{p95:.2f})"
+
+    _fmts = {"usd": _fmt_usd, "count": _fmt_count, "ratio": _fmt_ratio}
+
+    csv_rows = []
+    for marker, name, extractor, fmt_type in csv_metrics:
+        if marker == _SEC:
+            # Section header row
+            csv_rows.append({"Category": name, "Metric": ""})
+            continue
+        row = {"Category": "", "Metric": name}
+        for scen_display in csv_col_order:
+            scen_internal = None
+            for k, v in scen_map.items():
+                if v == scen_display:
+                    scen_internal = k
+                    break
+            if scen_internal is None:
+                row[scen_display] = ""
+                continue
+            stats = compute_statistics(iter_df, scen_internal, extractor)
+            if pd.isna(stats['mean']):
+                row[scen_display] = ""
+            else:
+                row[scen_display] = _fmts[fmt_type](
+                    stats['mean'], stats['p5'], stats['p95'])
+        csv_rows.append(row)
+
+    csv_df = pd.DataFrame(csv_rows, columns=["Category", "Metric"] + csv_col_order)
+    csv_df.to_csv(csv_path, index=False)
+    print(f"✅ Saved CSV summary: {csv_path}")
+
+    # ── LaTeX table for historical scenarios ────────────────────────────────
+    tex_path = Path(out_xlsx).parent / "scenario_stress_test.tex"
+
+    tex_scenarios = [
+        ("Great Miami", "great_miami"),
+        ("Andrew", "andrew"),
+        ("Lake Okeechobee", "lake_okeechobee"),
+        ("Irma", "irma"),
+        ("Great Miami then Andrew", "gm_then_andrew"),
+        ("Double Great Miami", "double_gm"),
+        ("Double Irma", "double_irma"),
+    ]
+
+    def _tex_usd(mean, p5, p95):
+        return f"{mean / 1e9:.1f}B ({p5 / 1e9:.1f}-{p95 / 1e9:.1f}B)"
+
+    def _tex_count(mean, p5, p95):
+        return f"{int(round(mean))} ({int(round(p5))}-{int(round(p95))})"
+
+    def _tex_ratio(mean, p5, p95):
+        return f"{mean:.2f} ({p5:.2f}-{p95:.2f})"
+
+    _tex_fmts = {"usd": _tex_usd, "count": _tex_count, "ratio": _tex_ratio}
+
+    # Metrics for LaTeX table (label, extractor, fmt_type) or section headers
+    _S = "SECTION"
+    tex_metrics = [
+        (_S, r"\multicolumn{8}{l}{\textit{Loss decomposition}} \\", None, None),
+        ("Total loss (USD)", lambda r: _total_damage(r), "usd", None),
+        ("Insured wind -- private (USD)", lambda r: _get(r, "wind_insured_private_usd", np.nan), "usd", None),
+        ("Citizens wind (USD)", lambda r: _get(r, "wind_insured_citizens_usd", np.nan), "usd", None),
+        ("Insured flood -- NFIP (USD)", lambda r: _get(r, "flood_insured_capped_usd", np.nan), "usd", None),
+        ("Un/Underinsured wind (USD)", lambda r: _get(r, "wind_underinsured_usd") + _get(r, "wind_uninsured_usd"), "usd", None),
+        ("Un/Underinsured flood (USD)", lambda r: _get(r, "flood_un_derinsured_usd", np.nan), "usd", "midrule"),
+        (_S, r"\multicolumn{8}{l}{\textit{Institutional stress}} \\", None, None),
+        ("Total public burden (USD)", lambda r: (_get(r, "citizens_residual_deficit_usd") + _get(r, "figa_residual_deficit_usd") + _get(r, "nfip_borrowed_usd") + _get(r, "fhcf_shortfall_usd")), "usd", None),
+        ("FHCF shortfall (USD)", lambda r: _get(r, "fhcf_shortfall_usd", np.nan), "usd", None),
+        ("FIGA residual (USD)", lambda r: _get(r, "figa_residual_deficit_usd", np.nan), "usd", None),
+        ("Citizens deficit (USD)", lambda r: _get(r, "citizens_residual_deficit_usd", np.nan), "usd", None),
+        ("NFIP treasury borrowing (USD)", lambda r: _get(r, "nfip_borrowed_usd", np.nan), "usd", "hline"),
+        (_S, r"\textit{Capital \& default assessment} & & & & & & & \\", None, None),
+        ("Private defaults (\\#)", lambda r: _get(r, "defaults_post", np.nan), "count", None),
+        ("Largest single-entity deficit (USD)", lambda r: _get(r, "largest_entity_deficit_usd", np.nan), "usd", "midrule"),
+        (_S, r"\multicolumn{8}{l}{\textit{Stress ratios}} \\", None, None),
+        ("FHCF utilization factor", lambda r: ((_get(r, "fhcf_recovery_private_usd") + _get(r, "fhcf_recovery_citizens_usd")) / fhcf_cap if fhcf_cap else np.nan), "ratio", None),
+        ("Citizens assessment stress factor", lambda r: (_get(r, "citizens_residual_deficit_usd") / (_get(r, "citizens_tier1_capacity_usd") + _get(r, "citizens_tier2_capacity_usd")) if (_get(r, "citizens_tier1_capacity_usd", 0) + _get(r, "citizens_tier2_capacity_usd", 0)) > 0 else np.nan), "ratio", None),
+        ("FIGA stress factor", lambda r: (_get(r, "figa_residual_deficit_usd") / (_get(r, "figa_residual_deficit_usd") + _get(r, "figa_collected_usd")) if (_get(r, "figa_residual_deficit_usd", 0) + _get(r, "figa_collected_usd", 0)) > 0 else np.nan), "ratio", None),
+        ("NFIP Florida stress factor", lambda r: (_get(r, "nfip_claims_paid_usd") / _get(r, "nfip_fl_premium_base_usd") if _get(r, "nfip_fl_premium_base_usd", 0) > 0 else np.nan), "ratio", None),
+    ]
+
+    lines = [
+        r"\begin{landscape}",
+        r"\begin{table}[htb!]",
+        r"\centering",
+        r"\caption{\textbf{Scenario-based loss decomposition and institutional stress outcomes for Florida hurricane events.}",
+        r"Results are reported as mean values across stochastic realizations, with uncertainty ranges in parentheses indicating the 5th--95th percentiles. Metric definitions are provided in \SITabII.}",
+        r"\label{TabScenarioStressTest}",
+        r"\resizebox{\columnwidth}{!}{%",
+        r"\begin{tabular}{@{}llllllll@{}}",
+        r"\toprule",
+        r"\textbf{Metric} &",
+        r"  \textbf{Great Miami} &",
+        r"  \textbf{Andrew} &",
+        r"  \textbf{Lake Okeechobee} &",
+        r"  \textbf{Irma} &",
+        r"  \textbf{Great Miami then Andrew} &",
+        r"  \textbf{Double Great Miami} &",
+        r"  \textbf{Double Irma} \\ \midrule",
+    ]
+
+    for marker_or_label, extractor_or_text, fmt_type, separator in tex_metrics:
+        if marker_or_label == _S:
+            lines.append(extractor_or_text)
+            continue
+
+        vals = []
+        for scen_display, scen_internal in tex_scenarios:
+            stats = compute_statistics(iter_df, scen_internal, extractor_or_text)
+            if pd.isna(stats['mean']):
+                vals.append("N/A")
+            else:
+                vals.append(_tex_fmts[fmt_type](
+                    stats['mean'], stats['p5'], stats['p95']))
+
+        cells = " &\n  ".join(vals)
+        lines.append(f"{marker_or_label} &\n  {cells} \\\\")
+
+        if separator == "midrule":
+            lines.append(r"\midrule")
+        elif separator == "hline":
+            lines.append(r"\hline")
+
+    lines += [
+        r"\bottomrule",
+        r"",
+        r"\end{tabular}%",
+        r"}",
+        r"\end{table}",
+        r"\end{landscape}",
+    ]
+
+    tex_path.write_text("\n".join(lines))
+    print(f"✅ Saved LaTeX table: {tex_path}")
 
 
 def main():

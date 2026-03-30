@@ -101,6 +101,108 @@ def combine_systemic_risk_tables(baseline_csv, climate_csv, policy_csv, output_c
     return result_df
 
 
+def build_latex_table(df_baseline, df_climate, df_policy):
+    """Build LaTeX table for systemic risk probabilities."""
+
+    scenarios_climate = [
+        '2050 SSP2-4.5', '2050 SSP5-8.5',
+        '2100 SSP2-4.5', '2100 SSP5-8.5',
+    ]
+    scenarios_policy = ['Market Exit', 'Penetration', 'Building Codes']
+
+    # Metrics in publication order, with LaTeX labels and separator positions
+    metrics = [
+        ("Defaults > 10",                 r"Defaults > 10",                   False),
+        ("Single Deficit > $1B",          r"Single Deficit > \$1B",           True),
+        ("FHCF > 100% Cap",              r"FHCF > 100\% Cap",               False),
+        ("FIGA > 100% Capacity",          r"FIGA > 100\% Capacity",           False),
+        ("Citizens > 100% Capacity",      r"Citizens > 100\% Capacity",       False),
+        ("NFIP > 200% Annual Premium",    r"NFIP > 200\% Annual Premium",     True),
+        ("Public Burden > 1% FL GDP",     r"Public Burden > 1\% FL GDP",      False),
+        ("Public Burden > 10% FL GDP",    r"Public Burden > 10\% FL GDP",     False),
+    ]
+
+    def _fmt(mean, p10, p90):
+        return f"{mean:.1f} ({p10:.1f}-{p90:.1f})"
+
+    def _row(metric_key, metric_label):
+        # Baseline
+        brow = df_baseline[df_baseline['Metric'] == metric_key]
+        if brow.empty:
+            return f"{metric_label} & N/A & " + " & ".join(["N/A"] * 7) + r" \\"
+        baseline = _fmt(brow['Annual Probability (%)'].values[0],
+                        brow['P10'].values[0], brow['P90'].values[0])
+
+        # Climate
+        climate_vals = []
+        for s in scenarios_climate:
+            crow = df_climate[df_climate['Metric'] == metric_key]
+            if crow.empty or s not in df_climate.columns:
+                climate_vals.append("N/A")
+            else:
+                climate_vals.append(_fmt(
+                    crow[s].values[0],
+                    crow[f'{s}_p10'].values[0],
+                    crow[f'{s}_p90'].values[0],
+                ))
+
+        # Policy
+        policy_vals = []
+        for s in scenarios_policy:
+            prow = df_policy[df_policy['Metric'] == metric_key]
+            if prow.empty or s not in df_policy.columns:
+                policy_vals.append("N/A")
+            else:
+                policy_vals.append(_fmt(
+                    prow[s].values[0],
+                    prow[f'{s}_P10'].values[0],
+                    prow[f'{s}_P90'].values[0],
+                ))
+
+        all_vals = [baseline] + climate_vals + policy_vals
+        return f"{metric_label} &\n  " + " &\n  ".join(all_vals) + r" \\"
+
+    lines = [
+        r"\begin{table}[htb!]",
+        r"\centering",
+        r"\caption{\textbf{Probabilistic exceedance of systemic insurance stress thresholds across climate and policy scenarios.}",
+        r"Annual exceedance probabilities (percent) of systemic stress thresholds for private insurers, public and quasi-public institutions, and aggregate fiscal impact, estimated from \num{10000} simulated tropical cyclone seasons. Results are shown for present-day conditions, mid-century (2050) and end-of-century (2100) climate scenarios under SSP2-4.5 and SSP5-8.5, as well as illustrative market and policy interventions evaluated under present-day climate forcing. Values denote mean probabilities, with uncertainty ranges (10th--90th percentile) in parentheses.}",
+        r"\label{TabSystemicRiskProb}",
+        r"",
+        r"\small",
+        r"\setlength{\tabcolsep}{4pt}",
+        r"",
+        r"\begin{tabular}{@{}l|l|llll|lll@{}}",
+        r"\toprule",
+        r"\textbf{Metric (\%)} &",
+        r"  \textbf{Baseline} &",
+        r"  \textbf{2050 SSP2-4.5} &",
+        r"  \textbf{2050 SSP5-8.5} &",
+        r"  \textbf{2100 SSP2-4.5} &",
+        r"  \textbf{2100 SSP5-8.5} &",
+        r"  \textbf{Market Exit} &",
+        r"  \textbf{Insurance Penetration} &",
+        r"  \textbf{Building Codes} \\ \midrule",
+        r"",
+    ]
+
+    for metric_key, metric_label, add_midrule in metrics:
+        lines.append(_row(metric_key, metric_label))
+        lines.append("")
+        if add_midrule:
+            lines.append(r"\midrule")
+            lines.append("")
+
+    lines += [
+        r"\bottomrule",
+        r"\end{tabular}",
+        r"\end{table}",
+        r"\end{landscape}",
+    ]
+
+    return "\n".join(lines)
+
+
 if __name__ == "__main__":
     # Define paths
     base_path = Path(__file__).parent.parent.parent
@@ -131,3 +233,12 @@ if __name__ == "__main__":
         preview_cols = df.columns[:8].tolist() if len(df.columns) > 8 else df.columns.tolist()
         print(df[preview_cols].head(3).to_string(index=False))
         print("...")
+
+        # Build and write LaTeX table
+        df_baseline = pd.read_csv(baseline_csv)
+        df_climate = pd.read_csv(climate_csv)
+        df_policy = pd.read_csv(policy_csv)
+        latex = build_latex_table(df_baseline, df_climate, df_policy)
+        tex_path = tables_path / "systemic_risk_all_scenarios.tex"
+        tex_path.write_text(latex)
+        print(f"\nWrote LaTeX table -> {tex_path}")

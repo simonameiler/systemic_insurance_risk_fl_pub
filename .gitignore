@@ -114,6 +114,10 @@ logs/
 notebooks/clean_notebooks.py
 fl_risk_model/data/fl_per_event_impacts_future_ssp245.csv
 
+# Proprietary data files
+fl_risk_model/data/FL HO Market Share Report_6.10.25.xlsx
+fl_risk_model/data/20250805 FL Surplus Capital, Group v Entity.xlsx
+
 # Large generated data
 fl_risk_model/data/all_events.csv
 

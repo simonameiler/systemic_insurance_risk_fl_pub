@@ -79,17 +79,7 @@ def build_table(dfs: dict) -> str:
         r"\begin{table}[htb!]",
         r"\centering",
         r"\small",
-        r"\caption{\textbf{Insured wind fraction sensitivity.}",
-        r"  Mean values (in \$B, except insurer defaults which are a count",
-        r"  per 10{,}000-season simulation) for each output metric across five",
-        r"  fixed insured wind fraction values, along with relative change",
-        r"  versus the reference ($f = 0.4$, the mean of the baseline",
-        r"  Beta(4,\,6) prior) and the approximate log--log elasticity",
-        r"  $\varepsilon$ centred at $f = 0.4$.",
-        r"  Metrics with $\varepsilon \approx 0$ are invariant to the insured",
-        r"  fraction by construction; $\varepsilon = 1$ indicates proportional",
-        r"  scaling; $\varepsilon > 1$ indicates amplification through the",
-        r"  insurance market.}",
+        r"\caption{\textbf{Sensitivity of model outputs to the insured wind loss fraction.} Mean values (in \$B; insurer defaults reported as counts) for each output metric across five fixed values of the insured wind fraction $f$. The table also reports the relative change compared to the reference case ($f = 0.4$, the mean of the baseline Beta(4,\,6) prior) and the approximate log--log elasticity $\varepsilon$ evaluated at $f = 0.4$. Metrics with $\varepsilon \approx 0$ are invariant to the insured fraction by construction; $\varepsilon = 1$ indicates proportional scaling; and $\varepsilon > 1$ indicates amplification through the insurance system.}",
         r"\label{tab:si_insured_frac}",
     ]
 
@@ -169,8 +159,8 @@ def main():
     )
     parser.add_argument(
         "--out",
-        default=None,
-        help="Write LaTeX to this file (default: print to stdout)",
+        default="results/tables/si_table_insured_frac.tex",
+        help="Write LaTeX to this file",
     )
     args = parser.parse_args()
 

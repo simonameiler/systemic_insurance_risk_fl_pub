@@ -72,7 +72,9 @@ systemic_insurance_risk_fl_pub/
 │   │   ├── combine_probabilistic_tables.py        ← unify probabilistic loss tables
 │   │   ├── combine_systemic_risk_tables.py        ← unify systemic risk comparison tables
 │   │   ├── compute_climate_deltas.py              ← GCM ensemble climate change deltas
-│   │   └── generate_si_table_insured_frac.py      ← SI table for insured fraction sensitivity
+│   │   ├── generate_si_table_insured_frac.py      ← SI table for insured fraction sensitivity
+│   │   ├── generate_si_table_variance_decomp.py   ← SI table for variance decomposition
+│   │   └── generate_table_baseline_return_periods.py ← baseline return period table
 │   │
 │   ├── hazard/                        ← hazard data preprocessing
 │   │   ├── build_per_event_impacts.py             ← log-linear damage model from Gori hazard matrices
