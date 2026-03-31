@@ -1,6 +1,6 @@
 # Florida Systemic Insurance Risk Model
 
-[![DOI](https://zenodo.org/badge/DOI/PLACEHOLDER.svg)](https://doi.org/PLACEHOLDER)
+[![DOI](https://zenodo.org/badge/1185729011.svg)](https://doi.org/10.5281/zenodo.19361127)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 These scripts reproduce the main results of the paper:
