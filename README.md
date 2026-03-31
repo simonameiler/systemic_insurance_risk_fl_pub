@@ -6,7 +6,7 @@
 These scripts reproduce the main results of the paper:
 
 **Simona Meiler**(1), Steven I. Jackson (2), Kerry Emanuel (3), Noah S. Diffenbaugh (4), Jack W.
-Baker (1): *Stress testing insurance market stability under climate-driven disaster risk*
+Baker (1): *Stress testing insurance market stability under climate risk*
 
 Publication status: [under review]
 
