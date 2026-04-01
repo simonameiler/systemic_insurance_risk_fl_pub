@@ -8,7 +8,7 @@ These scripts reproduce the main results of the paper:
 **Simona Meiler**(1), Steven I. Jackson (2), Kerry Emanuel (3), Noah S. Diffenbaugh (4), Jack W.
 Baker (1): *Stress testing insurance market stability under climate risk*
 
-Publication status: [under review]
+A preprint is available here: [https://doi.org/10.31223/X59X9X](https://doi.org/10.31223/X59X9X)
 
 (1) Civil and Environmental Engineering, Stanford University, CA, USA
 (2) American Academy of Actuaries, Washington, DC, USA
