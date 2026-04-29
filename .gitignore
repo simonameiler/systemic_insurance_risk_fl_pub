@@ -126,3 +126,6 @@ fl_risk_model/data/hazard/emanuel/*/all_events.csv
 fl_risk_model/data/hazard/emanuel/*/annual_frequencies.csv
 fl_risk_model/data/hazard/emanuel/*/event_metadata.csv
 fl_risk_model/data/hazard/emanuel/*/year_sets*.csv
+
+# Notebook for talks (not for production use)
+notebooks/probabilistic_risk_analysis_talks.ipynb

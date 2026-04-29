@@ -90,7 +90,7 @@ systemic_insurance_risk_fl_pub/
 │
 ├── notebooks/                         ← reproduce all publication figures and tables
 │   ├── historical_scenario_analysis.ipynb         ← Fig. 2, SI Fig. 2
-│   └── probabilistic_risk_analysis.ipynb          ← Fig. 3-6, Table 1, SI Tables 4-5, SI Fig. 1
+│   └── probabilistic_risk_analysis.ipynb          ← Fig. 3-4, Table 1, SI Tables 4-5, SI Fig. 1
 │
 └── results/                           ← output directories (MC runs, figures, tables)
     ├── figures/
