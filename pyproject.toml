@@ -57,10 +57,10 @@ climada = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/simonameiler/systemic_insurance_risk_fl"
-Documentation = "https://github.com/simonameiler/systemic_insurance_risk_fl#readme"
-Repository = "https://github.com/simonameiler/systemic_insurance_risk_fl.git"
-Issues = "https://github.com/simonameiler/systemic_insurance_risk_fl/issues"
+Homepage = "https://github.com/simonameiler/systemic_insurance_risk_fl_pub"
+Documentation = "https://github.com/simonameiler/systemic_insurance_risk_fl_pub#readme"
+Repository = "https://github.com/simonameiler/systemic_insurance_risk_fl_pub.git"
+Issues = "https://github.com/simonameiler/systemic_insurance_risk_fl_pub/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
