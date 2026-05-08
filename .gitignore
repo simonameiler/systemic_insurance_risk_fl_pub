@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Exclude diff_cat_model (separate repository)
+diff_cat_model/
+
 # C extensions
 *.so
 
