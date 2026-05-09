@@ -1,0 +1,12 @@
+{
+  "wind_loss_reduction_pct": 80,
+  "flood_loss_reduction_pct": 53,
+  "wind_flood_ratio": 1.509433962264151,
+  "policy_scenario": "building_codes",
+  "code_level_index": 7,
+  "seed": 42,
+  "n_years": 10000,
+  "event_set": "FL_ecearth6_ssp245cal",
+  "gcm": "ecearth6",
+  "ssp": "ssp245cal"
+}

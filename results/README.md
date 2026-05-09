@@ -33,16 +33,18 @@ any of the above dependencies.
 ```
 results/
 ├── mc_runs/                           ← per-run Monte Carlo output directories
-│   ├── emanuel_era5_baseline_*/       ← baseline (ERA5 TC climatology, 10,000 years)
+│   ├── emanuel_era5_baseline_*/       ← ERA5 baseline (ERA5 TC climatology, 10,000 years)
 │   │   ├── iterations.csv             ← one row per simulated year (all metrics)
 │   │   ├── return_period_summary.csv  ← pre-computed return-period summary
 │   │   └── run_config.json            ← run configuration metadata
 │   ├── emanuel_era5_market_exit_*/    ← market-exit policy scenario
 │   ├── emanuel_era5_penetration_*/    ← flood penetration policy scenario
 │   ├── emanuel_era5_building_codes_*/ ← building code policy scenario
-│   ├── emanuel_{gcm}_{pathway}_*/     ← GCM-driven climate scenario runs
-│   │   (canesm, cnrm6, ecearth6, ipsl6, miroc6 × ssp245/ssp585 × 20th/near/mid)
-│   ├── {historical_scenario}_*/       ← 8 historical hurricane scenarios
+│   ├── emanuel_{canesm,cnrm6,ecearth6,ipsl6,miroc6}_{20thcal,ssp245cal,ssp245_2cal,ssp585cal,ssp585_2cal}_baseline_*/
+│   │                                  ← 5 GCMs × 5 period/pathway combinations (25 directories)
+│   ├── emanuel_{gcm}_ssp245cal_buildingcode_{params}_*/
+│   │                                  ← 11-level building-code sensitivity sweep × 5 GCMs (55 directories)
+│   ├── {historical_scenario}_*/       ← 8 historical hurricane scenarios (gitignored; run locally)
 │   │   (great_miami, andrew, irma, lake_okeechobee, and four composite scenarios)
 │   ├── scenario_report_with_uncertainty_*.xlsx  ← Excel summary of historical scenarios
 │   └── scenario_report_with_uncertainty_*.csv   ← CSV version of the same report

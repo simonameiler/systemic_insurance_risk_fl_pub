@@ -111,13 +111,8 @@ results/mc_runs/lake_*/
 results/mc_runs/insured_frac_*/
 results/mc_runs/penetration_capital_*/
 results/mc_runs/variance_*/
-results/mc_runs/emanuel_canesm_*/
-results/mc_runs/emanuel_cnrm6_*/
-results/mc_runs/emanuel_ecearth6_*/
-results/mc_runs/emanuel_ipsl6_*/
-results/mc_runs/emanuel_miroc6_*/
 results/mc_runs/scenario_report_with_uncertainty_*.csv
-# Keep the scenario xlsx (Fig. 2 / SI Fig. 2), the 4 ERA5 policy runs, and climate_deltas
+# Keep ERA5 runs, GCM climate runs (5 GCMs × scenarios/periods), building-code sweeps, and climate_deltas
 
 # Ignore large generated outputs that are not needed for figure reproduction
 results/figures/

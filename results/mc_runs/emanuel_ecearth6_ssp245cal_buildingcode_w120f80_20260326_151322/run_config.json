@@ -1,0 +1,13 @@
+{
+  "mode": "stochastic_tc",
+  "year_sets_csv": "/home/groups/bakerjw/smeiler/climada_data/data/impact/impacts/FL_ecearth6_ssp245cal/year_sets_N10000_seed42.csv",
+  "n_years": 10000,
+  "seed": 42,
+  "policy_scenario_config": {
+    "type": "building_codes",
+    "params": {
+      "scenario": "SENS_W100_F80"
+    }
+  },
+  "timestamp": "20260326_151322"
+}

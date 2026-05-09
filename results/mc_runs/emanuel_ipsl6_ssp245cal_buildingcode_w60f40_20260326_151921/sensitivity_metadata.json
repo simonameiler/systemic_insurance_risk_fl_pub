@@ -1,0 +1,12 @@
+{
+  "wind_loss_reduction_pct": 60,
+  "flood_loss_reduction_pct": 40,
+  "wind_flood_ratio": 1.4999999999999998,
+  "policy_scenario": "building_codes",
+  "code_level_index": 5,
+  "seed": 42,
+  "n_years": 10000,
+  "event_set": "FL_ipsl6_ssp245cal",
+  "gcm": "ipsl6",
+  "ssp": "ssp245cal"
+}

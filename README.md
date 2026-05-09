@@ -102,7 +102,14 @@ systemic_insurance_risk_fl_pub/
     ├── figures/                       ← publication figures (PDF + PNG)
     ├── tables/                        ← publication tables (CSV + LaTeX)
     ├── climate_deltas/                ← GCM ensemble climate change delta CSVs
-    └── mc_runs/                       ← archived MC run directories (ERA5 baseline + policy scenarios)
+    └── mc_runs/                       ← archived MC run directories
+        ├── emanuel_era5_baseline_*/                ← ERA5 baseline (10,000 yr)
+        ├── emanuel_era5_market_exit_*/             ← market-exit policy scenario
+        ├── emanuel_era5_penetration_*/             ← flood penetration scenario
+        ├── emanuel_era5_building_codes_*/          ← ERA5 building code scenario
+        ├── emanuel_{canesm,cnrm6,ecearth6,ipsl6,miroc6}_{20thcal,ssp245cal,ssp245_2cal,ssp585cal,ssp585_2cal}_baseline_*/  ← 5 GCMs × 5 period/pathway combinations
+        ├── emanuel_{gcm}_ssp245cal_buildingcode_{params}_*/  ← 11-level building code sweep per GCM
+        └── {great_miami,andrew,irma,lake_okeechobee,...}_*/  ← 8 historical scenarios (gitignored; run locally)
 ```
 
 ## Content

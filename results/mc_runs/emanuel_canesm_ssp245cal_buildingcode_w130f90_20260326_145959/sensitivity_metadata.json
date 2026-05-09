@@ -1,0 +1,12 @@
+{
+  "wind_loss_reduction_pct": 100,
+  "flood_loss_reduction_pct": 90,
+  "wind_flood_ratio": 1.1111111111111112,
+  "policy_scenario": "building_codes",
+  "code_level_index": 12,
+  "seed": 42,
+  "n_years": 10000,
+  "event_set": "FL_canesm_ssp245cal",
+  "gcm": "canesm",
+  "ssp": "ssp245cal"
+}
