@@ -1,8 +1,7 @@
 # Archived Model Outputs — `results/`
 
 This directory contains pre-computed model outputs used to reproduce the figures and
-tables in the manuscript **"Stress testing insurance market stability under climate risk"**
-(Meiler et al., 2026).
+tables in the manuscript **"Stress testing insurance market stability under climate risk"**.
 
 These files are included so that reviewers and readers can:
 
