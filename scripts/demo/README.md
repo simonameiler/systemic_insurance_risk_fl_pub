@@ -47,8 +47,8 @@ python scripts/demo/run_demo.py --n_iter 50 --seed 7 --out my_demo_output
    only the financial figures are synthetic.
 2. Uses the **real Great Miami Hurricane (1926) county-level impact footprint**
    (`fl_risk_model/data/hazard/historical_events/1926255N15314.csv`) derived
-   from IBTrACS track data via CLIMADA (see `run_climada_hazard_pipeline.py`
-   for full reproduction).
+   from IBTrACS track data via CLIMADA (see
+   `scripts/hazard/simulate_historical_event_losses.py` for full reproduction).
 3. Runs the full insurance waterfall `n_iter` times (default: 100) with a
    Monte Carlo wind/water split sampled from the event's Beta prior
    (mean = 0.70 wind share, concentration = 10).
@@ -60,11 +60,7 @@ python scripts/demo/run_demo.py --n_iter 50 --seed 7 --out my_demo_output
 
 ## Approximate Runtime
 
-| Hardware | 100 iterations | 1 000 iterations |
-|----------|---------------|-----------------|
-| Modern laptop (Apple M-series or Intel i7) | ~2–5 min | ~20–40 min |
-| Older laptop / CI machine | ~5–10 min | ~60–90 min |
-
+Measured on Apple M-series MacBook: **~28 s for 100 iterations** (~0.28 s/iteration).
 Runtime scales approximately linearly with `--n_iter`.
 
 ---
@@ -89,12 +85,12 @@ Loading demo data...
   Total synthetic entity surplus: $18.2B
 Building model inputs (FHCF, Citizens, NFIP, county xwalk)...
 Running 100 iterations...
-  Completed  25/100 iterations  (Xs elapsed)
-  Completed  50/100 iterations  (Xs elapsed)
-  Completed  75/100 iterations  (Xs elapsed)
-  Completed 100/100 iterations  (Xs elapsed)
+  Completed  25/100 iterations  (6.5s elapsed)
+  Completed  50/100 iterations  (13.4s elapsed)
+  Completed  75/100 iterations  (20.2s elapsed)
+  Completed 100/100 iterations  (27.5s elapsed)
 
-  All 100 iterations completed in Xs
+  All 100 iterations completed in 27.5s
 
   Results saved to: demo_output/demo_summary.csv
 
@@ -103,10 +99,11 @@ Running 100 iterations...
 ============================================================
   ...
   Systemic stress (% of iterations):
-    Any private default  : ~95–100% of iterations
-    Defaults > 10 firms  : ~70–90% of iterations
-    FHCF shortfall > 0   : ~80–100% of iterations
-    ...
+    Any private default  : 100.0% of iterations
+    Defaults > 10 firms  : 100.0% of iterations
+    FHCF shortfall > 0   : 0.0% of iterations
+    Citizens deficit > 0 : 100.0% of iterations
+    NFIP borrowing > 0   : 96.0% of iterations
 
   IMPORTANT: These outputs use SYNTHETIC insurer financial data.
   Company names are real (public regulatory record); market shares
@@ -117,22 +114,29 @@ Running 100 iterations...
 
 ### Key Qualitative Expectations
 
-The 1926 Great Miami Hurricane is the paper's primary "extreme stress" scenario.
-At 2024 Florida exposure levels, this event is expected to generate:
+With default settings (`--seed 42`) the measured results are:
 
-- **Total gross damage**: $150–200 B USD (mean across 100 iterations).
-- **Private wind insured losses**: $35–45 B USD (mean) — substantially larger
-  than the $18.2 B total synthetic entity surplus.
-- **Private insurer defaults**: most or all iterations will show defaults, because
-  mean private wind losses exceed total sector surplus.  Expect 15–25 defaults
-  per iteration on average.
-- **FHCF near-exhaustion**: common in most iterations.
-- **Citizens residual deficit**: frequent given the scale of the event.
-- **NFIP borrowing**: common but smaller magnitude than wind losses.
+| Metric | Mean (100 iters) |
+|--------|------------------|
+| Total gross damage | $170.4 B |
+| Wind damage | $123.6 B |
+| Water/flood damage | $46.8 B |
+| Private wind insured | $38.9 B |
+| Citizens wind insured | $10.4 B |
+| NFIP flood paid | $13.8 B |
+| Any private default | 100% of iterations |
+| Defaults > 10 firms | 100% of iterations |
+| FHCF shortfall | $0 (capacity not exhausted) |
+| Citizens deficit | $5.3 B |
+| NFIP borrowing | $10.4 B (96% of iterations) |
+| FIGA residual deficit | $15.1 B |
 
-These qualitative patterns are consistent with the manuscript's core finding
-that a Great Miami–class event would exhaust private-sector capacity.  Exact
-numbers differ because the demo uses synthetic financial data.
+The FHCF pays out a mean of **$8.4 B** total (private + Citizens layers) but
+stays within its statutory capacity — so shortfall is zero.  Private defaults
+are driven by net losses after FHCF recovery (~$34.6 B) exceeding the $18.2 B
+total synthetic entity surplus.  These patterns are consistent with the
+manuscript's core finding.  Exact numbers differ because the demo uses synthetic
+financial data.
 
 ### Exact Numeric Values
 
@@ -148,15 +152,16 @@ snapshot.  Delete this file to regenerate it.
 
 ## Hazard Pipeline (Optional)
 
-`run_climada_hazard_pipeline.py` shows how the Great Miami impact footprint
-was computed from the raw IBTrACS track using CLIMADA:
+`scripts/hazard/simulate_historical_event_losses.py` is the actual script used
+to generate the pre-computed county impact footprints from IBTrACS tracks via
+CLIMADA (Holland 2008 wind model, RMSF-calibrated impact functions):
 
 ```bash
 conda activate climada_env
-python scripts/demo/run_climada_hazard_pipeline.py
+python scripts/hazard/simulate_historical_event_losses.py
 ```
 
-This script requires CLIMADA ≥ 6.1.0 and internet access (downloads IBTrACS
+This script requires CLIMADA ≥ 4.0 and internet access (downloads IBTrACS
 and LitPop tiles on first run, ~500 MB).  It is **not required** for the core
 demo — the pre-computed footprint is already in the repository.
 

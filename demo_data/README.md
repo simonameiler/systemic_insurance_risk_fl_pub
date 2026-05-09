@@ -49,7 +49,7 @@ Florida HO premium volume.
 - `catbonds_2024.csv` — Catastrophe bond terms (public)
 - `hazard/historical_events/1926255N15314.csv` — Great Miami Hurricane (1926) per-county
   wind damage fractions derived from IBTrACS + CLIMADA (public; see
-  `scripts/demo/run_climada_hazard_pipeline.py` for full reproduction)
+  `scripts/hazard/simulate_historical_event_losses.py` for full reproduction)
 
 ---
 

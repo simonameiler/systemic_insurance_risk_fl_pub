@@ -27,7 +27,7 @@ Scenario
     The pre-computed county-level impact footprint is in:
         fl_risk_model/data/hazard/historical_events/1926255N15314.csv
     For full transparency on how that file was produced, see:
-        scripts/demo/run_climada_hazard_pipeline.py  (requires CLIMADA)
+        scripts/hazard/simulate_historical_event_losses.py  (requires CLIMADA)
 
 Why Great Miami matters
 -----------------------
@@ -39,7 +39,7 @@ systemic stress (multiple insurer defaults, FHCF near-depletion, FIGA stress)
 visible in the demo, illustrating why the paper studies systemic risk.
 
 This demo does NOT require:
-    • WindRiskTech L.L.C. / MIT model synthetic TC event sets.
+    • MIT model synthetic TC event sets.
     • S&P Capital IQ licensed market-share or surplus data.
     • An HPC cluster — typical runtime is 2–5 minutes on a laptop.
 
@@ -191,7 +191,14 @@ def _load_demo_surplus(path: Path) -> pd.DataFrame:
         )
     if "GroupToEntityRatio" not in df.columns:
         df["GroupToEntityRatio"] = df["GroupSurplusUSD"] / df["SurplusUSD"].replace(0, np.nan)
-    return df[["Company", "StatEntityKey", "SurplusUSD", "GroupSurplusUSD", "GroupToEntityRatio"]]
+    # capital.py unconditionally selects these columns even when absent —
+    # add as NaN so the group-capital logic falls back to Company-as-GroupID
+    if "NAICGroupNumber" not in df.columns:
+        df["NAICGroupNumber"] = np.nan
+    if "NAICGroupName" not in df.columns:
+        df["NAICGroupName"] = np.nan
+    return df[["Company", "StatEntityKey", "SurplusUSD", "GroupSurplusUSD",
+               "GroupToEntityRatio", "NAICGroupNumber", "NAICGroupName"]]
 
 
 def _build_demo_common_inputs(
@@ -216,23 +223,24 @@ def _build_demo_common_inputs(
     #    The runner expects the column to be named 'Share' or MarketShare{year}.
     mshare = demo_mshare_df.copy()
 
-    # 3. County FIPS crosswalk (public)
+    # 3. County FIPS crosswalk (public).
+    #    fl_county_fips.csv uses STATEFP+COUNTYFP; pre-build 'county_fips' so
+    #    loader._fl_xwalk (which looks for county_fips/fips/countyfips) finds it.
+    #    runner._build_xwalk handles COUNTYNAME and the STATEFP+COUNTYFP pair
+    #    on its own, so the full raw frame is fine to pass to run_one_iteration.
     county_xwalk = pd.read_csv(cfg.DATA_DIR / "fl_county_fips.csv")
-    low = {c.lower(): c for c in county_xwalk.columns}
-    if "county" in low:
-        county_xwalk = county_xwalk.rename(columns={low["county"]: "County"})
-    if "county_fips" in low:
-        county_xwalk["county_fips"] = (
-            county_xwalk[low["county_fips"]].astype(str)
-            .str.replace(r"\D", "", regex=True).str.zfill(5)
-        )
-    elif "statefp" in low and "countyfp" in low:
-        sf = county_xwalk[low["statefp"]].astype(str).str.replace(r"\D", "", regex=True).str.zfill(2)
-        cf = county_xwalk[low["countyfp"]].astype(str).str.replace(r"\D", "", regex=True).str.zfill(3)
-        county_xwalk["county_fips"] = sf + cf
-    else:
-        raise KeyError("fl_county_fips.csv needs county_fips or STATEFP+COUNTYFP columns.")
-    county_xwalk = county_xwalk[["County", "county_fips"]].drop_duplicates()
+    _low = {c.lower(): c for c in county_xwalk.columns}
+    if "county_fips" not in _low and "fips" not in _low:
+        if "statefp" in _low and "countyfp" in _low:
+            sf = county_xwalk[_low["statefp"]].astype(str).str.replace(r"\D", "", regex=True).str.zfill(2)
+            cf = county_xwalk[_low["countyfp"]].astype(str).str.replace(r"\D", "", regex=True).str.zfill(3)
+            county_xwalk = county_xwalk.copy()
+            county_xwalk["county_fips"] = sf + cf
+        else:
+            raise KeyError(
+                f"fl_county_fips.csv needs county_fips, fips, or STATEFP+COUNTYFP columns. "
+                f"Found: {list(county_xwalk.columns)}"
+            )
 
     # 4. Citizens capital (public Citizens annual reports)
     cit_cap = load_citizens_capital_row_from_csv(
