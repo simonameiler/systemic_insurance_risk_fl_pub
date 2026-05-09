@@ -2,7 +2,7 @@
 
 This directory contains pre-computed model outputs used to reproduce the figures and
 tables in the manuscript **"Stress testing insurance market stability under climate risk"**
-(Meiler et al., *Nature Climate Change*, 2026).
+(Meiler et al., 2026).
 
 These files are included so that reviewers and readers can:
 

@@ -1,23 +1,15 @@
 #!/usr/bin/env python3
 """
-generate_emanuel_year_sets.py - Generate stochastic TC year-sets from Emanuel event sets
+generate_emanuel_year_sets.py - Generate stochastic TC year-sets from the MIT TC event sets
 
-This script generates year-sets for Monte Carlo analysis using the Emanuel TC
+This script generates year-sets for Monte Carlo analysis using the MIT TC
 event sets with their observed annual frequency distributions.
-
-Key difference from synthetic TC approach:
-- Instead of Poisson(λ) with fixed λ, we RESAMPLE from observed freqyear values
-- This preserves the empirical (underdispersed) frequency distribution
-- Maintains climate variability structure from ERA5/GCM simulations
 
 Usage:
     python scripts/hazard/generate_emanuel_year_sets.py --event_set FL_era5_reanalcal --n_years 10000 --seed 42
 
 Outputs:
     - <IMPACTS_BASE>/<event_set>/year_sets_N10000_seed42.csv
-
-Author: Simona Meiler
-Date: December 2025
 """
 
 import sys

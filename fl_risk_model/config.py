@@ -308,8 +308,8 @@ COMPOSITE_WIND_SHARE_PARAMS = {
 #   4. Escambia: 70% + (78.9% - 70.0% empirical mean) = 78.9% wind (example)
 #   5. Weighted by losses, still averages to exactly 70%
 #
-# Data source: florida_empirical_hazard_attribution_p95.csv (for extreme events)
-#   Based on actual FLOIR/NFIP damage observations from historical TC events
+# Data source: florida_log_contribution_p95_present.csv (for extreme events)
+#   Based on Gori et al. log-space hazard contributions (β_W×ln(W), β_P×ln(P+1), β_S×S)
 #   P95 represents extreme events (major hurricanes)
 #   Use for stress testing / extreme event scenarios
 #

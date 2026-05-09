@@ -23,9 +23,6 @@ Outputs (in OUTPUT_BASE/<event_set>/):
     - event_metadata.csv (event characteristics)
     - all_events.csv (aggregated events summary)
     - annual_frequencies.csv (frequency by year)
-
-Author: Simona Meiler
-Date: December 2025
 """
 
 import sys

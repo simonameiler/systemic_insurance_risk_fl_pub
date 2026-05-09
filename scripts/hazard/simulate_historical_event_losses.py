@@ -40,8 +40,6 @@ Requirements
     CLIMADA >= 4.0  (conda activate climada_env)
     Internet access for the first IBTrACS download (~480 MB cached locally)
     fl_risk_model/data/US_counties  (county shapefile)
-
-Author: Simona Meiler
 """
 
 import argparse

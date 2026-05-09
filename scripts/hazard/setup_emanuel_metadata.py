@@ -10,9 +10,6 @@ Run this if you have the per-event CSV files but are missing the metadata files.
 
 Usage:
     python scripts/hazard/setup_emanuel_metadata.py --event_set FL_era5_reanalcal
-
-Author: Simona Meiler
-Date: 2025
 """
 
 import sys

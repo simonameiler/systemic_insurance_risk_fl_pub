@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-compute_windfields_emanuel.py - Compute wind fields from Kerry Emanuel TC tracks
+compute_windfields_emanuel.py - Compute wind fields from the MIT TC tracks
 Processes a single synthetic event set - designed for parallel execution
 """
 

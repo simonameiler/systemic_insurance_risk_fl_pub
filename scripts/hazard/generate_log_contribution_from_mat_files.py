@@ -2,9 +2,9 @@
 Generate Wind/Water Attribution from Raw Gori .mat Files
 
 This script generates wind/water attribution CSV files using:
-1. Raw Gori .mat files (not pre-processed CSVs)
+1. Raw Gori .mat files
 2. Coastal/inland coefficient differentiation
-3. Logarithmic contribution method (same approach as calculate_empirical_hazard_attribution.py)
+3. Logarithmic contribution method (Gori et al. damage function structure)
 
 METHODOLOGY:
 The Gori model: ln(Damage) = β_W×ln(W) + β_R×ln(R+1) + β_S×S

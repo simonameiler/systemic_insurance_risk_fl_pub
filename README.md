@@ -50,14 +50,21 @@ systemic_insurance_risk_fl_pub/
 │   │   └── building_codes.py          ← wind/flood loss reduction from stricter codes
 │   │
 │   └── data/                          ← input datasets (see Data Availability)
-│       ├── *.csv / *.xlsx             ← FHCF terms, Citizens, NFIP, county mappings, etc.
+│       ├── *.csv                      ← FHCF terms, Citizens, NFIP, county mappings, wind/water attribution
+│       ├── FHCF_2024_Exposure_byCounty.xlsx  ← FHCF county exposure (public regulatory filing)
 │       ├── hazard/                    ← per-event impacts and historical scenarios
-│       │   ├── gori_data/             ← Gori et al. 2025 hazard matrices (Wind, Rain, Surge, EAD)
-│       │   ├── emanuel/               ← Kerry Emanuel TC event sets
-│       │   └── historical_events/     ← individual historical hurricane impact CSVs
+│       │   ├── gori_data/             ← placeholder; raw Gori et al. 2025 .mat files not redistributed (see Data Availability)
+│       │   ├── emanuel/               ← placeholder; precomputed Emanuel TC impacts available on request (see Data Availability)
+│       │   └── historical_events/     ← county-level wind damage for 4 model events + 4 composite scenarios
 │       └── US_counties/               ← Florida county shapefiles
 │
+├── demo_data/                         ← synthetic insurer data for the demo (see demo_data/README.md)
+├── demo_output/                       ← reference output for the demo (demo_summary.csv)
+│
 ├── scripts/
+│   ├── demo/                          ← self-contained model demo
+│   │   └── run_demo.py                ← Great Miami Hurricane, 99 synthetic insurers (~30 s)
+│   │
 │   ├── run/                           ← Monte Carlo run scripts
 │   │   ├── run_emanuel_monte_carlo.py             ← baseline MC with Emanuel TC event sets
 │   │   ├── run_emanuel_policy_suite.py            ← side-by-side policy scenario comparisons
@@ -78,8 +85,7 @@ systemic_insurance_risk_fl_pub/
 │   │
 │   ├── hazard/                        ← hazard data preprocessing
 │   │   ├── simulate_historical_event_losses.py    ← IBTrACS→CLIMADA pipeline for the 4 historical events
-│   │   ├── calculate_empirical_hazard_attribution.py ← wind/water attribution (P95 weighted)
-│   │   ├── generate_log_contribution_from_mat_files.py ← wind/water attribution from raw .mat files
+│   │   ├── generate_log_contribution_from_mat_files.py ← wind/water attribution (Gori log-contribution, P95)
 │   │   ├── compute_sequential_events.py           ← multi-hurricane scenario builder
 │   │   ├── compute_windfields_emanuel.py          ← CLIMADA windfields from Emanuel TC tracks
 │   │   ├── precompute_emanuel_tc_impacts.py       ← county-level impact precomputation
@@ -92,11 +98,11 @@ systemic_insurance_risk_fl_pub/
 │   ├── historical_scenario_analysis.ipynb         ← Fig. 2, SI Fig. 2
 │   └── probabilistic_risk_analysis_pub.ipynb      ← Fig. 3-4, Table 1, SI Tables 4-5, SI Fig. 1
 │
-└── results/                           ← output directories (MC runs, figures, tables)
-    ├── figures/
-    ├── tables/
-    ├── climate_deltas/
-    └── mc_runs/
+└── results/                           ← pre-computed outputs for notebook reproduction
+    ├── figures/                       ← publication figures (PDF + PNG)
+    ├── tables/                        ← publication tables (CSV + LaTeX)
+    ├── climate_deltas/                ← GCM ensemble climate change delta CSVs
+    └── mc_runs/                       ← archived MC run directories (ERA5 baseline + policy scenarios)
 ```
 
 ## Content
@@ -213,12 +219,11 @@ structure.
 
 > **Note**: The notebooks load results from `results/mc_runs/` via relative
 > paths.  They do **not** require the proprietary S&P Capital IQ or
-> WindRiskTech data files to generate figures.
+> MIT TC track data files to generate figures.
 
 ### (b) Lightweight model demo — no proprietary data needed
 
-A self-contained demo runs the full risk waterfall on the **Great Miami Hurricane (1926)** using
-synthetic insurer data.  Expected runtime: ~30 seconds on a laptop.
+A self-contained demo runs the full risk propagation on the **Great Miami Hurricane (1926)** using synthetic insurer data. Expected runtime: ~30 seconds on a laptop.
 
 ```bash
 pip install -e .
@@ -234,7 +239,7 @@ that make them necessary.
 
 Reproducing the Monte Carlo outputs from scratch requires:
 1. Licensed S&P Capital IQ surplus and market share data (see *Data availability and restrictions* below).
-2. WindRiskTech L.L.C. synthetic TC event sets (see below).
+2. MIT model TC tracks (WindRiskTech L.L.C.) (see below).
 3. An HPC cluster for runs with large event sets (see `scripts/cluster/`).
 
 Steps:
@@ -273,8 +278,9 @@ To adapt the model to a different event, region, or policy scenario:
 
 | File / Directory | Source | Notes |
 |-----------------|--------|-------|
-| `fl_risk_model/data/*.csv` | Public regulatory filings, FEMA | FHCF terms, Citizens capital, NFIP premium/penetration, county FIPS crosswalk |
-| `fl_risk_model/data/hazard/historical_events/*.csv` | Derived from IBTrACS via CLIMADA | County-level wind damage (USD) for each historical storm; see `scripts/hazard/simulate_historical_event_losses.py` |
+| `fl_risk_model/data/*.csv` | Public regulatory filings, FEMA | FHCF terms, Citizens capital, NFIP premium/penetration, county FIPS crosswalk, wind/water attribution |
+| `fl_risk_model/data/FHCF_2024_Exposure_byCounty.xlsx` | Florida Hurricane Catastrophe Fund (public) | County-level residential exposure used for FHCF layer sizing |
+| `fl_risk_model/data/hazard/historical_events/*.csv` | Derived from IBTrACS via CLIMADA | County-level wind damage (USD) for the 4 model events (Great Miami, Lake Okeechobee, Andrew, Irma) plus 4 composite multi-storm scenarios; see `scripts/hazard/simulate_historical_event_losses.py` |
 | `fl_risk_model/data/hazard/fl_per_event_impacts*.csv` | Derived from Gori et al. (2025) | Log-linear damage model outputs; see attribution below |
 | `fl_risk_model/data/catbonds_2024.csv` | Public cat bond prospectuses | Catastrophe bond terms and attachment points |
 | `demo_data/` | **Synthetic / fictitious** | Illustrative insurer data for demo only; not based on real companies |
@@ -296,14 +302,9 @@ and the figure-reproduction notebooks do **not** require these files.
 
 ### Data requiring a non-redistribution agreement (WindRiskTech L.L.C.)
 
-The synthetic tropical cyclone event sets from the MIT probabilistic model
-(Kerry Emanuel) are proprietary and owned by WindRiskTech L.L.C.  Due to
-proprietary restrictions, these data are not publicly archived.  Researchers
-interested in accessing the data for scientific purposes may contact
-WindRiskTech L.L.C. at info@windrisktech.com, subject to a non-redistribution
-agreement.  Precomputed per-event county-level impacts derived from these event
-sets are stored in `fl_risk_model/data/hazard/emanuel/` and are included in the
-repository.
+The synthetic tropical cyclone event sets from the MIT model are proprietary and owned by WindRiskTech L.L.C.  Due to proprietary restrictions, these data are not publicly archived.  Researchers interested in accessing the data for scientific purposes may contact WindRiskTech L.L.C. at info@windrisktech.com, subject to a non-redistribution agreement.
+
+Precomputed per-event county-level impacts derived from these event sets (`fl_risk_model/data/hazard/emanuel/`) are not included in the repository due to their volume and the underlying data restrictions.  They are available from the corresponding author upon reasonable request.
 
 ### External public data (Gori et al. 2025)
 
@@ -313,10 +314,8 @@ The synthetic TC hazard and damage simulations from:
 > in *Sensitivity of TC risk to storm climatology change and socioeconomic growth*.
 > DesignSafe-CI. https://doi.org/10.17603/ds2-0jkm-h487
 
-were used to derive the county-wide empirical wind/flood loss attribution tables
-(`fl_risk_model/data/hazard/`).  The raw `.mat` files are publicly available at
-the DOI above; they are not redistributed here.  The scripts in
-`scripts/hazard/` reproduce the preprocessing steps.
+were used to derive the county-wide wind/flood loss attribution tables
+(`fl_risk_model/data/florida_log_contribution_p95_present.csv`).  The raw `.mat` files are publicly available at the DOI above; they are not redistributed here (the `fl_risk_model/data/hazard/gori_data/` directory is an empty placeholder).  The script `scripts/hazard/generate_log_contribution_from_mat_files.py` reproduces the preprocessing steps.
 
 ---
 
