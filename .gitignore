@@ -95,8 +95,38 @@ dmypy.json
 .AppleDouble
 .LSOverride
 
-# Results directory (generated outputs)
-results/
+# Results directory: track only the specific archived outputs needed for peer review.
+# (Git cannot un-ignore files inside an ignored parent directory, so we list
+#  the subdirectories to exclude individually.)
+
+# Ignore all mc_run subdirectories EXCEPT the four ERA5 policy runs and the
+# historical scenario xlsx archived for notebook reproducibility.
+results/mc_runs/andrew_*/
+results/mc_runs/andrew_then_*/
+results/mc_runs/double_*/
+results/mc_runs/gm_then_*/
+results/mc_runs/great_miami_*/
+results/mc_runs/irma_*/
+results/mc_runs/lake_*/
+results/mc_runs/insured_frac_*/
+results/mc_runs/penetration_capital_*/
+results/mc_runs/variance_*/
+results/mc_runs/emanuel_canesm_*/
+results/mc_runs/emanuel_cnrm6_*/
+results/mc_runs/emanuel_ecearth6_*/
+results/mc_runs/emanuel_ipsl6_*/
+results/mc_runs/emanuel_miroc6_*/
+results/mc_runs/scenario_report_with_uncertainty_*.csv
+# Keep the scenario xlsx (Fig. 2 / SI Fig. 2), the 4 ERA5 policy runs, and climate_deltas
+
+# Ignore large generated outputs that are not needed for figure reproduction
+results/figures/
+results/tables/
+results/debug/
+results/mc_runs/*/debug/
+
+# Private calibration/validation scripts (use proprietary FLOIR data)
+scripts/hazard/evaluate_losses.py
 
 # Large data files (not tracked)
 *.hdf5

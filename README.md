@@ -77,7 +77,7 @@ systemic_insurance_risk_fl_pub/
 │   │   └── generate_table_baseline_return_periods.py ← baseline return period table
 │   │
 │   ├── hazard/                        ← hazard data preprocessing
-│   │   ├── build_per_event_impacts.py             ← log-linear damage model from Gori hazard matrices
+│   │   ├── simulate_historical_event_losses.py    ← IBTrACS→CLIMADA pipeline for the 4 historical events
 │   │   ├── calculate_empirical_hazard_attribution.py ← wind/water attribution (P95 weighted)
 │   │   ├── generate_log_contribution_from_mat_files.py ← wind/water attribution from raw .mat files
 │   │   ├── compute_sequential_events.py           ← multi-hurricane scenario builder
@@ -90,7 +90,7 @@ systemic_insurance_risk_fl_pub/
 │
 ├── notebooks/                         ← reproduce all publication figures and tables
 │   ├── historical_scenario_analysis.ipynb         ← Fig. 2, SI Fig. 2
-│   └── probabilistic_risk_analysis.ipynb          ← Fig. 3-4, Table 1, SI Tables 4-5, SI Fig. 1
+│   └── probabilistic_risk_analysis_pub.ipynb      ← Fig. 3-4, Table 1, SI Tables 4-5, SI Fig. 1
 │
 └── results/                           ← output directories (MC runs, figures, tables)
     ├── figures/
@@ -136,6 +136,46 @@ Input data files. See **Data Availability** below for details.
 
 ---
 
+## System requirements
+
+### Operating system
+
+macOS 12+ or Linux (Ubuntu 20.04+). Windows is not tested.
+
+### Python version
+
+Python 3.11 or 3.12 (recommended). Python 3.10 may work but is untested.
+
+### Required Python packages
+
+The following packages are installed automatically via `pip install -e .`:
+
+| Package | Purpose |
+|---------|---------|
+| `numpy ≥ 1.26` | Numerical arrays and random sampling |
+| `pandas ≥ 2.0` | Tabular data loading and manipulation |
+| `scipy ≥ 1.12` | Statistical distributions (Beta, log-normal) |
+| `matplotlib ≥ 3.8` | Figure generation in notebooks |
+| `openpyxl ≥ 3.1` | Reading FHCF and insurer Excel files |
+| `tqdm` | Progress bars in long MC runs |
+| `jupyter` | Running the analysis notebooks |
+
+See `pyproject.toml` for the full pinned dependency list.
+
+### CLIMADA (hazard preprocessing only)
+
+[CLIMADA](https://github.com/CLIMADA-project/climada_python) v6.1.0+ is required **only** to re-run the hazard preprocessing pipeline (`scripts/hazard/`).  CLIMADA is **not** required to run the demo, the notebooks, or the Monte Carlo risk model.  We used CLIMADA 6.1.0-develop.
+
+### HPC cluster (full upstream computation only)
+
+Monte Carlo runs with the complete synthetic TC event sets (Emanuel model, ~200 000 storm years) were executed on the Stanford Sherlock HPC cluster using SLURM job arrays.  A standard laptop or desktop is sufficient for the demo and notebook reproduction steps.
+
+### Non-standard hardware
+
+No GPUs or other specialised hardware are required for any step in this repository.
+
+---
+
 ## Installation
 
 ```bash
@@ -144,20 +184,139 @@ cd systemic_insurance_risk_fl_pub
 pip install -e .
 ```
 
-The model is designed to run within a [CLIMADA](https://github.com/CLIMADA-project/climada_python) conda environment (v6.1.0+), which provides all required dependencies (numpy, pandas, scipy, matplotlib, h5py, etc.).
-CLIMADA itself is only needed for hazard preprocessing (`scripts/hazard/`); we used v6.1.0, develop; the core risk model and Monte Carlo runs do not depend on it.
+Typical installation time: 2–10 minutes depending on network speed and whether
+numpy/scipy need to be compiled.
+
+The model is designed to also run inside a [CLIMADA](https://github.com/CLIMADA-project/climada_python) conda environment, which provides all required dependencies.
 
 ---
 
-## Data availability
+## Peer review reproducibility
 
-**Included in the repository**: FHCF contract terms, Citizens Property Insurance county data, NFIP claims and penetration rates, county mappings, per-event county-level impacts, catastrophe bond terms, historical hurricane scenario impacts (generated via a CLIMADA workflow from IBTrACS tracks), and wind/water hazard attribution tables (derived from the Gori et al. simulations below).
+There are **three levels of reproducibility**, depending on available data:
 
-**License required**: Florida company-level wind exposure data and statutory surplus capital data were retrieved from S\&P Capital IQ, which requires a commercial license.
+### (a) Reproducing manuscript figures and tables from archived results — no proprietary data needed
 
-**External — Gori et al. (2025) hazard data**: The synthetic tropical cyclone hazard and damage simulations from Gori et al., (2025) used in this study to derive county-wide empirical wind/flood loss attribution are publicly available from DesignSafe-CI: Gori, A. (2025). "Tropical Cyclone Synthetic Hazard and Damage Simulations", in *Sensitivity of TC risk to storm climatology change and socioeconomic growth*. DesignSafe-CI. [https://doi.org/10.17603/ds2-0jkm-h487](https://doi.org/10.17603/ds2-0jkm-h487). The raw .mat files (wind, rain, surge, and expected annual damage matrices) should be placed in `fl_risk_model/data/hazard/gori_data/`.
+All pre-computed Monte Carlo outputs needed to reproduce the paper's figures and
+tables are archived in `results/`.  No proprietary data, HPC access, or long
+computation is required.
 
-**External — Emanuel TC event sets**: The synthetic TC data from the MIT model are proprietary and owned by WindRiskTech L.L.C., a company that provides hurricane risk assessments to clients worldwide. Due to proprietary restrictions, these datasets are not publicly archived. However, researchers interested in accessing the data for scientific purposes can contact WindRiskTech L.L.C. at info@windrisktech.com, subject to a non-redistribution agreement. Precomputed per-event impacts should be placed in `fl_risk_model/data/hazard/emanuel/`.
+```bash
+pip install -e .
+jupyter lab notebooks/historical_scenario_analysis.ipynb      # Fig. 2, SI Fig. 2
+jupyter lab notebooks/probabilistic_risk_analysis_pub.ipynb   # Fig. 3-4, Table 1, SI Tables 4-5, SI Fig. 1
+```
+
+Run all cells from top to bottom.  See `results/README.md` for a detailed
+mapping of notebooks to figures and an explanation of the archived directory
+structure.
+
+> **Note**: The notebooks load results from `results/mc_runs/` via relative
+> paths.  They do **not** require the proprietary S&P Capital IQ or
+> WindRiskTech data files to generate figures.
+
+### (b) Lightweight model demo — no proprietary data needed
+
+A self-contained demo runs the full risk waterfall on the **Great Miami Hurricane (1926)** using
+synthetic insurer data.  Expected runtime: ~30 seconds on a laptop.
+
+```bash
+pip install -e .
+python scripts/demo/run_demo.py
+```
+
+See [`scripts/demo/README.md`](scripts/demo/README.md) for expected output,
+output schema, and troubleshooting.  See [`demo_data/README.md`](demo_data/README.md)
+for a description of the synthetic insurer datasets and the data restrictions
+that make them necessary.
+
+### (c) Full upstream Monte Carlo computation — requires licensed data
+
+Reproducing the Monte Carlo outputs from scratch requires:
+1. Licensed S&P Capital IQ surplus and market share data (see *Data availability and restrictions* below).
+2. WindRiskTech L.L.C. synthetic TC event sets (see below).
+3. An HPC cluster for runs with large event sets (see `scripts/cluster/`).
+
+Steps:
+```bash
+pip install -e .                            # install package
+# Place proprietary data in fl_risk_model/data/ (see config.py for expected filenames)
+python scripts/run/run_historical_scenarios_mc.py   # historical scenario MC
+python scripts/run/run_emanuel_monte_carlo.py        # full probabilistic MC
+```
+
+---
+
+## Instructions for use
+
+To adapt the model to a different event, region, or policy scenario:
+
+1. **Provide a new event impact file**: a CSV with columns `countyfp, county_name, value`
+   (where `value` is the fraction of county TIV affected) placed in
+   `fl_risk_model/data/hazard/historical_events/`.
+2. **Override configuration** in `fl_risk_model/config.py` or via `cfg` attributes
+   before running — e.g., `cfg.FIXED_YEAR`, `cfg.DO_FLOOD`, `cfg.FHCF_LAYER`.
+3. **Call the runner directly**:
+   ```python
+   from fl_risk_model.mc_run_events import run_one_iteration, _prepare_common_inputs
+   common = _prepare_common_inputs()
+   result = run_one_iteration("my_event", ["my_stem"], rng, common)
+   ```
+4. **Add a policy scenario**: subclass or configure one of the transforms in
+   `fl_risk_model/scenarios/` and pass `policy_scenario_config` to `run_one_iteration`.
+
+---
+
+## Data availability and restrictions
+
+### Data included in the repository (publicly redistributable)
+
+| File / Directory | Source | Notes |
+|-----------------|--------|-------|
+| `fl_risk_model/data/*.csv` | Public regulatory filings, FEMA | FHCF terms, Citizens capital, NFIP premium/penetration, county FIPS crosswalk |
+| `fl_risk_model/data/hazard/historical_events/*.csv` | Derived from IBTrACS via CLIMADA | County-level wind damage (USD) for each historical storm; see `scripts/hazard/simulate_historical_event_losses.py` |
+| `fl_risk_model/data/hazard/fl_per_event_impacts*.csv` | Derived from Gori et al. (2025) | Log-linear damage model outputs; see attribution below |
+| `fl_risk_model/data/catbonds_2024.csv` | Public cat bond prospectuses | Catastrophe bond terms and attachment points |
+| `demo_data/` | **Synthetic / fictitious** | Illustrative insurer data for demo only; not based on real companies |
+
+### Data requiring a commercial license (S&P Capital IQ)
+
+Two input files are **not included** in the repository because they are sourced
+from S&P Capital IQ under a commercial data license:
+
+- **Florida homeowners market share**: company-level direct premiums written
+  (used in `fl_risk_model/config.py` as `MARKET_SHARE_XLSX`).
+- **Florida statutory surplus and capital**: entity-level and group-level
+  surplus (used as `SURPLUS_FILE`).
+
+Researchers with access to S&P Capital IQ can retrieve these datasets from the
+Capital IQ platform and place them in `fl_risk_model/data/` with the filenames
+specified in `fl_risk_model/config.py`.  The demo (`scripts/demo/run_demo.py`)
+and the figure-reproduction notebooks do **not** require these files.
+
+### Data requiring a non-redistribution agreement (WindRiskTech L.L.C.)
+
+The synthetic tropical cyclone event sets from the MIT probabilistic model
+(Kerry Emanuel) are proprietary and owned by WindRiskTech L.L.C.  Due to
+proprietary restrictions, these data are not publicly archived.  Researchers
+interested in accessing the data for scientific purposes may contact
+WindRiskTech L.L.C. at info@windrisktech.com, subject to a non-redistribution
+agreement.  Precomputed per-event county-level impacts derived from these event
+sets are stored in `fl_risk_model/data/hazard/emanuel/` and are included in the
+repository.
+
+### External public data (Gori et al. 2025)
+
+The synthetic TC hazard and damage simulations from:
+
+> Gori, A. (2025). "Tropical Cyclone Synthetic Hazard and Damage Simulations",
+> in *Sensitivity of TC risk to storm climatology change and socioeconomic growth*.
+> DesignSafe-CI. https://doi.org/10.17603/ds2-0jkm-h487
+
+were used to derive the county-wide empirical wind/flood loss attribution tables
+(`fl_risk_model/data/hazard/`).  The raw `.mat` files are publicly available at
+the DOI above; they are not redistributed here.  The scripts in
+`scripts/hazard/` reproduce the preprocessing steps.
 
 ---
 
@@ -165,7 +324,7 @@ CLIMADA itself is only needed for hazard preprocessing (`scripts/hazard/`); we u
 
 - Python 3.11+ (recommended: use the CLIMADA conda environment)
 - [CLIMADA](https://github.com/CLIMADA-project/climada_python) v6.1.0+ (only for hazard preprocessing)
-- HPC cluster
+- HPC cluster (only for full MC runs with large event sets)
 
 ---
 
