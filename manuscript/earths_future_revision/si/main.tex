@@ -1,0 +1,700 @@
+\documentclass[fleqn,10pt]{wlscirep}
+\usepackage[utf8]{inputenc}
+\ifdefined\DeclareUnicodeCharacter\DeclareUnicodeCharacter{2009}{\,}\fi
+\usepackage[T1]{fontenc}
+\usepackage{verbatim}
+%\usepackage{pdflscape}
+%\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{pdflscape}
+\usepackage{tabularx}
+%\usepackage{longtable}
+%\usepackage{threeparttable}
+\usepackage{soul}
+\usepackage{lineno}
+%\linenumbers
+%\usepackage[nomarkers, figuresonly]{endfloat}
+
+\title{%
+    Supplementary Information for article "Stress testing insurance market stability under climate risk"
+}
+
+\author[1,*]{Simona Meiler}
+\author[2]{Steven I. Jackson}
+\author[3]{Kerry Emanuel}
+\author[4]{Noah S. Diffenbaugh}
+\author[1]{Jack W. Baker}
+
+\affil[1]{Civil and Environmental Engineering, Stanford University, CA, USA}
+\affil[2]{American Academy of Actuaries, Washington, DC, USA}
+\affil[3]{Lorenz Center, Massachusetts Institute of Technology, Cambridge, Massachusetts, USA}
+\affil[4]{Earth System Science, Stanford University, CA, USA}
+\affil[*]{Corresponding author simona@simonameiler.ch}
+
+\newcommand{\SITabI}{table S1}
+\newcommand{\SITabII}{table S2}
+\newcommand{\SITabIII}{table S3}
+\newcommand{\SITabIV}{table S4}
+\newcommand{\SITabV}{table S5}
+\newcommand{\SITabVI}{table S6}
+% \SITabVII (formerly "table S7", the variance-decomposition table) is
+% retired: that table is removed from this revision (see the correction
+% register, "Table S7 removal"). Tables formerly S8 and S9 are renumbered S7
+% and S8 by the automatic \thetable counter below; only the literal
+% cross-references in the prose (main/methods.tex, si/supporting_methods.tex)
+% needed manual updates.
+\newcommand{\SIFigI}{Figure~S1}
+\newcommand{\SIFigII}{Figure~S2}
+\newcommand{\SIFigIII}{Figure~S3}
+\newcommand{\SIMethodsI}{Supplementary Methods}
+
+\begin{document}
+
+\flushbottom
+\maketitle
+\thispagestyle{empty}
+
+\setcounter{section}{0}
+\renewcommand{\thesection}{S\arabic{section}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\captionsetup[figure]{labelformat=default, labelsep=period, name={Fig.}}
+\setcounter{figure}{0}
+\renewcommand{\thetable}{S\arabic{table}}
+\captionsetup[table]{labelformat=default, labelsep=period, name={Table}}
+\setcounter{table}{0}
+
+\renewcommand{\theequation}{S\arabic{equation}}
+\setcounter{equation}{0}
+\vspace*{1cm}
+
+\input{supporting_methods}
+\medskip
+\section*{Supporting tables}
+\begin{table}[htbp]
+\centering
+\caption{\textbf{Insured and estimated economic losses and resulting insured shares for Florida hurricane events (2017--2024)}. Economic losses are estimated using formulations including and excluding federal disaster assistance (FDA). All values are converted to 2024 USD.}
+\resizebox{\textwidth}{!}{%
+\label{TabInsuredFraction}
+\begin{tabular}{lrrrrrr}
+\hline
+Year & Insured losses & Est econ loss (incl. FDA) & $f_{\text{insured}}$ (incl.) & Est econ loss (excl. FDA) & $f_{\text{insured}}$ (excl.) \\
+\hline
+2017 & 28,159,458,046 & 60,750,223,673 & 46.35\% & 57,644,860,280 & 48.85\% \\
+2018 & 11,472,501,417 & 26,081,530,262 & 43.99\% & 23,251,364,093 & 49.34\% \\
+2019 & 23,342,615     & 198,468,914     & 11.76\% & 80,793,892      & 28.89\% \\
+2020 & 699,057,474    & 2,041,794,621   & 34.24\% & 1,783,712,209   & 39.19\% \\
+2021 & n.a. & n.a. & n.a. & n.a. & n.a. \\
+2022 & 23,914,182,689 & 56,175,193,964 & 42.57\% & 53,075,926,756 & 45.06\% \\
+2023 & 318,470,377    & 1,754,055,340   & 18.16\% & 1,315,565,662   & 24.21\% \\
+2024 & 7,466,073,319  & 25,060,543,556 & 29.79\% & 22,700,454,161 & 32.89\% \\
+\hline
+\multicolumn{2}{l}{Mean} &                & 32.41\% &                & 38.35\% \\
+\multicolumn{2}{l}{Median} &              & 34.24\% &                & 39.19\% \\
+\multicolumn{2}{l}{High-loss mean ($>$ \$25B)} & & 40.68\% &        & 44.03\% \\
+\hline
+\end{tabular}}
+\end{table}
+\clearpage
+\begin{landscape}
+\begin{table}[]
+\centering
+\caption{Definitions of systemic risk metrics used in the main text and Supplementary Information. Text~S4 defines the financial components and explains the interpretation of their aggregate.}
+\label{TabMetricDef}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{@{}lll@{}}
+\toprule
+\textbf{Metric} &
+  \textbf{Unit} &
+  \textbf{Definition} \\ \midrule
+\multicolumn{3}{l}{\textit{Loss decomposition}} \\
+Total loss &
+  USD &
+  Aggregate economic tropical cyclone loss before redistribution across insurance and public backstop layers. \\
+Insured wind, private &
+  USD &
+  Wind-related losses allocated to private admitted-market insurers in the initial risk-absorption layer. \\
+Citizens wind &
+  USD &
+  Wind-related losses allocated to Citizens in the initial risk-absorption layer. \\
+Insured flood, NFIP &
+  USD &
+  Flood-related losses allocated to the NFIP. \\
+Un/underinsured wind &
+  USD &
+  Wind-related damages not covered by private insurance or Citizens because of un- or underinsurance. \\
+Un/underinsured flood &
+  USD &
+  Flood-related damages not covered by the NFIP because of un- or underinsurance. \\
+Household burden &
+  USD &
+  Combined uninsured wind and flood residuals under the residential mapping described in Text~S3. \\
+Insured / uninsured share &
+  \% &
+  Share of total loss that is insured or un/underinsured. \\
+\multicolumn{3}{l}{\textit{Institutional stress and public burden}} \\
+FHCF shortfall &
+  USD &
+  Unrecovered wind losses resulting when the FHCF season-wide payout cap binds. \\
+FIGA residual &
+  USD &
+  Residual deficit remaining after insurer insolvencies are absorbed through the FIGA, subject to its assessment limits. \\
+Citizens deficit &
+  USD &
+  Residual deficit remaining after Citizens' surplus and assessment capacity are exhausted. \\
+NFIP Treasury borrowing &
+  USD &
+  Florida NFIP loss above the modeled national fund pool, recorded as a Treasury financing requirement without a borrowing limit or NFIP reinsurance. \\
+Total public burden &
+  USD &
+  Operational sum of FHCF shortfall, FIGA residual, Citizens deficit, and modeled NFIP borrowing. See Text~S4 for accounting limitations. \\
+\multicolumn{3}{l}{\textit{Capital depletion and default outcomes}} \\
+Private defaults &
+  \# &
+  Number of private insurer entities that become insolvent under a simulated event or season after modeled capital depletion. \\
+Largest single-entity deficit &
+  USD &
+  Maximum capital shortfall of any one insurer entity in a simulated event or season. \\
+\multicolumn{3}{l}{\textit{Stress ratios}} \\
+FHCF utilization factor &
+  ratio &
+  Share of the FHCF season-wide statutory payout capacity utilized in a given scenario or simulation. A value of 1 indicates that the cap is fully used. \\
+Citizens assessment stress factor &
+  ratio &
+  Citizens' deficit divided by its maximum assessment capacity (Tier 1 + Tier 2). Values above 1 indicate that the funding need exceeds statutory capacity. \\
+FIGA stress factor &
+  ratio &
+  Insolvency-related deficit relative to FIGA's effective maximum assessment capacity. Values above 1 indicate exceedance of capacity. \\
+NFIP Florida stress factor &
+  ratio &
+  Florida-attributable NFIP claims paid divided by Florida NFIP annual premium volume. \\
+\multicolumn{3}{l}{\textit{Probabilistic exceedance metrics}} \\
+Defaults $> 10$ &
+  annual probability (\%) &
+  Probability that more than ten private insurers default in a simulated tropical cyclone season. \\
+Single deficit $> \$1$B &
+  annual probability (\%) &
+  Probability that the largest single-company deficit exceeds USD~1~billion in a simulated season. \\
+FHCF $> 100\%$ cap &
+  annual probability (\%) &
+  Probability that modeled FHCF payouts reach or exceed the season-wide statutory cap. \\
+FIGA $> 100\%$ capacity &
+  annual probability (\%) &
+  Probability that FIGA funding needs exceed its statutory assessment capacity. \\
+Citizens $> 100\%$ capacity &
+  annual probability (\%) &
+  Probability that Citizens' deficit exceeds its assessment capacity. \\
+NFIP $> 200\%$ annual premium &
+  annual probability (\%) &
+  Probability that Florida-attributable NFIP losses exceed twice Florida NFIP annual premium income. \\
+Public burden $> 1\%$ Florida GDP &
+  annual probability (\%) &
+  Probability that total public burden exceeds 1\% of Florida's GDP in a simulated season. \\
+Public burden $> 10\%$ Florida GDP &
+  annual probability (\%) &
+  Probability that total public burden exceeds 10\% of Florida's GDP in a simulated season. \\ \bottomrule
+\end{tabular}%
+}
+\end{table}
+\end{landscape}
+
+\begin{landscape}
+\begin{table}[htb!]
+\centering
+\caption{\textbf{Scenario-based loss decomposition and institutional stress outcomes for Florida hurricane events.}
+Results are reported as mean values across stochastic realizations, with uncertainty ranges in parentheses indicating the 5th--95th percentiles. Metric definitions are provided in \SITabII. Named storms denote stylized hazard footprints evaluated on 2024 exposure and insurance-market conditions, not reconstructions of the original events or their realized losses.}
+\label{TabScenarioStressTest}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}llllllll@{}}
+\toprule
+\textbf{Metric} &
+  \textbf{Great Miami} &
+  \textbf{Andrew} &
+  \textbf{Lake Okeechobee} &
+  \textbf{Irma} &
+  \textbf{Great Miami then Andrew} &
+  \textbf{Double Great Miami} &
+  \textbf{Double Irma} \\ \midrule
+\multicolumn{8}{l}{\textit{Loss decomposition}} \\
+Total loss (USD) &
+  170.4B (170.4-170.4B) &
+  114.2B (114.2-114.2B) &
+  156.9B (156.9-156.9B) &
+  32.0B (32.0-32.0B) &
+  266.5B (266.5-266.5B) &
+  321.1B (321.1-321.1B) &
+  62.4B (62.4-62.4B) \\
+Insured wind, private (USD) &
+  36.9B (20.2-56.1B) &
+  29.0B (14.0-46.4B) &
+  16.3B (4.3-31.6B) &
+  6.0B (2.8-9.5B) &
+  61.4B (35.6-90.6B) &
+  69.3B (42.7-98.1B) &
+  11.5B (7.4-15.9B) \\
+Citizens wind (USD) &
+  10.3B (4.9-17.1B) &
+  10.3B (4.6-17.7B) &
+  2.6B (0.7-5.1B) &
+  0.5B (0.2-0.7B) &
+  18.8B (9.7-30.0B) &
+  19.4B (10.5-30.5B) &
+  0.9B (0.6-1.2B) \\
+Insured flood, NFIP (USD) &
+  15.0B (4.9-27.7B) &
+  4.9B (0.5-12.9B) &
+  17.0B (10.5-22.4B) &
+  2.6B (1.3-4.0B) &
+  19.8B (9.4-31.9B) &
+  28.1B (16.1-41.4B) &
+  5.2B (3.6-6.7B) \\
+Un/Underinsured wind (USD) &
+  72.2B (42.5-101.3B) &
+  60.5B (37.8-84.5B) &
+  28.3B (7.6-55.4B) &
+  9.7B (4.7-14.9B) &
+  122.9B (84.4-165.0B) &
+  136.7B (96.0-180.5B) &
+  18.7B (12.8-25.5B) \\
+Un/Underinsured flood (USD) &
+  35.9B (11.4-66.8B) &
+  9.4B (0.9-24.7B) &
+  92.6B (57.3-121.9B) &
+  13.3B (6.5-20.1B) &
+  43.7B (20.5-70.7B) &
+  67.7B (38.5-100.1B) &
+  26.1B (18.0-33.8B) \\
+\midrule
+\multicolumn{8}{l}{\textit{Institutional stress}} \\
+Total public burden (USD), corrected non-overlapping definition &
+  24.4B (15.2-33.4B) &
+  11.7B (4.1-22.3B) &
+  18.4B (16.6-20.9B) &
+  0.2B (0.0-0.8B) &
+  45.4B (26.8-65.5B) &
+  57.4B (39.4-76.1B) &
+  3.1B (2.1-4.0B) \\
+% CORRECTED (register item C1): excludes FHCF shortfall from the sum
+% (FIGA + Citizens + NFIP only); submitted values were 26.1 / 11.7 / 18.4 /
+% 0.2 / 51.0 / 65.4 / 3.1. Unchanged for scenarios with zero FHCF shortfall
+% in this run (Andrew, Lake Okeechobee, Irma, Double Irma).
+FHCF shortfall (USD), diagnostic only, not summed above &
+  1.7B (0.0-8.0B) &
+  0.0B (0.0-0.0B) &
+  0.0B (0.0-0.0B) &
+  0.0B (0.0-0.0B) &
+  5.6B (0.0-11.6B) &
+  8.0B (0.0-12.7B) &
+  0.0B (0.0-0.0B) \\
+FIGA residual (USD) &
+  7.0B (3.2-13.4B) &
+  4.2B (1.1-10.0B) &
+  3.3B (0.0-8.8B) &
+  0.1B (0.0-0.7B) &
+  15.8B (6.2-27.7B) &
+  19.1B (8.5-31.1B) &
+  1.3B (0.1-2.8B) \\
+Citizens deficit (USD) &
+  5.8B (3.1-11.4B) &
+  5.2B (1.9-11.9B) &
+  1.6B (0.0-4.0B) &
+  0.0B (0.0-0.0B) &
+  13.2B (4.7-24.1B) &
+  13.6B (5.5-24.7B) &
+  0.0B (0.0-0.3B) \\
+NFIP treasury borrowing (USD) &
+  11.5B (1.4-24.3B) &
+  2.2B (0.0-9.4B) &
+  13.6B (7.1-18.9B) &
+  0.1B (0.0-0.5B) &
+  16.4B (6.0-28.5B) &
+  24.7B (12.7-38.0B) &
+  1.8B (0.2-3.3B) \\
+\hline
+\textit{Capital \& default assessment} & & & & & & & \\
+Private defaults (\#) &
+  18 (15-22) &
+  16 (12-20) &
+  13 (0-18) &
+  5 (0-11) &
+  21 (18-23) &
+  22 (19-24) &
+  12 (8-14) \\
+Largest single-entity deficit (USD) &
+  1.9B (1.1-3.3B) &
+  1.2B (0.4-2.8B) &
+  1.0B (0.0-2.4B) &
+  0.1B (0.0-0.4B) &
+  3.8B (1.6-6.8B) &
+  4.6B (2.2-7.5B) &
+  0.6B (0.2-1.0B) \\
+\midrule
+\multicolumn{8}{l}{\textit{Stress ratios}} \\
+FHCF utilization factor &
+  0.79 (0.20-1.00) &
+  0.74 (0.25-0.93) &
+  0.02 (0.00-0.08) &
+  0.00 (0.00-0.00) &
+  0.98 (0.87-1.00) &
+  0.98 (0.92-1.00) &
+  0.00 (0.00-0.01) \\
+Citizens assessment stress factor &
+  6.46 (3.43-12.64) &
+  5.83 (2.16-13.26) &
+  1.74 (0.00-4.46) &
+  0.00 (0.00-0.00) &
+  14.67 (5.26-26.77) &
+  15.13 (6.07-27.40) &
+  0.06 (0.00-0.29) \\
+FIGA stress factor &
+  0.95 (0.91-0.98) &
+  0.88 (0.74-0.97) &
+  0.77 (0.00-0.97) &
+  0.17 (0.00-0.67) &
+  0.98 (0.95-0.99) &
+  0.98 (0.97-0.99) &
+  0.70 (0.23-0.89) \\
+NFIP Florida stress factor &
+  10.73 (3.49-19.86) &
+  3.54 (0.35-9.23) &
+  12.19 (7.56-16.02) &
+  1.90 (0.95-2.85) &
+  14.20 (6.74-22.89) &
+  20.13 (11.54-29.68) &
+  3.71 (2.58-4.79) \\
+\bottomrule
+
+\end{tabular}%
+}
+\end{table}
+\end{landscape}
+
+\begin{landscape}
+\begin{table}[htb!]
+\centering
+\caption{\textbf{Loss decomposition and public institutional burden across climate and policy scenarios.}
+Values show expected annual losses and institutional burdens under present-day baseline conditions, future climate scenarios (2050 and 2100 under SSP2-4.5 and SSP5-8.5), and illustrative market and policy interventions evaluated under present-day climate forcing. Values are reported as means in billion USD with uncertainty ranges (10th--90th percentile) in parentheses.}
+\label{TabClimatePolicyLosses}
+
+\small
+\setlength{\tabcolsep}{4pt}
+
+\begin{tabular}{@{}l|l|llll|lll@{}}
+\toprule
+\textbf{Metric (USD B)} &
+\textbf{Baseline} &
+\textbf{2050 SSP2-4.5} &
+\textbf{2050 SSP5-8.5} &
+\textbf{2100 SSP2-4.5} &
+\textbf{2100 SSP5-8.5} &
+\textbf{Market Exit} &
+\textbf{Insurance Penetration} &
+\textbf{Building Codes} \\
+\midrule
+
+\multicolumn{9}{l}{\textit{Loss decomposition}} \\
+Total loss                         & 19.3 (0.0--37.8) & 31.5 (15.3--45.5) & 34.9 (17.6--55.6) & 41.9 (18.3--50.0) & 59.2 (22.2--104.2) & 19.3 (0.0--37.8) & 19.3 (0.0--37.9) & 13.7 (0.0--27.9) \\
+Insured wind, private            & 5.5 (0.0--11.6) & 13.9 (6.7--19.9) & 15.4 (7.8--24.3) & 18.5 (8.1--22.1) & 26.2 (9.8--46.0) & 4.7 (0.0--9.8) & 8.1 (0.0--17.3) & 3.8 (0.0--8.1) \\
+Citizens wind                      & 1.1 (0.0--1.8) & 2.6 (1.3--3.8) & 2.9 (1.5--4.6) & 3.4 (1.5--4.1) & 4.7 (1.8--8.6) & 1.9 (0.0--3.5) & 1.7 (0.0--2.8) & 0.8 (0.0--1.2) \\
+Insured flood, NFIP              & 0.6 (0.0--0.9) & 1.5 (0.8--2.3) & 1.7 (0.8--2.7) & 1.9 (0.9--2.3) & 2.7 (1.0--5.0) & 0.6 (0.0--0.9) & 1.7 (0.0--2.4) & 0.5 (0.0--0.7) \\
+Un/underinsured wind               & 9.7 (0.0--19.8) & 7.3 (3.6--10.8) & 8.3 (4.1--13.1) & 9.9 (4.3--11.8) & 14.0 (5.2--24.5) & 9.7 (0.0--19.8) & 6.5 (0.0--13.4) & 6.8 (0.0--13.8) \\
+Un/underinsured flood              & 2.4 (0.0--3.9) & 6.2 (2.9--8.8) & 6.6 (3.4--10.8) & 8.2 (3.5--9.6) & 11.5 (4.3--20.1) & 2.4 (0.0--3.9) & 1.3 (0.0--2.0) & 1.8 (0.0--2.9) \\
+% CORRECTED (register item C5): Building Codes column (last), Total loss and
+% Un/underinsured wind/flood. fl_risk_model/mc_run_events.py captured
+% wind_total/water_total before the building-code loss-reduction block, so
+% total_damage_usd never reflected the prescribed reduction while insured
+% components (computed from the correctly reduced damage) shrank -- this
+% inflated the un/underinsured residual. Code fixed; values above are
+% reconstructed post hoc from the still-correct component columns
+% (scripts/earths_future_revision/section9_climate_policy_tables.py).
+% Submitted values were 19.3 (0.0-38.0) / 11.7 (0.0-23.8) / 2.6 (0.0-4.1).
+
+\midrule
+\multicolumn{9}{l}{\textit{Institutional stress}} \\
+Total public burden, corrected non-overlapping definition & 2.4 (0.0--1.9) & 7.1 (3.3--11.0) & 7.8 (4.0--13.9) & 9.6 (4.1--12.3) & 14.9 (5.1--29.7) & 2.7 (0.0--2.8) & 4.4 (0.0--3.6) & 1.5 (0.0--0.7) \\
+% CORRECTED (register items C1 + C5): Baseline, Market Exit, Insurance
+% Penetration, and Building Codes columns use the corrected, non-overlapping
+% burden definition (FIGA + Citizens + NFIP; submitted values 2.7 / 3.1 /
+% 5.1 / 1.6). AUTHOR CHECK REMAINING: the five climate-scenario columns
+% (2050/2100 x SSP2-4.5/SSP5-8.5) above still use the submitted legacy
+% definition and have not been recomputed under the GCM-ensemble delta
+% procedure in this pass -- see correction register item C1 and
+% scripts/analysis/compute_climate_deltas.py for the extension needed.
+FHCF shortfall (diagnostic, not summed above) & 0.3 (0.0--0.0) & 1.0 (0.4--1.6) & 1.1 (0.6--2.1) & 1.5 (0.6--2.0) & 2.5 (0.8--5.1) & 0.4 (0.0--0.0) & 0.7 (0.0--0.0) & 0.2 (0.0--0.0) \\
+FIGA residual                      & 1.3 (0.0--1.0) & 3.4 (1.6--5.2) & 3.8 (1.9--6.6) & 4.7 (2.0--6.0) & 7.3 (2.5--14.3) & 1.1 (0.0--0.7) & 2.0 (0.0--1.0) & 0.8 (0.0--0.3) \\
+Citizens deficit                   & 0.7 (0.0--0.7) & 1.8 (0.9--2.8) & 2.0 (1.0--3.4) & 2.4 (1.0--3.0) & 3.5 (1.3--6.9) & 1.3 (0.0--2.1) & 1.2 (0.0--1.6) & 0.5 (0.0--0.2) \\
+NFIP Treasury borrowing            & 0.3 (0.0--0.0) & 0.8 (0.4--1.4) & 0.9 (0.5--1.7) & 1.0 (0.4--1.4) & 1.7 (0.6--3.4) & 0.3 (0.0--0.0) & 1.2 (0.0--0.0) & 0.2 (0.0--0.0) \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+
+%\begin{landscape}
+\begin{table}[htb!]
+\centering
+\caption{\textbf{Probabilistic exceedance of systemic insurance stress thresholds across climate and policy scenarios.}
+Annual exceedance probabilities (percent) of systemic stress thresholds for private insurers, public and quasi-public institutions, and aggregate fiscal impact, estimated from \num{10000} simulated tropical cyclone seasons. Results are shown for present-day conditions, mid-century (2050) and end-of-century (2100) climate scenarios under SSP2-4.5 and SSP5-8.5, as well as illustrative market and policy interventions evaluated under present-day climate forcing. Values denote mean probabilities, with uncertainty ranges (10th--90th percentile) in parentheses.}
+\label{TabSystemicRiskProb}
+
+\small
+\setlength{\tabcolsep}{3.5pt}
+
+\begin{tabular}{@{}l|l|llll|lll@{}}
+\toprule
+\textbf{Metric (\%)} &
+  \textbf{Baseline} &
+  \textbf{2050 SSP2-4.5} &
+  \textbf{2050 SSP5-8.5} &
+  \textbf{2100 SSP2-4.5} &
+  \textbf{2100 SSP5-8.5} &
+  \textbf{Market Exit} &
+  \textbf{Insurance Penetration} &
+  \textbf{Building Codes} \\ \midrule
+
+Defaults > 10 &
+  11.4 (10.9-11.8) &
+  17.7 (12.6-20.6) &
+  18.8 (13.1-22.2) &
+  20.2 (13.5-21.3) &
+  22.7 (14.6-27.3) &
+  10.3 (9.9-10.7) &
+  9.7 (9.3-10.0) &
+  9.2 (8.8-9.6) \\
+
+Single Deficit > \$1B &
+  7.2 (6.9-7.5) &
+  11.5 (7.9-14.2) &
+  12.2 (8.6-15.9) &
+  13.5 (8.8-15.1) &
+  16.6 (9.9-22.8) &
+  6.5 (6.2-6.8) &
+  8.2 (7.9-8.6) &
+  5.6 (5.3-5.9) \\
+
+\midrule
+
+FHCF > 100\% Cap &
+  0.8 (0.7-0.9) &
+  0.9 (0.7-1.1) &
+  1.0 (0.7-1.2) &
+  1.0 (0.7-1.1) &
+  1.2 (0.8-1.6) &
+  0.7 (0.6-0.8) &
+  1.2 (1.0-1.3) &
+  0.5 (0.4-0.6) \\
+
+FIGA > 100\% Capacity &
+  13.6 (13.2-14.1) &
+  22.1 (15.1-27.5) &
+  23.3 (16.6-30.9) &
+  26.0 (17.0-29.4) &
+  32.3 (19.0-45.3) &
+  12.8 (12.3-13.2) &
+  13.4 (13.0-13.9) &
+  11.5 (11.1-11.9) \\
+
+Citizens > 100\% Capacity &
+  9.5 (9.2-9.9) &
+  15.1 (10.4-18.8) &
+  16.1 (11.2-20.8) &
+  17.3 (11.5-19.4) &
+  21.0 (12.6-29.5) &
+  13.0 (12.6-13.4) &
+  11.8 (11.3-12.2) &
+  7.9 (7.6-8.3) \\
+
+NFIP > 200\% Annual Premium &
+  5.0 (4.8-5.3) &
+  5.9 (4.4-6.9) &
+  6.1 (4.6-7.5) &
+  6.6 (4.7-7.2) &
+  7.7 (5.0-10.0) &
+  5.0 (4.8-5.3) &
+  9.3 (8.9-9.7) &
+  4.0 (3.7-4.2) \\
+
+\midrule
+
+Public Burden > 1\% FL GDP &
+  3.7 (3.5-3.9) &
+  4.3 (3.2-5.1) &
+  4.5 (3.4-5.5) &
+  4.9 (3.4-5.3) &
+  5.6 (3.7-7.3) &
+  4.3 (4.0-4.5) &
+  5.6 (5.3-5.9) &
+  2.4 (2.2-2.6) \\
+
+Public Burden > 10\% FL GDP &
+  0.1 (0.1-0.2) &
+  0.2 (0.1-0.2) &
+  0.2 (0.1-0.2) &
+  0.2 (0.1-0.2) &
+  0.2 (0.1-0.3) &
+  0.2 (0.1-0.3) &
+  0.7 (0.6-0.8) &
+  0.0 (0.0-0.1) \\
+
+\bottomrule
+\end{tabular}
+\end{table}
+\end{landscape}
+
+\begin{table}[htb!]
+\centering
+\small
+\caption{\textbf{Sensitivity of model outputs to the insured wind loss fraction.} Mean values (in \$B; insurer defaults reported as counts) for each output metric across five fixed values of the insured wind fraction $f$. The table also reports the relative change compared to the reference case ($f = 0.4$, the mean of the baseline Beta(4,\,6) prior) and the approximate log--log elasticity $\varepsilon$ evaluated at $f = 0.4$. Metrics with $\varepsilon \approx 0$ are invariant to the insured fraction by construction; $\varepsilon = 1$ indicates proportional scaling; and $\varepsilon > 1$ indicates amplification through the insurance system.}
+\label{tab:si_insured_frac}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{lrrrrr|rrrrr}
+\toprule
+& \multicolumn{5}{c|}{Mean value (\$B)} & \multicolumn{4}{c}{Change vs.\ $f{=}0.4$} & \\
+\cmidrule(lr){2-6}\cmidrule(lr){7-10}
+Metric & $f{=}0.1$ & $f{=}0.2$ & $f{=}0.3$ & $f{=}0.4$ & $f{=}0.5$ & $\Delta_{0.1}$ & $\Delta_{0.2}$ & $\Delta_{0.3}$ & $\Delta_{0.5}$ & $\varepsilon$ \\
+\midrule
+\multicolumn{11}{l}{\textit{Loss decomposition}} \\\\
+Wind insured, private & 1.36 & 2.72 & 4.08 & 5.44 & 6.80 & -75\% & -50\% & -25\% & +25\% & +1.00 \\
+Wind insured, Citizens & 0.27 & 0.53 & 0.80 & 1.07 & 1.34 & -75\% & -50\% & -25\% & +25\% & +1.00 \\
+Wind un/underinsured & 10.26 & 9.12 & 7.98 & 6.84 & 5.70 & +50\% & +33\% & +17\% & -17\% & -0.66 \\
+\addlinespace
+\multicolumn{11}{l}{\textit{Institutional stress}} \\\\
+FHCF shortfall & 0.02 & 0.10 & 0.22 & 0.36 & 0.50 & -95\% & -74\% & -39\% & +39\% & +1.60 \\
+FIGA residual deficit & 0.15 & 0.46 & 0.84 & 1.27 & 1.72 & -88\% & -64\% & -34\% & +36\% & +1.40 \\
+Citizens residual deficit & 0.12 & 0.29 & 0.49 & 0.71 & 0.94 & -84\% & -60\% & -31\% & +32\% & +1.28 \\
+\addlinespace
+\multicolumn{11}{l}{\textit{Capital / defaults}} \\\\
+Insurer defaults (count) & 0.8186 & 1.4122 & 1.8586 & 2.1992 & 2.4831 & -63\% & -36\% & -15\% & +13\% & +0.57 \\
+Largest entity deficit & 0.05 & 0.13 & 0.22 & 0.32 & 0.43 & -84\% & -59\% & -31\% & +32\% & +1.25 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\newpage
+% REMOVED (Earth's Future revision, correction register: "Table S7 removal").
+% The submitted variance-decomposition table (300 seasons x 50 parameter
+% draws, one-way ANOVA eta^2) is removed here, along with the associated
+% hazard-dominance / broad-robustness claims that cited it. The 300 seasons
+% were selected to span the loss distribution rather than drawn at random,
+% so the reported variance shares describe that specific design and do not,
+% on their own, establish robustness to all structural assumptions or to a
+% randomly sampled season -- a scope limitation the submitted text already
+% partly acknowledged but that this revision treats as a reason to remove
+% the table rather than qualify it further. The focused NFIP allocation test
+% (Text~S3, Table~S6) and the insured-fraction sensitivity (Table~S6) are
+% more directly relevant to the manuscript's central claims and are
+% retained. The research code
+% (scripts/run/run_variance_decomposition.py) and archived results are
+% unchanged and remain available; this revision independently reproduced
+% every eta^2 value reported in the submitted table exactly
+% (docs/earths_future_revision/correction_register.md item "S6-ANOVA";
+% results/earths_future_revision/historical/table_S7_audit_retained_for_code_reference.csv).
+% Tables S8 and S9 below are renumbered to S7 and S8.
+
+\begin{table*}[t]
+\centering
+\caption{\textbf{Ideal data inputs and the publicly available proxies and models used in this study.}
+For each component of the modeling framework, we list the data that a regulator or supervisor with statutory data-collection authority could, in principle, obtain (ideal data input), the public proxy or model adopted here, and the implications for interpreting model outcomes. The effects listed here are not a quantitative bias assessment.}
+\label{tab:data_requirements}
+\footnotesize
+\renewcommand{\arraystretch}{1.10}
+\resizebox{0.92\textwidth}{!}{%
+\begin{tabular}{@{}p{0.155\textwidth} p{0.275\textwidth} p{0.275\textwidth} p{0.205\textwidth}@{}}
+\toprule
+\textbf{Component} & \textbf{Ideal data inputs} & \textbf{Public proxy or model used here} & \textbf{Effect on systemic-risk estimates} \\
+\midrule
+\multicolumn{4}{@{}l}{\textit{Hazard and loss generation}}\\
+\midrule
+TC hazard & TC event catalog including wind, rainfall, and storm-surge fields and future sea-level-rise (SLR) projections & Historical (IBTrACS) and synthetic (MIT model) TC events for present and future climate; peak sustained wind as the hazard, with rainfall and surge represented indirectly (see Vulnerability and Wind--flood split) & Omits additional coastal flood change from SLR. Baseline period affects TC frequency and losses. Net effect is not quantified \\
+Asset exposure & Property-level replacement-cost values (TIV) by structure and occupancy & 2020 GDP disaggregated with LitPop using nightlight intensity and population at approximately 4\,km resolution & Economic exposure proxy includes nonresidential assets. Its mapping to residential losses requires an allocation assumption (Text~S3) \\
+Vulnerability & Residential, structure-specific damage functions & Regionally calibrated USA impact function, wind-parameterized, fit to total losses & Includes nonresidential damage and average rainfall and surge contributions. Does not resolve local building vulnerability \\
+Wind--flood split & Event-level claims by peril (wind, surge, rainfall) & County-level multi-hazard regression (Gori et al.\ 2025); climatological mean shares & Peril allocation is approximate and shifts losses between wind insurers and the NFIP \\
+\midrule
+\multicolumn{4}{@{}l}{\textit{Insurance-system layers}}\\
+\midrule
+Private wind insurers (exposure) & Policy- or property-level premiums, coverage, and exposure by carrier and county & County TIV from FHCF allocated to carriers by statewide direct premium shares & Removes geographic specialization. The effect on simultaneous defaults and FIGA demand has not been quantified \\
+Insurer capital & Full balance sheets, risk-based capital, internal models, parent guarantees, and cross-line support & Statutory surplus (entity and group) with a group-support rule & Support follows an assumed rule. Actual commitments and capital available from other business lines are not observed \\
+Reinsurance (FHCF) & Per-company FHCF elections and realized recoveries & Published FHCF reimbursement-contract terms and per-company elections (retention, coverage \%, USD~17\,B seasonal cap) & Uses published terms. Recovery timing and placement of the company limit require contractual interpretation \\
+Reinsurance (private treaties) & Per-carrier quota-share, excess-of-loss, retrocession, and industry-loss-warranty programs & Not represented (omitted) & Recoverable private reinsurance would reduce retained loss for covered claims. The magnitude is not estimated \\
+Catastrophe bonds & Full insurance-linked-securities positions and triggers by sponsor & Public deal terms (Artemis); single-occurrence layers & Public disclosures may omit coverage or trigger details. The magnitude of omitted recovery is not estimated \\
+Insured share (wind) & Observed take-up and coverage adequacy by county and peril & Billion-Dollar Disaster reconstruction ($\approx$40\% in large events); Beta(4,6) & Calibrated against total economic losses and applied to wind losses. Sensitivity is reported in Table~S6 \\
+NFIP flood & Policy-level NFIP coverage and claims, plus the private-flood market & County coverage-in-force, take-up rates, Florida premium, and fund balance & Structure-based take-up is applied to economic losses. Private flood coverage and variation in loss within counties are absent \\
+Citizens & Policy-in-force and claims detail & Published county exposure, statutory surplus, Tier~1/Tier~2 premium bases & Uses observed county exposure and surplus with simplified assessment capacity \\
+FIGA & Realized insolvency deficits and assessable-premium base & Statutory caps (2\% normal plus 4\% emergency) on surviving-insurer premium & Represents assessment capacity using surviving premium. Does not model subsequent collections or financing \\
+NFIP backstop & Fund balance, reinsurance, and Treasury borrowing authority & Modeled fund pool (USD~3.441\,B) plus Treasury borrowing & Omits NFIP reinsurance, other states' claims, and the borrowing limit. These omissions can affect financing needs in different directions \\
+\bottomrule
+\end{tabular}}
+\end{table*}
+
+\begin{table}[ht]
+\centering
+\caption{\textbf{Model parameters and uncertainty treatment in the risk-propagation framework.}
+Each parameter is classified as \emph{deterministic} (held fixed across all simulations), \emph{stochastic} (resampled each Monte Carlo iteration), or \emph{uncertain} (varied across the climate-model ensemble). Data inputs and their public proxies are summarised separately in Table~S7.}
+\label{tab:si-parameters}
+\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{@{}%
+  >{\raggedright\arraybackslash}p{4.0cm}%
+  >{\raggedright\arraybackslash}p{4.0cm}%
+  >{\raggedright\arraybackslash}p{4.0cm}%
+  >{\raggedright\arraybackslash}X@{}}
+\toprule
+Parameter & Value & Source & Treatment \\
+\midrule
+\multicolumn{4}{@{}l}{\textit{Stochastic (sampled each iteration)}}\\
+\addlinespace[2pt]
+Insured wind fraction $f_W$ & $\mathrm{Beta}(4,6)$, mean $0.40$ & Florida loss reconstruction (Text~S3) & Stochastic; swept $0.1$--$0.5$ (Table~S6) \\
+Wind/flood loss share & Beta prior, mean $0.846$ (wind) & Gori et al.\ (2025), county $P_{95}$ & Stochastic; the dominant driver of variance in flood-side metrics \\
+TIV perturbation & $\mathrm{CoV}=0.15$ & Assumed & Stochastic \\
+\addlinespace[3pt]
+\multicolumn{4}{@{}l}{\textit{Deterministic (fixed across simulations)}}\\
+\addlinespace[2pt]
+Number of simulated seasons $N$ & $10{,}000$ & Model configuration & Deterministic \\
+FHCF seasonal cap & \$17\,B & FHCF statute / 2023--24 report & Deterministic \\
+FHCF coverage election $\mathrm{cov}_i$ & $\{45,75,90\}\%$ & FHCF reimbursement contract & Deterministic; assigned by insurer \\
+FHCF retention and payout-limit multiples & retention multiples $12.1464$ (45\%), $7.2878$ (75\%), $6.0732$ (90\%); payout multiple $11.2368$; expense factor $1.10$ & FHCF reimbursement contract & Deterministic \\
+FIGA assessment cap & $2\%$ normal $+\,4\%$ emergency of surviving premium & Fla.\ Stat.\ \S631.57 & Deterministic \\
+Citizens Tier~1 / Tier~2 caps & $15\%$ / $10\%$ of respective premium bases & Citizens enabling statute & Deterministic \\
+NFIP fund pool & \$3.441\,B & CRS IN10784 & Deterministic \\
+Intragroup support rule & group/entity surplus ratio $>10$; eligible deficits cured up to the available group pool & Stylized rule; surplus from S\&P filings & Deterministic \\
+\addlinespace[3pt]
+\multicolumn{4}{@{}l}{\textit{Uncertain (varied across the climate ensemble)}}\\
+\addlinespace[2pt]
+Climate-change deltas & 5-GCM ensemble median, 10th--90th percentile range & CMIP6 / MIT TC model & Uncertain (ensemble range reported) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\clearpage
+\section*{Supporting figures}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/fig_loss_return_period.png}
+    \caption{\textbf{Return period curves for total tropical cyclone losses in Florida.} 
+    Event-based losses (red dashed line) and seasonal aggregate losses (solid black line) are shown. 
+    Event-based return periods are derived from the empirical exceedance distribution of single events in the ERA5 synthetic tropical cyclone event set (\num{8800} events covering 1980--2023; Text~S2). Seasonal return periods are computed from the empirical exceedance distribution of aggregate losses across simulated \num{10000} tropical cyclone years (Text~S5).}
+\label{FigEventRP}
+\end{figure*}
+
+\begin{figure*}[ht]
+    \centering
+    \includegraphics[width=0.45\textwidth]{figures/wind_loss_deviation.png}
+    \caption{\textbf{County-level deviation in wind loss attribution across Florida.} 
+    Percentage-point deviation of county-specific wind shares from the state-wide mean, derived from events at or above the county 95th percentile of compound hazard intensity in the synthetic tropical cyclone event set (Text~S2). Positive values indicate wind-dominated counties; negative values indicate relatively stronger flood contributions.}
+\label{FigWindLossDeviation}
+\end{figure*}
+
+\begin{figure*}[htb!]
+    \centering
+    \includegraphics[width=1.0\textwidth]{figures/fig_climate_buildingcode_sensitivity.png}
+    \caption{\textbf{Sensitivity of systemic insurance outcomes to prescribed loss reductions under future climate conditions.} Sensitivity analysis showing the effect of incremental reductions in wind- and flood-related losses representing the effects of stronger building standards and retrofitting on systemic risk outcomes under mid-century (2041-2060) SSP2-4.5 climate conditions. Shown are a) annual total loss, b) annual number of private insurer defaults, and c) annual total public burden. Solid lines indicate results for the median climate-induced risk change across the GCM ensemble, shaded bands show the 10th--90th percentile range across GCMs, and dashed lines denote the present-day ERA5 baseline. All quantities represent mean annual outcomes across \num{10000} simulated tropical cyclone seasons per climate realization.}
+\label{FigClimateBuildingCodeSensitivity}
+\end{figure*}
+
+\clearpage
+\renewcommand{\refname}{Supplementary References}
+\bibliography{systemic_risk_fl}
+
+\end{document}

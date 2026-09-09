@@ -1,0 +1,334 @@
+% Supporting methods relocated and rewritten from the CommsEE submission.
+% Editorial comments identify scientific details that require author verification.
+
+\section*{Text S1 Data provenance}\label{TextS1}
+\subsection*{Insurance exposure and coverage}\label{DataInsuranceMarket}
+We assemble the insurance market inputs from statutory filings, regulatory reports, and administrative datasets. The financial inputs describe conditions in 2024. County totals provide the link between the gridded economic loss estimates and the insurance portfolios, while insurer and statewide inputs determine capital and institutional capacity. Table~S7 summarizes the available data and the assumptions needed to connect them. Table~S8 lists the principal parameters and their treatment in the simulations.
+
+For the private admitted market, county total insured value (TIV) comes from the Florida Hurricane Catastrophe Fund (FHCF) 2024 annual exposure report \cite{fhcf_coverage_2024}. We allocate this residential wind exposure among the top 100 individual insurers according to their statewide residential direct premiums written in 2024. The premium data come from National Association of Insurance Commissioners (NAIC) annual statements accessed through S\&P Capital IQ and Florida Office of Insurance Regulation (FLOIR) market share reports \cite{floir_marketshare_2024}. Each insurer therefore has the same relative share of the private market in every county. This assumption preserves the observed statewide market shares but does not represent geographic specialization among insurers. Insurer exposure by county is not publicly available. Its protection as a trade secret was upheld in Office of Insurance Regulation v. State Farm Florida Insurance Co. \cite{statefarm_oir_2017}.
+
+Citizens Property Insurance Corporation, hereafter Citizens, publishes county exposure directly. We use its policies in force and exposure as of September 30, 2024, including multiperil homeowners and residential wind-only policies \cite{citizens_policies_in_force_2024}.
+
+National Flood Insurance Program (NFIP) coverage in force and written premiums come from FEMA OpenFEMA data for policy year 2024 \cite{fema_nfip_redacted_policies_v2_2024}. County participation rates use FEMA estimates of insured residential structures relative to all residential structures within and outside Special Flood Hazard Areas (SFHAs) \cite{fema_nfip_penetration_2025}. We apply these rates to the county flood losses as described in Text~S3. Private flood insurance is not represented.
+% RESOLVED S1-NFIP. Dataset snapshot confirmed: fl_risk_model/data/NfipResidentialPenetrationRates.csv, FEMA OpenFEMA "NfipResidentialPenetrationRates" dataset, asOfDate 2025-05-15, filtered to Florida's 68 counties. The baseline structure-weighted rate reproduces the reported all-county rate exactly wherever no missing-data cleaning occurred (fl_risk_model/tests/earths_future/test_nfip_allocation.py).
+
+\subsection*{Capital and risk transfer}
+Private insurer capital is statutory surplus as regards policyholders for calendar year 2024, obtained from NAIC statutory financial statements through S\&P Capital IQ. We record both entity and group surplus to represent the intragroup support described in Text~S4. Citizens' surplus comes from its 2024 annual statutory financial statement \cite{citizens_annual_statement_2024}. The NFIP fund pool is the combined National Flood Insurance Fund and Reserve Fund balance of USD~3.441~billion as of October 28, 2024 \cite{crs_nfip_fund_balance_2025}. Florida written premiums provide the denominator for the NFIP stress indicator.
+
+FHCF inputs follow the 2023--2024 reimbursement contract. Company coverage elections of 45\%, 75\%, or 90\%, reimbursement premiums, and NAIC identifiers come from FHCF coverage selections and premium calculation reports \cite{fhcf_coverage_2024}. Retention and payout multiples follow the FHCF annual report \cite{fhcf_annual_report_2023}. We impose a statewide seasonal reimbursement cap of USD~17~billion. The model includes FHCF recoveries and catastrophe bonds but does not represent other private reinsurance treaties.
+
+We identify outstanding catastrophe bonds covering Florida wind exposure during the 2024 hurricane season in the Artemis deal directory \cite{artemis_catbond_2024} and check their terms against sponsor offering documents and transaction disclosures. The inputs include sponsor, peril, trigger type, attachment, exhaustion, and limit. We represent indemnity, industry loss, and parametric triggers as applicable to each bond. Each bond provides a single occurrence layer within a season, without reinstatement. Text~S4 gives the payout calculation.
+% PARTIALLY RESOLVED S1-BONDS. The production source file
+% (fl_risk_model/data/catbonds_2024.csv) exists and was located; a
+% formatted public inventory table with source dates for the data release
+% was not produced in this pass (remaining work).
+
+\section*{Text S2 Hurricane hazards and economic loss generation}\label{TextS2}
+\subsection*{Historical and synthetic tracks}\label{DataTCtracks}
+Historical tropical cyclone (TC) tracks come from the International Best Track Archive for Climate Stewardship (IBTrACS) \cite{knapp_international_2010}. Synthetic tracks are generated with the statistical-dynamical MIT TC model \cite{emanuel_statistical_2006,emanuel_hurricanes_2008}. We use environmental fields from ERA5 for present-day conditions \cite{hersbach_era5_2020} and five CMIP6 global climate models (GCMs) for the climate comparisons. These are CanESM5 \cite{swart_canadian_2019}, CNRM-CM6-1 \cite{voldoire_evaluation_2019}, EC-Earth3 \cite{ec-earth-consortium_2019}, IPSL-CM6A-LR \cite{hourdin_lmdz6a_2020}, and MIROC6 \cite{tatebe_description_2019}.
+
+The ERA5 reference covers 1980--2023. Each GCM provides a historical reference for 1995--2014 and future conditions for 2041--2060 and 2081--2100 under SSP2-4.5 and SSP5-8.5. The model generates 200 TCs per year through genesis, track, and intensity simulations. This yields \num{8800} TCs in the ERA5 set and \num{4000} in each GCM, period, and scenario set before spatial filtering. We retain tracks passing within \SI{150}{\kilo\meter} of the Florida coast.
+
+Annual frequency is derived from the fraction of seeded disturbances that develop into storms with winds above \SI{40}{\knot} under the environmental conditions of each simulation. A frequency correction adjusts the number of developed storms relative to the seeded ensemble to match the calibrated climatological baseline. The resulting frequencies retain differences among the climate simulations and are used to sample the synthetic seasons in Text~S5.
+% AUTHOR CHECK S2-FREQUENCY. The calibration target, correction factor, and annual count distribution are not given in the supplied sources. Add exact settings from the hazard-generation workflow.
+
+\subsection*{Wind fields, exposure, and vulnerability}\label{MethodsHazModel}
+We calculate economic losses with CLIMADA \cite{aznar-siguan_climada_2019}, combining hazard, exposure, and vulnerability within the IPCC risk framework \cite{ipcc_managing_2012}. The Holland wind model \cite{holland_revised_2008} converts each track into a two-dimensional wind field at 120 arc-second resolution, approximately \SI{4}{\kilo\meter} at the equator. The field combines circular winds and the translational component from storm motion. Hazard intensity is the maximum lifetime 1-minute sustained wind at \SI{10}{\meter} above ground at each grid cell. Values below \SI{34}{\knot}, or \SI{17.5}{\meter\per\second}, are excluded.
+
+The exposure layer uses LitPop \cite{eberenz_asset_2020} to disaggregate Florida's 2020 GDP by nightlight intensity and population at the same 120 arc-second resolution. These gridded values provide an economic exposure proxy. They are distinct from the residential insured values used in the financial model and do not provide property replacement costs.
+
+We apply the USA impact function from the regional calibration of Eberenz et al. \cite{eberenz_regional_2021}. It relates wind intensity to the fraction of exposed value lost. Although wind is its hazard input, the function was calibrated against total TC economic losses and therefore incorporates the average contribution of rainfall and surge in the calibration events. We do not separately simulate rainfall or storm surge losses. Nor do we resolve differences in structural vulnerability within counties. We aggregate the gridded losses to counties before applying the financial model.
+
+Sea-level rise is absent from the future hazard calculations. The climate experiments therefore evaluate changes represented by the synthetic TC sets while leaving this additional source of coastal flood change unmodeled.
+
+\subsection*{Wind and flood contributions}\label{MethodsWindFloodSplit}
+The insurance calculation requires separate wind and flood losses. We estimate their relative contributions with the multi-hazard regression of Gori et al. \cite{gori_sensitivity_2025,gori_tropical_2025}. That study combines county wind, precipitation, and surge intensities from physical hazard models with a damage regression calibrated to observed losses. Its synthetic TCs use the same underlying MIT track model as the present study. We use this regression to allocate our economic loss estimates between perils, rather than to calculate a second set of total losses.
+
+For event $e$ and county $c$, the contributions in the regression are
+\begin{equation}
+c_{V,e,c} = \beta_V \ln V_{\text{max},e,c}, \qquad
+c_{P,e,c} = \beta_P \ln\!\left(P_{\text{cum},e,c}+1\right), \qquad
+c_{S,e,c} = \beta_S\, S_{\text{max},e,c},
+\label{eq:hazardcontributions}
+\end{equation}
+where $V_{\text{max}}$, $P_{\text{cum}}$, and $S_{\text{max}}$ denote maximum wind speed, cumulative precipitation, and maximum surge. The coefficients follow the regional specification of Gori et al. \cite{gori_sensitivity_2025}. Their sum defines the compound hazard intensity
+\begin{equation}
+H_{e,c} = c_{V,e,c} + c_{P,e,c} + c_{S,e,c}.
+\end{equation}
+For each county, we select events at or above its 95th percentile of $H_{e,c}$. We then average their relative wind contributions
+\begin{equation}
+\tilde{r}_{V,c} =
+\left\langle
+\frac{c_{V,e,c}}{c_{V,e,c} + c_{P,e,c} + c_{S,e,c}}
+\right\rangle_{H_{e,c}\,\geq\,H_c^{(p95)}}.
+\end{equation}
+Exposure weighting across Florida counties gives a statewide wind share of 84.6\%. The remaining 15.4\% comprises 10.2\% surge and 5.2\% precipitation. Figure~S2 shows the county departures from the statewide wind share. These contribution ratios are an assumption for partitioning total losses. They do not provide an event-specific reconstruction of observed damage by peril.
+
+We sample a wind share for each event from a Beta distribution. For synthetic events, the distribution mean is 84.6\%. For the historical scenarios, the means are 70\% for Great Miami, 87.5\% for Andrew, 30\% for Lake Okeechobee, and 50\% for Irma, based on the damage reconstructions used in the model. We proportionally rescale the county shares so that their loss-weighted statewide mean equals the sampled event share. The county wind and flood losses are
+\begin{equation}
+L_{V,e,c}=L_{\text{total},e,c}\,r_{V,e,c}, \qquad
+L_{F,e,c}=L_{\text{total},e,c}\,(1-r_{V,e,c}),
+\end{equation}
+where $r_{V,e,c}$ is the rescaled county share. Flood loss is the residual after wind loss. In the financial equations below, $L_{W,c}$ denotes the same wind loss as $L_{V,e,c}$, with the event index omitted.
+% AUTHOR CHECK S2-SPLIT. Specify the regression coefficients and hazard units used, Beta shape parameters, sources for historical prior means, and treatment of rescaled county fractions outside [0,1]. Only the means are documented in the supplied manuscript.
+
+\section*{Text S3 Insured loss allocation}\label{TextS3}
+\subsection*{Empirical basis for the insured wind fraction}
+We estimate the fraction of Florida hurricane economic losses covered by insurance using data from FLOIR, NFIP payouts, and federal disaster assistance. The reconstruction follows the approach in the U.S. Billion-Dollar Weather and Climate Disaster Database \cite{smith_us_2013,smith_quantifying_2015}. With federal assistance included, estimated economic loss is
+\begin{equation}
+L_{\text{econ}} = 2 \cdot L_{\text{insured}} + L_{\text{NFIP}} + L_{\text{FDA}},
+\label{eq:economicreconstruction}
+\end{equation}
+where $L_{\text{insured}}$ is FLOIR insured loss, $L_{\text{NFIP}}$ is NFIP payouts, and $L_{\text{FDA}}$ is federal disaster assistance. The factor of two accounts for uninsured private losses in this reconstruction \cite{smith_us_2013}. Because the treatment of assistance is uncertain, we also calculate economic losses excluding $L_{\text{FDA}}$. For each estimate, the insured fraction is
+\begin{equation}
+f_{\text{insured}} = \frac{L_{\text{insured}}}{L_{\text{econ}}}.
+\label{eq:insuredcalibration}
+\end{equation}
+
+FLOIR loss reports cover hurricane losses in 2017--2020 and 2022--2024 \cite{floir_catastrophe_2026}. NFIP payouts come from FEMA's Floodsmart database \cite{nfip_historical_2026}, and assistance from FEMA disaster summaries \cite{fema_declarations_2026}. We convert these monetary values to 2024 USD using CPI-U from the U.S. Bureau of Labor Statistics \cite{bls_cpi_2026}. Table~S1 reports both estimates for each year. The annual shares range from 11.76\% to 49.34\% across the two formulations. Mean shares for years exceeding USD~25~billion in estimated economic loss are 40.68\% with assistance included and 44.03\% with assistance excluded.
+
+The calibration combines the annual means, the two estimation approaches, and the means for years with large losses to obtain a representative share of 38.9\%. We use a Beta$(4,6)$ distribution, with mean 0.40, for the fraction of wind loss assigned to insurance. This is an indirect calibration. The reconstructed fraction has total economic loss in its denominator, whereas the model applies it to wind loss. We therefore treat 0.40 as an allocation assumption and evaluate its influence in Text~S6. It is not a direct estimate of the proportion of properties with wind insurance.
+% PARTIALLY RESOLVED S3-CALIBRATION. The median of \SITabI's six summary
+% statistics (32.41, 34.24, 40.68, 38.35, 39.19, 44.03) is 38.77%, close to
+% but not exactly the reported 38.9%; this is a plausible but unconfirmed
+% reconstruction of the stated weighting. AUTHOR DECISION NEEDED: confirm
+% the exact weighting rule, or adjust the reported figure to 38.8% (median)
+% if that is in fact how it was calculated.
+
+\subsection*{Allocation to insurance portfolios}\label{MethodsRiskAbsorption}
+For county $c$, the sampled fraction $f_W$ divides economic wind loss into insured loss and a residual
+\begin{equation}
+L^{\mathrm{ins}}_{W,c} = f_W\, L_{W,c},
+\qquad
+L^{\mathrm{hh}}_{W,c} = (1-f_W)\, L_{W,c}.
+\end{equation}
+The residual does not enter insurer balance sheets. We allocate insured wind losses between private insurers and Citizens according to their county TIV shares. The private share is then distributed among insurers $i$
+\begin{equation}
+G_i = \sum_c \frac{v_{i,c}}{V^{\mathrm{priv}}_c}\,\sigma_c\, L^{\mathrm{ins}}_{W,c},
+\qquad
+G_{\mathrm{Cit}} = \sum_c \big(1-\sigma_c\big)\, L^{\mathrm{ins}}_{W,c},
+\end{equation}
+where $v_{i,c}$ is insurer $i$'s county TIV, $V^{\mathrm{priv}}_c=\sum_i v_{i,c}$, and $\sigma_c$ is the private market share of insured wind value in that county. Thus $G_i$ and $G_{\mathrm{Cit}}$ are gross insured wind losses before recoveries.
+
+FEMA defines residential penetration as insured residential structures divided by the estimated number of residential structures, using the 2022 National Structure Inventory for the denominator \cite{fema_nfip_penetration_2025}. We use the county rate $r_{\mathrm{all},c}$, the SFHA rate $r_{\mathrm{SFHA},c}$, and the counts of all and SFHA residential structures. The SFHA fraction is $s_c=n_{\mathrm{SFHA},c}/n_{\mathrm{all},c}$, constrained to zero through one. We infer the non-SFHA rate as $(r_{\mathrm{all},c}-s_c r_{\mathrm{SFHA},c})/(1-s_c)$ and constrain it to the same range. Missing and undefined rates are set to zero. The effective county rate is $\tau_c=s_c r_{\mathrm{SFHA},c}+(1-s_c)r_{\mathrm{non},c}$. In the baseline this reproduces the county rate apart from these data cleaning steps. It weights structures, not losses within the county. The structure inventory can be incomplete, which introduces uncertainty in the denominator.
+
+We assume this structure share also represents the fraction of flood loss insured. The county allocation is subject to aggregate coverage in force $\mathrm{CIF}_c$
+\begin{equation}
+L^{\mathrm{ins}}_{F,c} = \min\!\big(\tau_c\, L_{F,c},\ \mathrm{CIF}_c\big),
+\qquad
+L^{\mathrm{hh}}_{F,c} = L_{F,c} - L^{\mathrm{ins}}_{F,c}.
+\end{equation}
+All insured flood loss is assigned to the NFIP. Federal disaster assistance is used only in the empirical reconstruction above and does not enter this flood allocation.
+
+We retain the notation $L^{\mathrm{hh}}$ and the metric name household burden for the combined uninsured wind and flood residuals in the reported results. The exposure and vulnerability inputs do not distinguish residential from nonresidential economic losses. Interpreting the entire residual as a household loss therefore depends on the model's mapping of aggregate economic losses to the residential insurance system.
+% AUTHOR CHECK S3-RESIDENTIAL. Verify or add the residential mapping before describing all uninsured economic losses as household losses. No residential scaling has been invented in this revision.
+
+\section*{Text S4 Institutional risk propagation}\label{TextS4}\label{MethodsRiskProp}
+The financial calculation applies recoveries, capital, and backstop capacity to the gross losses defined in Text~S3. We apply it once to an individual event or to the combined county losses of a paired scenario or synthetic season. Each season starts from the same capital positions. The equations below specify the calculation, with the event or season index omitted for readability.
+
+\subsection*{FHCF recoveries}
+For insurer $i$, the FHCF reimbursement premium $\Pi_i$ and coverage election $p_i\in\{0.45,0.75,0.90\}$ determine retention $R_i$ and company limit $K_i$
+\begin{equation}
+R_i = m_{\mathrm{ret}}(p_i)\,\Pi_i,
+\qquad
+K_i = m_{\mathrm{pay}}\,\Pi_i.
+\end{equation}
+The retention multiples are $m_{\mathrm{ret}}(0.90)=6.0732$, $m_{\mathrm{ret}}(0.75)=7.2878$, and $m_{\mathrm{ret}}(0.45)=12.1464$. The payout multiple is $m_{\mathrm{pay}}=11.2368$. The recovery includes the coverage election and a loss adjustment expense factor $\lambda=1.10$
+\begin{equation}
+\mathrm{Rec}_i = \lambda\, p_i\, \min\!\Big(\max\big(G_i - R_i,\,0\big),\ K_i\Big).
+\label{eq:fhcf}
+\end{equation}
+% UNRESOLVED, AUTHOR DECISION NEEDED (S4-FHCF; see correction register item
+% C3). Equation retained exactly as submitted. Strong circumstantial
+% evidence (the primary 2023-24 FHCF Reimbursement Contract's retention
+% multiple design, confirmed to adjust the retention to 200%/120%/100% of
+% its 90%-coverage base value for the 45%/75%/90% coverage elections, which
+% is consistent with FHCFPremium already scaling with a company's own
+% coverage election) suggests the *p_i outside the min() applies the
+% election a second time to the capped portion of recovery. This was not
+% changed because the exact treatment of FHCFPremium in
+% fl_risk_model/data/24fin_fhcf.csv was not independently confirmed against
+% the primary filing. If confirmed, recovery for companies below 90%
+% coverage would increase (up to 2.22x on the capped layer at 45%
+% coverage), requiring a full production rerun not possible with the
+% hazard inputs available in this pass.
+
+Total FHCF recovery cannot exceed $C_{\mathrm{FHCF}}=\$17$~billion in a season. When the aggregate uncapped recovery exceeds this amount, we reduce each recovery in proportion to its share of the total, giving $\widetilde{\mathrm{Rec}}_i=\mathrm{Rec}_i C_{\mathrm{FHCF}}/\sum_j\mathrm{Rec}_j$. Otherwise, $\widetilde{\mathrm{Rec}}_i=\mathrm{Rec}_i$. The unrecovered amount is $F_{\mathrm{FHCF}}=\max(\sum_i\mathrm{Rec}_i-C_{\mathrm{FHCF}},0)$. The loss remaining with insurer $i$ is $N_i^{\mathrm{F}}=G_i-\widetilde{\mathrm{Rec}}_i$.
+
+\subsection*{Catastrophe bonds}
+For an indemnity bond with attachment $A_i$ and limit $\mathrm{Lim}_i$, recovery is
+\begin{equation}
+B_i = \min\!\Big(\max\big(N^{\mathrm{F}}_i - A_i,\,0\big),\ \mathrm{Lim}_i\Big).
+\end{equation}
+Index and industry triggers use statewide insured wind losses before FHCF recovery. Bond payouts reduce net losses without changing FHCF recoveries. The remaining loss applied to insurer capital is $N_i=N_i^{\mathrm{F}}-B_i$.
+
+\subsection*{Capital depletion and group support}\label{MethodsRiskTransferCapital}
+We deduct net loss from statutory surplus $S_i$, leaving $E_i=S_i-N_i$. An entity with $E_i<0$ is provisionally insolvent. We then consider support within groups defined by NAIC parent identifiers. Support is available to a provisionally insolvent entity only when the ratio of group surplus to that entity's surplus exceeds 10.
+
+For group $g$, the available pool combines surplus held outside its modeled entities and positive post-loss surplus within those entities
+\begin{equation}
+P_g = \max\!\Big(S^{\mathrm{grp}}_g - \textstyle\sum_{i\in g} S_i,\ 0\Big)
+      \;+\; \sum_{i\in g}\max(E_i,\,0).
+\end{equation}
+We draw first on the parent pool and then on solvent members in proportion to their remaining surplus. Support does not push a contributing entity below zero. Eligible deficits can be covered only up to the available pool. If $C_i\geq0$ is the contribution to entity $i$, its adjusted surplus is
+\begin{equation}
+E'_i = E_i + C_i,
+\qquad
+\text{entity $i$ defaults if } E'_i < 0.
+\end{equation}
+This support rule is a model assumption rather than an observed commitment by the parent company.
+
+\subsection*{FIGA assessments}
+The Florida Insurance Guaranty Association (FIGA) receives the aggregate deficit of defaulted private insurers, $D_{\mathrm{FIGA}}=\sum_{i:E'_i<0}(-E'_i)$. We represent assessment capacity as 2\% normal plus 4\% emergency assessments on surviving insurers' written premiums $\Pi_{\mathrm{surv}}$. The residual is
+\begin{equation}
+F_{\mathrm{FIGA}} = \max\!\big(D_{\mathrm{FIGA}} - 0.06\,\Pi_{\mathrm{surv}},\ 0\big).
+\end{equation}
+These assessments supply one modeled funding capacity. The calculation does not simulate collections or financing over subsequent years.
+% AUTHOR CHECK S4-ASSESSMENTS. Confirm the premium base, emergency assessment authority, collection horizon, and treatment of assessment-induced capital effects against code and governing terms. No legal interpretation was added during editing.
+
+\subsection*{Citizens assessments}
+Citizens' gross wind loss passes through the same modeled risk transfer steps, leaving net loss $N_{\mathrm{Cit}}$. Its deficit after surplus is $D_{\mathrm{Cit}}=\max(N_{\mathrm{Cit}}-S_{\mathrm{Cit}},0)$. We then apply two assessment tiers. The first is limited to 15\% of Citizens' premium base $\Pi_{\mathrm{Cit}}$, and the second to 10\% of the statewide property premium base $\Pi_{\mathrm{state}}$
+\begin{align}
+T_1 &= \min\!\big(D_{\mathrm{Cit}},\ 0.15\,\Pi_{\mathrm{Cit}}\big), \\
+T_2 &= \min\!\big(D_{\mathrm{Cit}} - T_1,\ 0.10\,\Pi_{\mathrm{state}}\big), \\
+F_{\mathrm{Cit}} &= \max\!\big(D_{\mathrm{Cit}} - T_1 - T_2,\ 0\big).
+\end{align}
+The residual $F_{\mathrm{Cit}}$ is the deficit after both modeled assessment tiers.
+
+\subsection*{NFIP financing}
+NFIP payouts first draw on the national fund pool $P_{\mathrm{NFIP}}=\$3.441$~billion. The modeled requirement beyond this pool is
+\begin{equation}
+\mathrm{NFIP}_{\mathrm{borrow}} = \max\!\Big(\textstyle\sum_c L^{\mathrm{ins}}_{F,c} - P_{\mathrm{NFIP}},\ 0\Big).
+\end{equation}
+We report this quantity as NFIP Treasury borrowing. The model applies the national fund balance to Florida claims without competing claims from other states. It does not include NFIP reinsurance or a limit on additional Treasury borrowing. The result describes a financing requirement under these assumptions, rather than borrowing necessarily available under current authority.
+
+\subsection*{Aggregate public burden}
+The submitted model defined total public burden as the sum of all four components,
+\begin{equation}
+B_{\mathrm{public}}^{\mathrm{legacy}} = F_{\mathrm{FHCF}} + F_{\mathrm{FIGA}} + F_{\mathrm{Cit}} + \mathrm{NFIP}_{\mathrm{borrow}}.
+\label{eq:publicburdenlegacy}
+\end{equation}
+% RESOLVED S4-ACCOUNTING (correction register item C1). Tracing
+% fl_risk_model.runner shows that capital depletion is applied to
+% NetWindUSD (gross wind loss minus FHCF and cat-bond recovery), so whenever
+% an insurer's or Citizens' unrecovered FHCF shortfall is not absorbed by
+% its own remaining capital, it already appears inside $F_{\mathrm{FIGA}}$
+% or $F_{\mathrm{Cit}}$; confirmed with deterministic fixtures
+% (fl_risk_model/tests/earths_future/test_accounting_fixtures.py). Equation
+% \eqref{eq:publicburdenlegacy} therefore double-counts that portion. The
+% portion of the shortfall that *is* absorbed by remaining capital never
+% appears in $F_{\mathrm{FIGA}}$, $F_{\mathrm{Cit}}$, or NFIP borrowing at
+% all -- it is a private capital loss, not a public or quasi-public
+% obligation -- so it should not be added to the aggregate either.
+We therefore report a corrected, non-overlapping aggregate that excludes the FHCF shortfall entirely,
+\begin{equation}
+B_{\mathrm{public}} = F_{\mathrm{FIGA}} + F_{\mathrm{Cit}} + \mathrm{NFIP}_{\mathrm{borrow}},
+\label{eq:publicburden}
+\end{equation}
+and retain equation~\eqref{eq:publicburdenlegacy} for reconciliation with the submitted values. $F_{\mathrm{FHCF}}$ is reported separately as an upstream diagnostic of FHCF capacity stress (statewide utilization of the \$17B seasonal cap), not as a fourth additive channel. Main-text Table~\ref{TabProbRPvalues}, Fig.~\ref{FigLossPublicBurdenScaling}, and \SITabIII\ use equation~\eqref{eq:publicburden}. The components measure different forms of financial stress. FIGA and Citizens residuals are deficits beyond modeled assessment capacity, borne by surviving insurers and policyholders through assessments, not by the state. NFIP borrowing is the modeled federal financing requirement and is the one component that represents a direct fiscal outlay. Their sum is an operational stress indicator. It does not establish the final distribution of costs among claimants, policyholders, taxpayers, and other parties.
+
+\section*{Text S5 Simulations and experiments}\label{TextS5}
+\subsection*{Historical and sequential stress tests}
+We apply the model to the 1926 Great Miami Hurricane, 1992 Hurricane Andrew, 1928 Lake Okeechobee Hurricane, and 2017 Hurricane Irma. We also construct three pairs of events. These are Great Miami followed by Andrew, Great Miami twice, and Irma twice. Each historical or paired scenario has 200 parameter realizations with the storm tracks held fixed. The named storms define hazard footprints applied to the study's exposure and financial inputs. They are not reconstructions of the markets or losses in the years when the storms occurred.
+
+For paired storms, the first storm reduces exposed asset values before losses from the second are calculated. Vulnerability does not change between events. These scenarios represent exposure depletion without physical recovery or further damage from changes in building condition. We combine the resulting county losses and apply the financial calculation once to the pair. Synthetic seasons likewise sum county wind and flood losses before a single financial calculation. Capital, group support, recoveries, and institutional capacity are therefore evaluated against the aggregate seasonal loss. The model does not simulate the timing of financial recoveries between storms or market recovery across successive seasons.
+
+\subsection*{Synthetic seasons and outcome metrics}\label{MethodsOutput}
+For each hazard set, we sample events with replacement according to its annual TC frequency to construct \num{10000} synthetic seasons. Retained events include all tracks within the \SI{150}{\kilo\meter} coastal buffer, including those with small or localized county losses, so a season can retain a track yet still record zero county-level loss. In the ERA5 season set, 28.5\% of seasons have zero total loss, 15.3\% have nonzero loss from exactly one contributing event, and 56.2\% have nonzero loss from two or more events.
+% RESOLVED S5-COUNTS. Reproduced exactly from the archived ERA5 baseline
+% (10,000 seasons; scripts/earths_future_revision/section8_historical_and_variance.py):
+% 28.53% of seasons have total_damage_usd <= 0 ("no TC losses" means zero
+% loss, not zero retained tracks -- every season has at least one nominally
+% retained track within the 150 km buffer). Of the remaining 71.47%, 15.30%
+% (of all 10,000) have exactly one contributing event and 56.17% have two or
+% more. The three figures are P(zero loss), P(nonzero loss AND 1 event), and
+% P(nonzero loss AND 2+ events); they sum to 100.00%.
+
+Each realization samples the insured wind fraction, the event wind share, and a perturbation to county TIV with coefficient of variation 0.15. Other market inputs and institutional parameters remain fixed unless varied in an experiment. For each season we record economic losses, their initial insurance allocation, insurer defaults, the largest entity deficit, institutional capacity exceedances, and the public burden components. Table~S2 defines the outputs and thresholds. Text~S6 distinguishes the public burden calculations used for annual exceedance probabilities and return-period comparisons.
+
+For a condition $\mathcal{B}$, annual exceedance probability is
+\begin{equation}
+P(\mathcal{B}) = \frac{1}{N}\sum_{j=1}^{N}\mathbf{1}\!\left[\mathcal{B}_j\right],
+\end{equation}
+where $N=\num{10000}$ and $\mathbf{1}$ indicates whether season $j$ meets the condition. The indicators include more than ten private defaults, an entity deficit above USD~1~billion, institutional capacity exceedances, NFIP claims above twice Florida NFIP annual premiums, and public burden above 1\% or 10\% of Florida GDP. Empirical return periods are the inverse of cumulative exceedance frequencies. Seasonal return periods use the synthetic year sets. Event return periods use the annual frequencies of individual storms. Figure~S1 compares both loss curves.
+
+\subsection*{Climate comparisons}\label{MethodsFutureClim}
+SSP2-4.5 provides the primary climate comparison. Tables~S4 and S5 also report SSP5-8.5. Both pathways use the same five GCMs, historical reference, future periods, and financial model. Exposure, market shares, capital, and institutional rules remain at their study values. These experiments show how the present market configuration responds to changes in hurricane hazard. They do not forecast future insurance markets.
+
+We estimate climate effects relative to each GCM's own 1995--2014 reference and add these changes to the ERA5 baseline. This approach accounts for differences between reanalysis and GCM hazard environments when using statistical-dynamical TC simulations \cite{emanuel_hurricanes_2008,camargo_global_2013}. For each GCM, scenario, period, and metric, we subtract the historical value from the future value. We then add the median change across the five GCMs to the corresponding ERA5 value. The 10th--90th percentile range across GCM changes describes ensemble spread.
+
+Continuous outcomes use means across \num{10000} seasons. Threshold indicators use the corresponding annual exceedance probabilities, so probability changes are added in percentage points. Text~S6 describes sampling uncertainty. No future changes in underwriting, capitalization, exposure, or regulatory policy are included.
+% AUTHOR CHECK S5-DELTAS. Document the handling of negative losses or probabilities outside [0,1] after addition, and the exact combination of baseline bootstrap uncertainty with five-GCM spread. Do not imply delta correction resolves all GCM bias.
+
+\subsection*{Market and coverage experiments}\label{MethodsPolicy}
+We evaluate three prescribed interventions under present-day hazard conditions, using \num{10000} seasons for each configuration. The first two change insurance exposure and capital without changing gross wind or flood losses. The third reduces physical losses before insurance allocation.
+
+In the private market exit experiment, Citizens' target share of insured value rises from 15\% to 25\%. Of the exposure leaving private insurers, 85\% transfers to Citizens and 15\% becomes uninsured. Private insurer surplus decreases with exposure contraction, allowing partial retention of fixed capital. Citizens' surplus scales with its market share raised to 1.3, reflecting adverse selection in exiting exposure. A change from 15\% to 25\% in share thus corresponds to a 66.7\% increase in exposure and an approximately 94\% increase in surplus. The intervention changes where losses fall and the capital available to meet them.
+% PARTIALLY RESOLVED S5-EXIT. fl_risk_model/scenarios/market_exit.py
+% confirms 85% of exiting exposure transfers to Citizens, 15% becomes
+% uninsured, as stated. CONFIRMED DISCREPANCY: the Citizens surplus-scaling
+% exponent used in the active code path
+% (adjust_citizens_capital_for_growth, scaling_method="adverse_selection")
+% is 1.3, not the 1.2 stated below; with the actual 15%->25% share change,
+% exponent 1.3 gives a ~94% surplus increase (matching the archived
+% emanuel_era5_market_exit_moderate results), not "~84%". Recommend
+% correcting this paragraph's exponent and percentage to 1.3 / ~94% to
+% match the code and the already-validated production results, rather than
+% changing the code to match this text (see correction register).
+
+In the coverage experiment, the target wind insured fraction rises from 40\% to 60\%, and the target flood participation rate from 11\% to 30\%. County flood changes use FEMA data within and outside SFHAs \cite{fema_nfip_penetration_2025}. The specified multipliers are 1.2 within SFHAs and 3.0 outside, applied to approximate baseline rates of 35\% and 5\%, respectively. Coastal counties receive proportional increases 1.5 times those in inland counties. NFIP policy counts, coverage, and premiums adjust proportionally. Citizens' target share falls from 15\% to 8\% as exposure transfers to private insurers and private coverage expands. Insurer surplus scales in proportion to exposure growth.
+% AUTHOR CHECK S5-COVERAGE. Verify the normalization needed to reach the stated 30% flood target from the SFHA multipliers, coastal adjustment, and county weights. Keep targets distinct from measured take-up and from the wind loss allocation fraction.
+
+In the loss reduction experiment, wind losses decrease by 30\% and flood losses by 25\% before allocation to insurance. Exposure and capital remain unchanged. This represents a prescribed effect of stronger building standards and retrofitting. The model does not simulate particular engineering measures or the costs of implementing them.
+
+\subsection*{Loss reductions needed to offset climate effects}\label{MethodsBuildingCodeClimate}
+We assess whether prescribed loss reductions can offset the mid-century SSP2-4.5 change in systemic risk. For each GCM, we simulate \num{10000} historical seasons for 1995--2014 and \num{10000} future seasons for 2041--2060. The future experiment uses 13 levels of combined wind and flood loss reduction spanning 0\% to 95\%, with wind and flood reductions applied in a fixed 3 to 2 ratio.
+
+For each level, we subtract the GCM historical mean from the future mean after loss reduction. We add the median change across GCMs to the ERA5 baseline and report the 10th--90th percentile range. Figure~S3 shows the responses of annual total loss, private defaults, and public burden.
+% AUTHOR CHECK S5-OFFSET. List all 13 reduction settings and define combined reduction and the 3 to 2 ratio precisely, including how the settings remain within physical bounds at the 95% endpoint.
+
+\section*{Text S6 Uncertainty and evaluation procedures}\label{TextS6}
+\subsection*{Estimation of public burden and return levels}
+Annual public burden exceedance probabilities use the (non-overlapping, equation~\eqref{eq:publicburden}) component sum within each season. Main-text Table~\ref{TabProbRPvalues} now estimates the return level of that same season-level sum directly, rather than summing separately estimated component return levels: a sum of component quantiles generally differs from the quantile of their sum, and did so materially in the submitted version (correction register item R1). Total loss return levels remain independently ranked marginal quantiles, so Fig.~\ref{FigLossPublicBurdenScaling} compares a marginal-quantile series (total loss) with a genuine season-level-aggregate quantile series (public burden), not two marginal series.
+% RESOLVED S5-QUANTILES. Recomputed as the quantile of the season-level
+% aggregate (equation~\eqref{eq:publicburden}), per correction register item
+% R1. The submitted component-return-level sum is retained separately in
+% main-text Table~\ref{TabProbRPvalues} for reconciliation only.
+
+\subsection*{Sampled parameters and sampling uncertainty}
+The sampled parameters are the insured wind fraction, event wind share, and county TIV perturbation. The insured wind fraction follows Beta$(4,6)$. Event wind distributions have the means listed in Text~S2. County TIV has coefficient of variation 0.15. Table~S8 distinguishes these inputs from the fixed institutional parameters and the GCM ensemble.
+% AUTHOR CHECK S6-DRAWS. Add the TIV distribution, dependence across counties and entities, and sampling frequency. A coefficient of variation alone does not fully specify this perturbation.
+
+Historical scenario ranges are the 5th--95th percentiles across the 200 parameter realizations in Table~S3. For the probabilistic baseline, we bootstrap the \num{10000} ERA5 seasons \num{1000} times and report the 10th--90th percentile range. Future comparisons also report the 10th--90th percentile spread of changes across five GCMs. Parameter variation, resampling of seasons, and GCM spread describe different sources of uncertainty. They do not cover structural assumptions that remain fixed.
+
+\subsection*{Sensitivity to the insured wind fraction}
+We rerun the model at fixed wind insured fractions from 0.1 to 0.5 in steps of 0.1. Table~S6 reports mean outcomes, changes relative to 0.4, and approximate local log--log elasticities at 0.4. A value near one indicates proportional response. A value above one indicates a more than proportional response near the reference fraction.
+
+Reducing the fraction from 0.4 to 0.1 lowers mean FIGA residual deficit by 88\% and increases uninsured wind loss by 50\%. FHCF, FIGA, and Citizens residuals have elasticities above one at the reference value. This experiment shows how allocating more wind loss to insurance affects the modeled capacity thresholds. It does not validate the allocation fraction or test the geographic distribution of insurer exposure, omitted reinsurance, or other fixed assumptions.
+
+\subsection*{NFIP allocation sensitivity}
+We test the flood-loss allocation assumption (Text~S3) with three configurations applied to the same county flood losses, wind losses, capital, seeds, and coverage caps: the baseline structure-weighted rate $\tau_c$; a limiting case that assigns county flood loss entirely within Special Flood Hazard Areas (SFHAs), using each county's SFHA participation rate; and a limiting case that assigns it entirely outside SFHAs, using each county's inferred non-SFHA rate. Configurations are restricted to zones that exist in each county (a county with no SFHA stock has no defined "SFHA-only" rate, and symmetrically for "non-SFHA-only"). These are limiting allocation scenarios, not predictions of where flood losses occur or confidence intervals: which configuration yields a higher rate varies by county (67 of 68 Florida counties have a higher SFHA rate; one does not), so neither is a uniform upper or lower bound. The baseline rate lies within the per-county envelope of the two limiting configurations for all 68 counties by construction.
+% Earth's Future revision: this section replaces the removed 300-season by
+% 50-parameter-draw variance decomposition (previously Table S7) as the
+% Section~8 structural-sensitivity test. See the correction register,
+% "Table S7 removal" and item "C6/U1," for the rationale and for what
+% remains blocked (scoring these configurations against corrected insured
+% flood losses and NFIP financing requires re-running the financial model
+% against the same per-county, per-event flood losses used in the archived
+% production run; the required cache is not distributed in this repository).
+
+\subsection*{Consistency checks and limits of evaluation}
+We compare total losses for the four historical hazard footprints with normalized losses reported by Mueller et al. \cite{muller_normalized_2025}. The estimates fall within the reported range. This provides a check on the scale of aggregate losses under the study inputs. It does not validate the county allocation, insured fraction, or financial outcomes separately.
+
+The Irma scenario illustrates a limitation of the institutional comparison. With an assumed wind share of 50\%, the model produces low FHCF recovery, whereas the FHCF's actual Irma-related reimbursement was substantially larger, on the order of USD~6~billion, about a third of its statutory cap \cite{fhcf_annual_report_2023}. Both the modeled scenario and the historical experience remain below the fund's capacity, but agreement on capacity exhaustion does not validate the recovery amount. This difference shows why aggregate loss checks need to be distinguished from checks of allocation and institutional payments.
+% RESOLVED (partially): a secondary-source figure for the Irma FHCF
+% reimbursement (~USD 6B, ~36-38% of the $17B cap) is now cited. AUTHOR
+% CHECK REMAINING: verify this figure and its contract year directly
+% against the primary FHCF annual report (sbafla.com/media/uvmnfyka/
+% 2022-fhcf-annual-report.pdf) before final submission; see correction
+% register item "S6-IRMA."
+
+The choice of hazard baseline also matters. Atlantic TC activity varies over multiple decades, so the 1980--2023 reference can differ from a longer climatology \cite{vecchi_changes_2021,emanuel_atlantic_2021,muller_normalized_2025}. Frequency choices can affect downstream losses and financial risk estimates \cite{liu_recalibrating_2026}. Figure~S1 compares event and seasonal loss curves within the chosen baseline. It does not test alternative historical baselines.
+
+Table~S7 identifies data limitations and their possible effects. Some assumptions can affect outcomes in opposing directions. The sensitivity exercises above evaluate the parameters and structural choices varied here and do not establish an overall upper bound on systemic stress. Assessment of institutional results also requires the contractual and accounting checks noted in the main text.
+

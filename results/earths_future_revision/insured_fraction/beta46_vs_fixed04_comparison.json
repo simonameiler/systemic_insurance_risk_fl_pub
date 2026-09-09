@@ -1,0 +1,52 @@
+{
+  "Wind insured, private": {
+    "Beta(4,6)_mean_run": 5491050988.223578,
+    "fixed_f=0.4_mean_run": 5442782383.164213,
+    "relative_diff": -0.008790412830418964
+  },
+  "Wind insured, Citizens": {
+    "Beta(4,6)_mean_run": 1077922754.0709696,
+    "fixed_f=0.4_mean_run": 1068495888.0549124,
+    "relative_diff": -0.008745400336392265
+  },
+  "Wind un/underinsured": {
+    "Beta(4,6)_mean_run": 9735462654.356918,
+    "fixed_f=0.4_mean_run": 9766917406.880949,
+    "relative_diff": 0.0032309458359386463
+  },
+  "FHCF shortfall (diagnostic)": {
+    "Beta(4,6)_mean_run": 345602104.79177666,
+    "fixed_f=0.4_mean_run": 362945771.1347447,
+    "relative_diff": 0.05018391410960159
+  },
+  "FIGA residual deficit": {
+    "Beta(4,6)_mean_run": 1292311924.0864177,
+    "fixed_f=0.4_mean_run": 1268754443.9743707,
+    "relative_diff": -0.018228942775329257
+  },
+  "Citizens residual deficit": {
+    "Beta(4,6)_mean_run": 718277468.2344651,
+    "fixed_f=0.4_mean_run": 714969310.6365687,
+    "relative_diff": -0.004605681988087346
+  },
+  "NFIP Treasury borrowing": {
+    "Beta(4,6)_mean_run": 345997559.61779946,
+    "fixed_f=0.4_mean_run": 355337096.81218296,
+    "relative_diff": 0.026993072450280483
+  },
+  "Total public burden (corrected)": {
+    "Beta(4,6)_mean_run": 2356586951.938682,
+    "fixed_f=0.4_mean_run": 2339060851.423122,
+    "relative_diff": -0.007437069318041516
+  },
+  "Insurer defaults (count)": {
+    "Beta(4,6)_mean_run": 2.1875,
+    "fixed_f=0.4_mean_run": 2.1992,
+    "relative_diff": 0.005348571428571347
+  },
+  "Largest entity deficit": {
+    "Beta(4,6)_mean_run": 328194908.3869914,
+    "fixed_f=0.4_mean_run": 324364836.3148025,
+    "relative_diff": -0.01167011423490038
+  }
+}

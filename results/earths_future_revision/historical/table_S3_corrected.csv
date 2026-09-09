@@ -1,0 +1,8 @@
+Scenario,n_realizations,Total loss,Total public burden (legacy 4-comp.),"Total public burden (corrected, non-overlapping)",FHCF shortfall (diagnostic),FIGA residual,Citizens deficit,NFIP Treasury borrowing
+Great Miami,1000,170.4B (170.4-170.4B),26.1B (15.4-38.8B),24.4B (15.2-33.4B),1.7B (0.0-8.0B),7.0B (3.2-13.4B),5.8B (3.1-11.4B),11.5B (1.4-24.3B)
+Andrew,1000,114.2B (114.2-114.2B),11.7B (4.1-22.3B),11.7B (4.1-22.3B),0.0B (0.0-0.0B),4.2B (1.1-10.0B),5.2B (1.9-11.9B),2.2B (0.0-9.4B)
+Lake Okeechobee,1000,156.9B (156.9-156.9B),18.4B (16.6-20.9B),18.4B (16.6-20.9B),0.0B (0.0-0.0B),3.3B (0.0-8.8B),1.6B (0.0-4.0B),13.6B (7.1-18.9B)
+Irma,1000,32.0B (32.0-32.0B),0.2B (0.0-0.8B),0.2B (0.0-0.8B),0.0B (0.0-0.0B),0.1B (0.0-0.7B),0.0B (0.0-0.0B),0.1B (0.0-0.5B)
+Great Miami then Andrew,1000,266.5B (266.5-266.5B),51.0B (28.7-74.0B),45.4B (26.8-65.5B),5.6B (0.0-11.6B),15.8B (6.2-27.7B),13.2B (4.7-24.1B),16.4B (6.0-28.5B)
+Double Great Miami,1000,321.1B (321.1-321.1B),65.4B (42.7-88.3B),57.4B (39.4-76.1B),8.0B (0.0-12.7B),19.1B (8.5-31.1B),13.6B (5.5-24.7B),24.7B (12.7-38.0B)
+Double Irma,1000,62.4B (62.4-62.4B),3.1B (2.1-4.0B),3.1B (2.1-4.0B),0.0B (0.0-0.0B),1.3B (0.1-2.8B),0.0B (0.0-0.3B),1.8B (0.2-3.3B)

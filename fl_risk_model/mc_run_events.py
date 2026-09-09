@@ -726,9 +726,19 @@ def run_one_iteration(scenario_name: str,
     # Expose sampled wind shares to any branch code that reads cfg at runtime
     cfg.RUNTIME_WIND_SHARE_OVERRIDES = dict(sampled)
 
-    # Totals for audit (BEFORE any scenario modifications)
-    wind_total = numsum(wind_df["WindDamageUSD"])
-    water_total = numsum(water_df["WaterDamageUSD"])
+    # NOTE (Earth's Future correction, register item C5): wind_total/water_total
+    # (and therefore total_damage_usd) must be computed from the SAME wind_df/
+    # water_df that feed the downstream insurance allocation. Previously these
+    # were captured here, before the building-codes scenario block below
+    # replaces wind_df/water_df with loss-reduced versions, so the reported
+    # gross totals silently ignored the prescribed wind/flood loss reduction
+    # while insured and uninsured/underinsured components (computed from the
+    # reduced wind_df/water_df) correctly shrank. That produced the submitted
+    # SI Table S4 building-code column's unchanged ~USD 19.3B total loss and
+    # its increased uninsured wind/flood residual (which several downstream
+    # exports reconstruct as total-minus-insured). The totals are now taken
+    # after the building-codes block, once wind_df/water_df hold whatever
+    # damage actually enters the financial model this iteration.
 
     # =============================================================================
     # SCENARIO APPLICATION: Building codes (BEFORE carveout)
@@ -763,7 +773,16 @@ def run_one_iteration(scenario_name: str,
             "wind": building_codes_diag_wind,
             "flood": building_codes_diag_flood,
         }
-    
+
+    # Totals for audit and reporting, taken AFTER any scenario modifications
+    # (building codes) so that total_damage_usd, wind_total_usd, and
+    # water_total_usd reflect whatever damage actually enters the financial
+    # model below. For scenarios that do not touch physical losses
+    # (market_exit, penetration, baseline), wind_df/water_df are unmodified
+    # at this point, so these totals are unchanged from before.
+    wind_total = numsum(wind_df["WindDamageUSD"])
+    water_total = numsum(water_df["WaterDamageUSD"])
+
     # IMPORTANT: Inject damage loaders AFTER building codes is applied
     # so that runner.load_wind_damage() gets the reduced wind damage
     _inject_damage_loaders(wind_df, water_df)
