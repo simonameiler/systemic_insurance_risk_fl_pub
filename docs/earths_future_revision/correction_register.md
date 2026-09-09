@@ -145,6 +145,22 @@ approximation is evaluable rather than merely asserted.
 
 ## C3. FHCF coverage election possibly applied twice (Section 4; AUTHOR CHECK S4-FHCF; Reviewer 2 Eq. 9)
 
+> **SUPERSEDED, 2026-09 FHCF verification pass.** The inference-only
+> hypothesis below (removing the `* coverage_frac` term entirely) is **not**
+> what the primary contract supports and should not be implemented as
+> written. A source-backed verification against the FHCF 2023-2024
+> Reimbursement Contract found a different, more precisely located defect:
+> the Company's Limit must cap the fully coverage-scaled reimbursement
+> (Article IV(1)), not the raw excess before scaling -- `p` stays in the
+> formula, but the `min(...,K)` moves. A second, independent defect
+> (company Retention/Limit applied per county row instead of once per
+> company) was also found and was not part of the original C3 hypothesis.
+> See `docs/earths_future_revision/fhcf_contract_verification.md` for the
+> verified formula, source citations, executed tests, and the proposed
+> patch. This box supersedes the item below; the original text is kept
+> unmodified underneath for the record of what was suspected before the
+> primary-source check.
+
 **Evidence.** `fl_risk_model.config.FHCF_RET_MULTIPLES = {90: 6.0732, 75:
 7.2878, 45: 12.1464}` satisfy `mult(p) * p = const` to 4 significant figures
 (`7.2878/6.0732 = 1.2000`, `12.1464/6.0732 = 2.0000`). Confirmed against the
