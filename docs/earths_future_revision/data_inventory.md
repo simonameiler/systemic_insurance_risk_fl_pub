@@ -27,6 +27,22 @@ Note: `andrew_then_gm_20260326_210244/` was also copied but is not currently
 used by any script (kept for completeness; the manuscript's "sequential"
 scenarios are Great Miami -> Andrew, double Great Miami, and double Irma).
 
+**Added in the FHCF corrections and pilot task**: two more gitignored,
+licensed inputs, present in the original checkout but absent from this
+worktree, were required to run any local financial-model pilot at all
+(`fl_risk_model.loader.load_market_share` and the surplus loader raise
+`FileNotFoundError` without them) and were copied read-only, unmodified,
+not committed:
+
+| File | Contents | Used for |
+|---|---|---|
+| `fl_risk_model/data/FL HO Market Share Report_6.10.25.xlsx` | FLOIR statewide residential market-share-by-company report | Company premium/exposure allocation in every `run_one_scenario` call |
+| `fl_risk_model/data/20250805 FL Surplus Capital, Group v Entity.xlsx` | S&P Capital IQ-derived entity/group statutory surplus | Capital depletion in every `run_one_scenario` call |
+
+SHA-256 (16-hex-char) checksums of both files, alongside every other input
+the local FHCF pilot depends on, are recorded in
+`results/earths_future_revision/fhcf_pilot/pilot_manifest.json`.
+
 **Discrepancy found while reconciling this inventory**: the copied historical
 run directories contain **1,000** realizations per scenario, and reproduce
 the submitted SI Table S3 numbers to the reported precision. Main Methods
@@ -41,7 +57,7 @@ should be located and substituted.
 `results/mc_runs/emanuel_era5_baseline_20260326_141913/`,
 `emanuel_era5_market_exit_moderate_*/`, `emanuel_era5_penetration_major_*/`,
 `emanuel_era5_building_codes_major_*/`, all 5-GCM x 5-period baseline runs,
-and the 11-level x 5-GCM building-code sweep (`*_buildingcode_w*f*_*/`) are
+and the 13-level x 5-GCM building-code sweep (`*_buildingcode_w*f*_*/`, corrected count -- see correction register item R3) are
 tracked in git and were present immediately after `git worktree add`. These
 are the inputs for Sections 5, 6, and 9.
 

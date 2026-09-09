@@ -97,12 +97,12 @@ def corrected_table(df: pd.DataFrame) -> pd.DataFrame:
         rows[label] = {f"RP{rp}": to_billion(rl[f"RP{rp}"]) for rp in RETURN_PERIODS}
 
     rl_legacy_season = empirical_return_level(df["public_burden_legacy_usd"].to_numpy(dtype=float))
-    rows["Total public burden (season-sum, legacy 4-component def.)"] = {
+    rows["Residual financing requirement (season-sum, legacy 4-component def., for reconciliation)"] = {
         f"RP{rp}": to_billion(rl_legacy_season[f"RP{rp}"]) for rp in RETURN_PERIODS
     }
 
     rl_corr_season = empirical_return_level(df["public_burden_corrected_usd"].to_numpy(dtype=float))
-    rows["Total public burden (season-sum, corrected non-overlapping def.)"] = {
+    rows["Residual financing requirement (season-sum, FIGA+Citizens+NFIP)"] = {
         f"RP{rp}": to_billion(rl_corr_season[f"RP{rp}"]) for rp in RETURN_PERIODS
     }
 

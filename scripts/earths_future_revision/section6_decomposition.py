@@ -50,6 +50,10 @@ import pandas as pd
 from common import OUT_DIR, load_iterations, to_billion
 
 BIN_EDGES_USD = [0.0, 1.0, 39.5e9, 147e9, 246e9, 357e9, 564e9, np.inf]
+# Approximate return-period anchors for each edge, used only to build labels;
+# the edges themselves (BIN_EDGES_USD) are what actually assigns seasons to
+# bins. RP_ANCHORS[i] is the return period at BIN_EDGES_USD[i].
+RP_ANCHORS = {1.0: 0, 39.5e9: 10, 147e9: 25, 246e9: 50, 357e9: 100, 564e9: 250}
 BIN_LABELS = [
     "Zero loss",
     "> 0 -- 10yr (39.5B)",
@@ -68,25 +72,61 @@ COMPONENTS = {
 }
 
 
-def assign_bins(df: pd.DataFrame, min_count: int) -> pd.Series:
-    bins = pd.cut(df["total_damage_usd"], BIN_EDGES_USD, labels=BIN_LABELS,
-                  right=True, include_lowest=True)
-    # Zero-loss seasons: cut with include_lowest puts damage==0 into the first
-    # bin already since edges start at 0.0; make it explicit.
-    bins = bins.astype(object)
-    bins[df["total_damage_usd"] <= 0.0] = "Zero loss"
+def _label_for_edge_range(lo_edge: float, hi_edge: float) -> str:
+    """Build a bin label from its ACTUAL (possibly post-merge) lower/upper
+    edges, rather than a static pre-merge string. This is what fixes the
+    display bug where a merged top bin kept a stale "100yr -- 250yr
+    (357-564B)" label after absorbing everything above 564B (and, in the
+    production 10,000-season baseline, above 357B -- see
+    docs/earths_future_revision/correction_register.md item "decomposition
+    display correction")."""
+    if lo_edge <= 0.0:
+        return "Zero loss"
+    lo_rp = RP_ANCHORS.get(lo_edge)
+    hi_rp = RP_ANCHORS.get(hi_edge)
+    lo_b = f"{lo_edge / 1e9:.1f}"
+    if np.isinf(hi_edge):
+        rp_part = f"> {lo_rp}yr" if lo_rp is not None else ""
+        return f"{rp_part} (> {lo_b}B)".strip()
+    hi_b = f"{hi_edge / 1e9:.1f}"
+    if lo_rp is not None and hi_rp is not None:
+        rp_part = f"{lo_rp}yr -- {hi_rp}yr" if lo_rp > 0 else f"> 0 -- {hi_rp}yr"
+        return f"{rp_part} ({lo_b}-{hi_b}B)"
+    return f"{lo_b}-{hi_b}B"
 
-    # Merge sparse bins (documented rule: merge a bin with < min_count seasons
-    # into the next-lower-severity bin that has adequate counts).
-    counts = bins.value_counts()
-    order = BIN_LABELS
-    merged = bins.copy()
-    for i, label in enumerate(order):
-        if label == "Zero loss":
-            continue
-        if counts.get(label, 0) < min_count and i > 1:
-            prev_label = order[i - 1]
-            merged[merged == label] = prev_label
+
+def assign_bins(df: pd.DataFrame, min_count: int) -> pd.Series:
+    # Work with integer bin codes (0..len(edges)-2) so merges can recompute
+    # each surviving bin's true edge range afterward, instead of reusing a
+    # pre-merge string label that may no longer describe its contents.
+    codes = pd.cut(df["total_damage_usd"], BIN_EDGES_USD, labels=False,
+                    right=True, include_lowest=True)
+    codes = codes.astype("float")
+    codes[df["total_damage_usd"] <= 0.0] = -1  # -1 reserved for "Zero loss"
+
+    # Merge sparse bins into the next-lower-severity bin, repeating until no
+    # non-zero-loss bin (other than the lowest, index 0) is below min_count
+    # -- this correctly handles a merge cascade, not just one sparse bin.
+    lo_edges = list(BIN_EDGES_USD[:-1])
+    hi_edges = list(BIN_EDGES_USD[1:])
+    changed = True
+    while changed:
+        changed = False
+        counts = codes.value_counts()
+        present = sorted(c for c in codes.dropna().unique() if c >= 0)
+        for c in present:
+            if c == 0:
+                continue
+            if counts.get(c, 0) < min_count:
+                prev = max(x for x in present if x < c)
+                codes[codes == c] = prev
+                hi_edges[int(prev)] = hi_edges[int(c)]  # extend the surviving bin's upper edge
+                changed = True
+                break
+
+    merged = codes.map(
+        lambda c: "Zero loss" if c < 0 else _label_for_edge_range(lo_edges[int(c)], hi_edges[int(c)])
+    )
     return merged
 
 
@@ -133,9 +173,12 @@ def bin_summary(df: pd.DataFrame, bins: pd.Series, n_boot: int, seed: int) -> pd
         rows.append(row)
 
     out = pd.DataFrame(rows)
-    order_map = {label: i for i, label in enumerate(BIN_LABELS)}
-    out["_order"] = out["bin"].map(order_map)
-    out = out.sort_values("_order").drop(columns="_order").reset_index(drop=True)
+    # Sort by observed severity (mean total loss), not by matching against
+    # the static pre-merge BIN_LABELS: bin labels are now built dynamically
+    # from each bin's actual (possibly merged) edges, so a "Zero loss" bin
+    # sorts first by construction (mean loss 0) without needing a lookup
+    # table that would go stale exactly like the label string used to.
+    out = out.sort_values("mean_total_loss_usd").reset_index(drop=True)
     return out
 
 

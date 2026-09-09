@@ -1,4 +1,4 @@
-Scenario,n_realizations,Total loss,Total public burden (legacy 4-comp.),"Total public burden (corrected, non-overlapping)",FHCF shortfall (diagnostic),FIGA residual,Citizens deficit,NFIP Treasury borrowing
+Scenario,n_realizations,Total loss,Total public burden (legacy 4-comp.),Residual financing requirement (FIGA+Citizens+NFIP),FHCF shortfall (diagnostic),FIGA residual,Citizens deficit,NFIP Treasury borrowing
 Great Miami,1000,170.4B (170.4-170.4B),26.1B (15.4-38.8B),24.4B (15.2-33.4B),1.7B (0.0-8.0B),7.0B (3.2-13.4B),5.8B (3.1-11.4B),11.5B (1.4-24.3B)
 Andrew,1000,114.2B (114.2-114.2B),11.7B (4.1-22.3B),11.7B (4.1-22.3B),0.0B (0.0-0.0B),4.2B (1.1-10.0B),5.2B (1.9-11.9B),2.2B (0.0-9.4B)
 Lake Okeechobee,1000,156.9B (156.9-156.9B),18.4B (16.6-20.9B),18.4B (16.6-20.9B),0.0B (0.0-0.0B),3.3B (0.0-8.8B),1.6B (0.0-4.0B),13.6B (7.1-18.9B)

@@ -1,5 +1,5 @@
 {
-  "source_iterations": "/Users/simonameiler/Documents/work/03_code/repos/systemic_insurance_risk_fl_earths_future/results/mc_runs/emanuel_era5_baseline_20260326_141913/iterations.csv",
+  "source_iterations": "../../results/mc_runs/emanuel_era5_baseline_20260326_141913/iterations.csv",
   "n_seasons": 10000,
   "amplification": {
     "total_loss": {

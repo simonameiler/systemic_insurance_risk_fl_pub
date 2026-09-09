@@ -308,6 +308,34 @@ def apply_fhcf_recovery(loss_df: pd.DataFrame, terms_df: pd.DataFrame) -> pd.Dat
     """
     Apply FHCF recoveries to gross wind losses.
 
+    Verified against the FHCF 2023-2024 Reimbursement Contract, Article
+    IV(1) ("... in the amount of Ultimate Net Loss ... in excess of the
+    Company's Retention ... multiplied by the applicable Coverage Level,
+    plus 10 percent of the reimbursed Losses as a Loss Adjustment Expense
+    Allowance, the total of which shall not exceed the Company's Limit")
+    and Article V(26)/(28) (Retention and Ultimate Net Loss are defined
+    once per Covered Event for the Company's entire book of Covered
+    Policies). See docs/earths_future_revision/fhcf_contract_verification.md
+    for the full source table and the two defects this function used to
+    have:
+
+    1. Formula order: the Company's Limit must cap the fully
+       coverage-and-expense-scaled reimbursement, not the raw
+       excess-over-retention before scaling.
+    2. Aggregation level: Retention and the Limit apply once to a
+       Company's TOTAL loss for the event/season, not independently to
+       each row of a Company×County input.
+
+    Both are corrected here by computing the recovery once per Company
+    (summing GrossWindLossUSD across every row of that Company first,
+    regardless of the input's granularity) and then allocating that single
+    company-level recovery back to the original rows in proportion to each
+    row's share of the Company's gross loss. If a Company's total gross
+    loss is zero, every one of its rows receives zero recovery (the 0/0
+    share is defined as zero, not NaN). This makes the function's result
+    invariant to how a Company's loss happens to be split across rows
+    (e.g. by county), which it was not before this fix.
+
     Parameters
     ----------
     loss_df : pd.DataFrame
@@ -315,9 +343,10 @@ def apply_fhcf_recovery(loss_df: pd.DataFrame, terms_df: pd.DataFrame) -> pd.Dat
           - 'Company' : str
           - 'GrossWindLossUSD' : float
         Optional:
-          - 'County' : str (carried through unmodified)
+          - 'County' : str, or any other column (carried through unmodified)
 
-        Losses may be at Company×County granularity or company-aggregated.
+        Losses may be at Company×County granularity or company-aggregated;
+        the result is identical either way (see item 2 above).
 
     terms_df : pd.DataFrame
         Terms **already normalized** by `normalize_fhcf_terms`, must contain:
@@ -326,11 +355,32 @@ def apply_fhcf_recovery(loss_df: pd.DataFrame, terms_df: pd.DataFrame) -> pd.Dat
     Returns
     -------
     pd.DataFrame
-        `loss_df` with added columns:
-          - 'ExcessUSD'       : max(Gross - Retention, 0)
-          - 'RecoverableUSD'  : min(ExcessUSD, LimitUSD)
-          - 'RecoveryUSD'     : RecoverableUSD × (CoveragePct_norm/100) × FHCF_LAE_FACTOR
-          - 'NetWindUSD'      : GrossWindLossUSD - RecoveryUSD
+        `loss_df`, in its original row order, with added columns:
+          - 'CompanyGrossWindLossUSD' : sum of GrossWindLossUSD across all
+            rows sharing this row's Company (diagnostic; company-level,
+            broadcast to every row of that company)
+          - 'CompanyExcessUSD'        : max(CompanyGrossWindLossUSD -
+            RetentionUSD, 0) (diagnostic; company-level, broadcast)
+          - 'CompanyRecoveryUSD'      : min(CompanyExcessUSD x
+            (CoveragePct_norm/100) x FHCF_LAE_FACTOR, LimitUSD)
+            (diagnostic; company-level, broadcast; this is the quantity
+            Article IV(1) actually caps at the Company's Limit)
+          - 'RecoveryUSD'             : CompanyRecoveryUSD allocated to
+            this row in proportion to its share of
+            CompanyGrossWindLossUSD (row-level; sums exactly back to
+            CompanyRecoveryUSD across a company's rows)
+          - 'NetWindUSD'              : GrossWindLossUSD (this row) -
+            RecoveryUSD (this row)
+
+        Earlier versions of this function returned row-level 'ExcessUSD'
+        and 'RecoverableUSD' columns computed independently per row (the
+        aggregation-level defect above). Those columns are intentionally
+        NOT reproduced under their old names, because their old per-row
+        meaning no longer applies once Retention/Limit are correctly
+        applied once per Company: silently keeping the old names while
+        changing what they measure would let a caller receive a changed
+        quantity without noticing. No caller in this repository reads
+        either of those two columns after this function returns.
 
     Notes
     -----
@@ -343,28 +393,62 @@ def apply_fhcf_recovery(loss_df: pd.DataFrame, terms_df: pd.DataFrame) -> pd.Dat
     ctx_loss = "apply_fhcf_recovery: loss_df"
     _require(loss_df, ["Company", "GrossWindLossUSD"], ctx_loss)
 
-    # Work on copies; never modify inputs in place.
+    # Work on a copy; never modify the input in place. Row order is
+    # preserved throughout (all merges below are left-joins onto `df`).
     df = loss_df.copy()
     df["GrossWindLossUSD"] = _to_float(df["GrossWindLossUSD"])
 
-    # Keep only the contract columns we need from normalized terms
+    # Keep only the contract columns we need from normalized terms, one row
+    # per Company (as normalize_fhcf_terms produces).
     t = terms_df[["Company", "CoveragePct_norm", "RetentionUSD", "LimitUSD"]].copy()
     t["CoveragePct_norm"] = _to_float(t["CoveragePct_norm"])
     t["RetentionUSD"] = _to_float(t["RetentionUSD"])
     t["LimitUSD"] = _to_float(t["LimitUSD"])
 
-    # Left-join: companies without terms -> zero recovery
-    df = df.merge(t, on="Company", how="left")
+    # --- Step 1: sum gross loss to ONE row per Company (Article V(26)/(28)) ---
+    company_totals = (
+        df.groupby("Company", as_index=False)["GrossWindLossUSD"]
+        .sum()
+        .rename(columns={"GrossWindLossUSD": "CompanyGrossWindLossUSD"})
+    )
 
-    # Excess over retention (floor at zero)
-    df["ExcessUSD"] = (df["GrossWindLossUSD"] - df["RetentionUSD"].fillna(0.0)).clip(lower=0.0)
+    # --- Step 2: attach terms once per Company; missing terms -> zero recovery ---
+    company_totals = company_totals.merge(t, on="Company", how="left")
+    company_totals["RetentionUSD"] = company_totals["RetentionUSD"].fillna(0.0)
+    company_totals["LimitUSD"] = company_totals["LimitUSD"].fillna(0.0)
+    coverage_frac = (
+        company_totals["CoveragePct_norm"].fillna(0.0) / 100.0
+    ).clip(lower=0.0, upper=1.0)
 
-    # Cap by company limit
-    df["RecoverableUSD"] = df[["ExcessUSD", "LimitUSD"]].min(axis=1).fillna(0.0)
+    # --- Step 3: compute recovery ONCE per Company, cap applied to the fully
+    # scaled amount (Article IV(1): "... the total of which shall not
+    # exceed the Company's Limit") ---
+    company_totals["CompanyExcessUSD"] = (
+        company_totals["CompanyGrossWindLossUSD"] - company_totals["RetentionUSD"]
+    ).clip(lower=0.0)
+    scaled_excess = company_totals["CompanyExcessUSD"] * coverage_frac * float(FHCF_LAE_FACTOR)
+    company_totals["CompanyRecoveryUSD"] = (
+        pd.concat([scaled_excess, company_totals["LimitUSD"]], axis=1).min(axis=1).fillna(0.0)
+    )
 
-    # Apply coverage percent and LAE
-    coverage_frac = (df["CoveragePct_norm"].fillna(0.0) / 100.0).clip(lower=0.0, upper=1.0)
-    df["RecoveryUSD"] = (df["RecoverableUSD"] * coverage_frac * float(FHCF_LAE_FACTOR)).astype(float)
+    # --- Step 4: broadcast company-level results back onto the original rows ---
+    df = df.merge(
+        company_totals[["Company", "CompanyGrossWindLossUSD", "CompanyExcessUSD", "CompanyRecoveryUSD"]],
+        on="Company",
+        how="left",
+    )
+    df["CompanyGrossWindLossUSD"] = df["CompanyGrossWindLossUSD"].fillna(0.0)
+    df["CompanyExcessUSD"] = df["CompanyExcessUSD"].fillna(0.0)
+    df["CompanyRecoveryUSD"] = df["CompanyRecoveryUSD"].fillna(0.0)
+
+    # --- Step 5: allocate the single company recovery to rows in proportion
+    # to each row's share of the company's gross loss; 0/0 -> 0. ---
+    row_share = np.where(
+        df["CompanyGrossWindLossUSD"] > 0,
+        df["GrossWindLossUSD"] / df["CompanyGrossWindLossUSD"],
+        0.0,
+    )
+    df["RecoveryUSD"] = (df["CompanyRecoveryUSD"] * row_share).astype(float)
 
     # Net
     df["NetWindUSD"] = df["GrossWindLossUSD"] - df["RecoveryUSD"]

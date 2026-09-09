@@ -1,0 +1,30 @@
+{
+  "code_revision_git_describe": "e584cef-dirty",
+  "seed": 42,
+  "n_iter": 100,
+  "scenarios": [
+    "great_miami",
+    "andrew",
+    "lake_okeechobee",
+    "irma",
+    "gm_then_andrew",
+    "double_gm",
+    "double_irma"
+  ],
+  "input_checksums_sha256_16": {
+    "hazard/1926255N15314.csv": "3ed84fd24b64a2e6",
+    "hazard/1928250N14343.csv": "02494a06a43a834a",
+    "hazard/1992230N11325.csv": "2542fbf33c772875",
+    "hazard/2017242N16333.csv": "b23536e91e7196fa",
+    "hazard/andrew_then_great_miami.csv": "25f984c9ccaa0d2d",
+    "hazard/great_miami_then_andrew.csv": "4227381b24cf35be",
+    "hazard/great_miami_twice.csv": "ee38e6b2402aff80",
+    "hazard/irma_twice.csv": "489ea147453b6986",
+    "data/24fin_fhcf.csv": "bab002e565582a98",
+    "data/fhcf_terms_keyed.csv": "81ea37cab2a54fca",
+    "data/company_keys.csv": "fd40533596baa3af",
+    "data/FL HO Market Share Report_6.10.25.xlsx": "6c9f28234f55a620",
+    "data/20250805 FL Surplus Capital, Group v Entity.xlsx": "e757d6f927c4eab1",
+    "data/FHCF_2024_Exposure_byCounty.xlsx": "778356c57a63d497"
+  }
+}

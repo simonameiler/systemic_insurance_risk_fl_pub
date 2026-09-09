@@ -1,9 +1,28 @@
 # FHCF contract verification
 
+> **UPDATE (FHCF corrections and pilot task, base commit `e584cef`).** Both
+> defects identified below are now PATCHED in
+> `fl_risk_model/fhcf.py::apply_fhcf_recovery`, validated with 46 passing
+> regression tests, and exercised in a local (non-cluster) pilot on real
+> historical-scenario inputs. See
+> `docs/earths_future_revision/fhcf_patch_and_pilot_report.md` for the patch
+> description, test results, the pilot comparison, the participant/premium
+> reconciliation (which explains why `fhcf_shortfall_usd` is now
+> structurally zero given the current premium snapshot), the full rerun
+> manifest, and the runtime estimate. This document's Sections 1-4 (the
+> source verification itself) are unchanged and remain the citation record.
+> Sections 5 and 7 (the patch specification and dependency map) describe
+> what was *proposed*; the patch report above describes what was actually
+> *implemented and tested*, and should be read as authoritative for
+> implementation status. No production analyses have been rerun at
+> production scale; see the patch report's Section 8 for the exact
+> remaining step.
+
 Scope: verify the FHCF reimbursement formula, input definitions, Citizens
 fallback, and statewide cap against primary FHCF/SBA documents. No
 production financial rules were changed and no production analyses were
-rerun in this task. Branch `earths-future/corrections-and-sensitivity`,
+rerun in this task **as originally written; both defects are now patched,
+see the update box above**. Branch `earths-future/corrections-and-sensitivity`,
 worktree `systemic_insurance_risk_fl_earths_future`, base commit
 `d4a4fbb` (verified clean at the start of this task; no local changes
 existed to preserve beyond that commit).
@@ -72,7 +91,7 @@ rerun (Section 7).
 | `CoveragePct` / `CoveragePct_norm` | Company's elected coverage level, snapped to {45,75,90} | "Coverage Level": 90%, 75%, or 45%, elected under Art. XXI or deemed under Art. III(3) | Art. V(11), p.6 | Matches |
 | `RetentionUSD` = `FHCFPremium x FHCF_RET_MULTIPLES[cov]` | Company retention in USD | "Retention" = Retention Multiple x Company's Reimbursement Premium (Art. V(26)(c), p.8-9); "Retention Multiple" = a base value adjusted to 100%/120%/200% of the 90%-level amount for the 90%/75%/45% coverage elections (Art. V(27), p.8) | Art. V(26)-(27), p.8-9, FHCF-2023K | Matches. `FHCF_RET_MULTIPLES = {90: 6.0732, 75: 7.2878, 45: 12.1464}` reproduce the 100%/120%/200% ratios exactly (7.2878/6.0732 = 1.2000; 12.1464/6.0732 = 2.0000) |
 | `LimitUSD` = `FHCFPremium x FHCF_PAYOUT_MULTIPLE` | Company's maximum recoverable amount | "Limit" = maximum amount a Company may recover, calculated by multiplying the Company's Reimbursement Premium by the Payout Multiple | Art. V(17), p.6 | Matches: Limit is *not* coverage-level-scaled in its own definition, confirming `p` is applied elsewhere (Art. IV(1)), not folded into `K` |
-| `FHCF_PAYOUT_MULTIPLE = 11.2368` | Single payout multiple, same for all coverage levels | "Payout Multiple" = single-season industry Claims-Paying Capacity / total aggregate industry Reimbursement Premium for the Contract Year, one value for all companies | Art. V(21), p.7 | Matches; a single statewide multiple, not company- or coverage-level-specific |
+| `FHCF_PAYOUT_MULTIPLE = 11.2368` | Single payout multiple, same for all coverage levels | "Payout Multiple" = single-season industry Claims-Paying Capacity / total aggregate industry Reimbursement Premium for the Contract Year, one value for all companies | Art. V(21), p.7; numeric value from the **2024 Ratemaking Formula Report with Supplemental Information** (May 10, 2024), PDF p.3, column "2023 Contract Year Actual as of 10/24/2023 for Ratemaking," row "Projected Payout Multiple" = 11.2368, footnoted "As of 12/31/2023, FHCF premium was $1.513 billion and Projected Payout Multiple was 11.2368" | Matches; a single statewide multiple, not company- or coverage-level-specific. **Corrected attribution** (see note below): 11.2368 is the *actualized* 2023 Contract Year figure reported a year later, not the value in the original March 2023 report, which projected 11.7254 for the same contract year (same source, column "2023 Contract Year Modeled"). `config.py` matches the actualized figure, not the original projection. |
 | `FHCF_LAE_FACTOR = 1.10` (i.e. `(1+a)`, `a=0.10`) | Multiplicative loss-adjustment-expense factor | "Loss Adjustment Expense Allowance" = 10% of reimbursed Losses under Art. IV, **included in, and not in addition to, the Limit** | Art. V(19)(a)-(b), p.7 | The 10% rate matches. "Included in ... the Limit" confirms LAE is part of what `K` caps, i.e. it belongs inside the `min(...,K)`, consistent with the verified formula and inconsistent with adding LAE on top of an already-capped `min(E,K)` |
 | Formula: `recovery = (1+a) x p x min(E,K)` (current code) | -- | Not supported: Art. IV(1) caps the *total* of the coverage-scaled excess plus LAE at the Limit, not the raw excess | Art. IV(1), p.3 | **Mismatch (Section 3)** |
 | Formula: `recovery = min((1+a) x p x E, K)` (verified) | -- | Supported | Art. IV(1), p.3 | Verified |
@@ -82,20 +101,36 @@ rerun (Section 7).
 | Statewide cap applied once to combined Private + Citizens | Single call combining `private_precap` and `citizens_precap` | Citizens' coastal account and personal-lines/commercial-lines account are each treated "as if it were... a separate participating insurer with its own... Retention, and Ultimate Net Loss," i.e. part of the same statewide pool, not a separate cap | Art. V(8), p.5 | Matches -- no defect found here |
 | Citizens general/live-fallback path: `Limit = Premium x Payout Multiple` (no coverage factor) | `_citizens_terms_fallback_row` + `normalize_fhcf_terms`, `runner.py` lines ~768-817 | Same as Art. V(17) | Art. V(17), p.6 | Matches |
 | Citizens dead-code path: `CITIZENS_FHCF_LIMIT_USD = Premium x PayoutMultiplier x CoveragePct` | `config.py` line 138, read only by `citizens_fhcf_terms_from_cfg_or_csv` in `branches/citizens.py` | Not supported (same reasoning as the general Limit mismatch above, in the opposite direction: this formula pre-applies a coverage factor Art. V(17) does not include) | Art. V(17), p.6 | **Inconsistent, but unreachable (Section 4)** |
-| Contract year of the inputs | `24fin_fhcf.csv`, `config.py` comment "2023-24 contract" | -- | FHCF-2023K, "Coverage Effective: June 1, 2023" (Contract Year June 1 2023 - May 31 2024, Art. III(1)) | The numeric multipliers in `config.py` (6.0732, 7.2878, 12.1464, 11.2368) match the **2023 Ratemaking Formula Report** (presented to the SBA March 23, 2023, for the FHCF 2023 Contract Year), **not** a 2024-2025 vintage despite the `24fin_fhcf.csv` filename. See Section 6. |
+| Contract year of the inputs | `24fin_fhcf.csv`, `config.py` comment "2023-24 contract" | -- | FHCF-2023K, "Coverage Effective: June 1, 2023" (Contract Year June 1 2023 - May 31 2024, Art. III(1)) | The retention multipliers (6.0732, 7.2878, 12.1464) match the **2023 Ratemaking Formula Report** (presented to the SBA March 23, 2023, PDF p.11 / printed p.7, table "Coverage % / Retention Multiple"). The payout multiple (11.2368) matches the **actualized** 2023 Contract Year figure published a year later in the 2024 Ratemaking Formula Report's supplemental comparison table (PDF p.3), not the 2023 report's own original projection (11.7254, same table, column "2023 Contract Year Modeled"). Both figures pertain to the same 2023-2024 Contract Year; `config.py` does not mix a 2023 retention multiple with a 2024-2025 payout multiple. **Not corrected**: the payout multiple is *not* changed to 11.7254 to match the original 2023 report -- 11.2368 is the better, later, actualized figure for the same contract year, and it is what the retained production results were computed with. This is an attribution correction to the verification record only; it does not affect the two confirmed code defects (Sections 3-4) or imply any change to `config.py`. The precise vintage of the *company-level* premiums in `24fin_fhcf.csv` (as distinct from the industry-wide multipliers) remains open -- see Section 6 and the provenance trace below. |
 
 Primary documents used:
 - 2023-2024 Reimbursement Contract ("FHCF-2023K," Rule 19-8.010 F.A.C.), fetched from
   https://fhcf.sbafla.com/media/sr4invnv/2023-reimbursement-contract-final-7-18-2022.pdf
   (36 pages; read in full).
 - Florida Hurricane Catastrophe Fund 2023 Ratemaking Formula Report, Paragon
-  Strategic Solutions Inc., presented to the SBA March 23, 2023, cover
-  letter dated March 17, 2023, fetched from
-  https://fhcf.sbafla.com/media/pfihme0c/20230323_2023ratemakingformulareport.pdf
-  (cover letter and title page read; the numeric retention-multiple table
-  itself, cited via a secondary web search result quoting this report, was
-  not independently re-opened page-by-page inside the 100+ page report --
-  see Section 6, unresolved question 2).
+  Strategic Solutions Inc., presented to the SBA March 23, 2023, fetched from
+  https://fhcf.sbafla.com/media/pfihme0c/20230323_2023ratemakingformulareport.pdf.
+  Cover letter (dated March 17, 2023) and printed page 7 (PDF page 11,
+  "Insurance Industry Aggregate Retention for Ratemaking Purposes") read
+  directly and quoted verbatim: table "Coverage % 90% / 75% / 45%,
+  Retention Multiple 6.0732 / 7.2878 / 12.1464"; this same page's narrative
+  gives the industry retention numerator ($9.067 billion) and the $17
+  billion limit. Printed page 8 (PDF page 12) gives the loss-layer
+  derivation but this report's own payout multiple for the 2023 Contract
+  Year, 11.7254, appears only in the 2024 report's retrospective table
+  (below), not as a labeled "Payout Multiple" line inside this 2023 report
+  itself within the pages read.
+- Florida Hurricane Catastrophe Fund 2024 Ratemaking Formula Report with
+  Supplemental Information (May 10, 2024), fetched from
+  https://fhcf.sbafla.com/media/ldbfufvt/2024-ratemaking-formula-report-final-with-supplemental.pdf.
+  PDF page 3 ("Page 2 of 3" of the supplemental document) read directly: a
+  four-column comparison table gives, for "2023 Contract Year Actual as of
+  10/24/2023 for Ratemaking," Projected Payout Multiple = 11.2368 and 90%
+  Retention Multiple = 6.0732, footnoted "As of 12/31/2023, FHCF premium
+  was $1.513 billion and Projected Payout Multiple was 11.2368"; the
+  adjacent "2023 Contract Year Modeled" column (the original March 2023
+  report's own projection) gives 11.7254 and 6.0732 for the same two
+  quantities.
 
 The template contract (FHCF-2023K) itself does not state the final dollar
 values of the Retention Multiple or Payout Multiple -- these are calculated
@@ -259,19 +294,18 @@ appropriately out of scope for this task).
    preparer or a matching FHCF exposure/premium bulletin can answer; it is
    not a question this verification can resolve by re-reading the contract
    template.
-2. **Exact page/table location of the numeric Retention Multiple values
-   inside the 2023 Ratemaking Formula Report.** The report's cover letter
-   (read in full) confirms the $9.067 billion aggregate industry retention
-   and $17.000 billion limit level for the 2023 Contract Year, consistent
-   with `config.py`'s constants and with Article V(27)'s formula structure,
-   and a general web search independently attributed the specific values
-   6.0732/7.2878/12.1464 to this same report. The full ~100-page report was
-   not paginated through in this pass to locate and quote that exact
-   exhibit table directly. This does not change the conclusion (the values
-   are corroborated from two directions -- the cover letter's aggregate
-   dollar figures combine with Article V(27)'s stated ratios to reproduce
-   them, and the web search independently names the same report) but a
-   direct page citation is still open.
+2. **RESOLVED.** The retention multiples 6.0732 / 7.2878 / 12.1464 are
+   confirmed directly, by reading the source, on printed page 7 (PDF page
+   11) of the 2023 Ratemaking Formula Report. The payout multiple 11.2368
+   is confirmed directly on PDF page 3 of the 2024 Ratemaking Formula
+   Report with Supplemental Information, as the actualized 2023 Contract
+   Year figure (footnoted "As of 12/31/2023"), not the 2023 report's own
+   original projection of 11.7254 for the same contract year. The prior
+   version of this document mis-attributed 11.2368 to the 2023 report
+   itself; that attribution is corrected in Section 2's source table. This
+   correction affects only the citation, not any conclusion: `config.py`'s
+   constants are unchanged, both formula defects in Sections 3-4 are
+   unaffected, and no code was altered because of this correction.
 3. **Whether the model represents Citizens as one combined entity or as
    its two statutory accounts.** Article V(8) treats Citizens' coastal
    account and its personal-lines/commercial-lines account as two separate

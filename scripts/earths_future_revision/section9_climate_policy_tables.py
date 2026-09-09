@@ -73,7 +73,7 @@ MEANS_METRICS = {
     "Insured flood, NFIP": "flood_insured_capped_usd",
     "Un/underinsured wind": "wind_un_underinsured_usd",
     "Un/underinsured flood": "flood_un_derinsured_usd",
-    "Total public burden (corrected)": "public_burden_corrected_usd",
+    "Residual financing requirement": "public_burden_corrected_usd",
     "FHCF shortfall (diagnostic)": "fhcf_shortfall_usd",
     "FIGA residual": "figa_residual_deficit_usd",
     "Citizens deficit": "citizens_residual_deficit_usd",

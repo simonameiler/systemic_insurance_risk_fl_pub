@@ -76,15 +76,19 @@ def _fhcf_terms(company: str, premium: float, coverage_pct: float) -> pd.DataFra
 
 
 def test_fhcf_shortfall_propagates_into_downstream_default_deficit():
-    """Case A: an insurer's uncapped FHCF-eligible loss exceeds the
-    company limit, producing an FHCF shortfall borne by that insurer. That
-    insurer's remaining (post-recovery) loss then exceeds its own capital,
-    producing a default. The resulting FIGA-style deficit (net loss minus
-    capital) already contains the FHCF shortfall dollar-for-dollar, because
-    capital depletion in fl_risk_model.runner.run_one_scenario is applied to
+    """Case A: an insurer's FHCF-eligible loss is far enough past its own
+    Limit that recovery has saturated at the full Limit (verified formula,
+    Article IV(1); see docs/earths_future_revision/fhcf_contract_verification.md),
+    producing an FHCF shortfall borne by that insurer. That insurer's
+    remaining (post-recovery) loss then exceeds its own capital, producing a
+    default. The resulting FIGA-style deficit (net loss minus capital)
+    already contains the FHCF shortfall dollar-for-dollar, because capital
+    depletion in fl_risk_model.runner.run_one_scenario is applied to
     NetWindUSD = Gross - Recovery (see runner.py step 8-9), i.e. after FHCF
     recovery. Adding the statewide FHCF shortfall AND this deficit therefore
-    double-counts the overlapping dollars.
+    double-counts the overlapping dollars. This fixture uses a single-row
+    (single-company) loss_df, so it is unaffected by the separate
+    company-aggregation defect/fix (see test_fhcf_contract_verification.py).
     """
     company = "TestCo"
     premium = 10_000_000.0  # arbitrary
@@ -92,13 +96,22 @@ def test_fhcf_shortfall_propagates_into_downstream_default_deficit():
     terms = _fhcf_terms(company, premium, coverage_pct)
     retention = float(terms["RetentionUSD"].iloc[0])
     limit = float(terms["LimitUSD"].iloc[0])
+    coverage_frac = coverage_pct / 100.0
+    from fl_risk_model.config import FHCF_LAE_FACTOR
+    # Verified formula (Article IV(1); see fhcf_contract_verification.md):
+    # recovery saturates at the full Limit once
+    # Excess >= Limit / (coverage_frac * LAE). Use a loss comfortably past
+    # that point so recovery is already fully saturated at `limit`.
+    saturation_excess = limit / (coverage_frac * FHCF_LAE_FACTOR)
 
-    # Baseline case: loss exactly fills the company's FHCF-recoverable layer
-    # (Excess == Limit, so recovery is exactly at its capped value and the
-    # company bears no shortfall above its own limit).
-    gross_at_cap = retention + limit
+    # Baseline case: loss is well past the saturation point, so recovery is
+    # exactly at its capped value (the full Limit) and the company bears a
+    # shortfall above its own limit equal to (gross - retention - recovery).
+    gross_at_cap = retention + 2.0 * saturation_excess
     loss_df_at_cap = pd.DataFrame([{"Company": company, "GrossWindLossUSD": gross_at_cap}])
+    recovery_at_cap = float(apply_fhcf_recovery(loss_df_at_cap, terms)["RecoveryUSD"].iloc[0])
     net_at_cap = float(apply_fhcf_recovery(loss_df_at_cap, terms)["NetWindUSD"].iloc[0])
+    assert recovery_at_cap == pytest.approx(limit, rel=1e-9)  # confirms saturation
 
     # Give the insurer exactly enough capital to absorb this baseline case
     # with zero deficit.

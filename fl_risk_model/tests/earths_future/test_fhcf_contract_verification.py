@@ -4,48 +4,44 @@ FHCF contract verification tests (docs/earths_future_revision/fhcf_contract_veri
 These tests are separate from fl_risk_model/tests/earths_future/test_accounting_fixtures.py
 on purpose. That file's
 test_fhcf_coverage_election_may_be_applied_twice_between_retention_and_limit
-only quantifies a suspected discrepancy; it does not assert a verified
-correction and is retained unmodified as a record of what was suspected
-before this verification. The tests below assert expected values derived
-directly from cited clauses of the FHCF 2023-2024 Reimbursement Contract
-(FHCF-2023K, Rule 19-8.010 F.A.C., "Coverage Effective: June 1, 2023"),
-Article IV(1) and Article V(17), V(19), V(26), V(27), V(28). See the
-verification report for the full source table and page references.
+only quantified a suspected discrepancy against an alternative hypothesis
+that was NOT adopted (removing the coverage factor entirely); it is
+retained unmodified as a record of that earlier, evidence-lighter
+suspicion.
 
-Two independent, previously undocumented findings are established here:
+The two defects verified against the primary FHCF 2023-2024 Reimbursement
+Contract (FHCF-2023K, Rule 19-8.010 F.A.C., "Coverage Effective: June 1,
+2023"), Article IV(1) and Article V(17), V(19), V(26), V(27), V(28), have
+now been PATCHED in fl_risk_model/fhcf.py::apply_fhcf_recovery:
 
 1. FORMULA ORDER (Article IV(1)): the Company's Limit caps the *total*
    reimbursement (coverage-level-scaled excess plus the loss adjustment
    expense allowance), not the raw excess-over-retention before scaling.
-   The current implementation (fl_risk_model.fhcf.apply_fhcf_recovery)
-   caps the excess before scaling: `(1+a) * p * min(E, K)`. The contract
-   requires `min((1+a) * p * E, K)`. The two formulas agree whenever
-   E <= K (which includes every case up to and including E == K, since
-   (1+a)*p <= 0.99 < 1 for all three coverage levels) and diverge only once
-   E > K, where the current code permanently under-recovers relative to the
-   Company's actual contractual Limit -- by up to 50.5% of the Limit at the
-   45% coverage election.
+   PATCHED: apply_fhcf_recovery now computes
+   min((1+a) * p * E, K) instead of (1+a) * p * min(E, K).
 
 2. AGGREGATION LEVEL (Article V(26), V(28)): Retention and Ultimate Net
-   Loss are defined once per Covered Event for the Company's entire book of
-   Covered Policies, not per county. fl_risk_model.runner.run_one_scenario
-   calls fl_risk_model.fhcf.attach_fhcf_terms_for_losses (which explicitly
-   collapses to one row per Company) and then
-   fl_risk_model.fhcf.apply_fhcf_recovery on a loss_df that is still at
-   Company x County granularity. apply_fhcf_recovery merges the one
-   company-level RetentionUSD/LimitUSD onto every county row and then
-   computes ExcessUSD/RecoverableUSD ROW BY ROW, so a company's single
-   Retention and Limit are silently applied independently to every county
-   row instead of once to the company's summed loss. This can either
-   under-count excess (many counties each below retention alone) or, more
-   importantly for tail risk, let a company recover a multiple of its
-   actual contractual Limit (several counties each independently capped at
-   the full Limit).
+   Loss are defined once per Covered Event for the Company's entire book,
+   not per county. PATCHED: apply_fhcf_recovery now sums GrossWindLossUSD
+   to one row per Company before computing recovery, then allocates the
+   single company-level recovery back to the original rows in proportion
+   to each row's share of the company's gross loss.
+
+The tests below are REGRESSION tests against the verified formula: they
+assert what the code SHOULD do and currently DOES do, now that both
+defects are patched. They are not merely defect-characterization tests
+that happen to pass -- each expected value is computed independently
+(_verified_recovery, or hand-derived company totals), not copied from a
+prior run of the code under test. The record of the OLD (pre-patch)
+behavior that these tests used to assert is preserved in
+docs/earths_future_revision/fhcf_contract_verification.md and in the
+correction register, not re-derived here.
 
 Run with: pytest fl_risk_model/tests/earths_future/test_fhcf_contract_verification.py -v
 """
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -55,9 +51,10 @@ from fl_risk_model.fhcf import (
     attach_fhcf_terms_for_losses,
 )
 from fl_risk_model.config import FHCF_RET_MULTIPLES, FHCF_PAYOUT_MULTIPLE, FHCF_LAE_FACTOR
+from fl_risk_model.runner import _apply_industry_season_cap
 
 PREMIUM = 10_000_000.0
-LAE = FHCF_LAE_FACTOR  # 1.10, matches Article V(19)(a): 10% of reimbursed losses
+LAE = FHCF_LAE_FACTOR  # 1.10, i.e. (1+a); matches Article V(19)(a): 10% of reimbursed losses
 LIMIT = PREMIUM * FHCF_PAYOUT_MULTIPLE  # Article V(17): Limit = Premium x Payout Multiple
 
 
@@ -78,14 +75,16 @@ def _current_code_recovery(gross: float, terms: pd.DataFrame) -> float:
 
 
 # ---------------------------------------------------------------------------
-# 1. Formula-order verification at 45%, 75%, 90%, across five loss regions.
+# 1. Formula verification at 45%, 75%, 90%, across six loss regions:
+#    below retention, at retention, within the layer, at E=K, at the actual
+#    saturation point E = K/(1.10*p), and well above saturation.
 # ---------------------------------------------------------------------------
 
 COVERAGE_LEVELS = {45: 0.45, 75: 0.75, 90: 0.90}
 
 
 @pytest.mark.parametrize("cov_pct,p", COVERAGE_LEVELS.items())
-def test_below_retention_current_code_matches_contract(cov_pct, p):
+def test_below_retention(cov_pct, p):
     terms = _terms(cov_pct)
     retention = float(terms["RetentionUSD"].iloc[0])
     gross = retention - 1_000_000.0
@@ -96,7 +95,7 @@ def test_below_retention_current_code_matches_contract(cov_pct, p):
 
 
 @pytest.mark.parametrize("cov_pct,p", COVERAGE_LEVELS.items())
-def test_at_retention_current_code_matches_contract(cov_pct, p):
+def test_at_retention(cov_pct, p):
     terms = _terms(cov_pct)
     retention = float(terms["RetentionUSD"].iloc[0])
     expected = _verified_recovery(retention, retention, LIMIT, p)
@@ -106,99 +105,114 @@ def test_at_retention_current_code_matches_contract(cov_pct, p):
 
 
 @pytest.mark.parametrize("cov_pct,p", COVERAGE_LEVELS.items())
-def test_in_covered_layer_current_code_matches_contract(cov_pct, p):
-    """Within the covered layer (E < K), the two formula orderings coincide
-    because (1+a)*p <= 0.99 < 1 at every coverage level: scaling E down by
-    (1+a)*p before or after comparing to K gives the same result. This is
-    the region existing production results were computed in for the vast
-    majority of loss draws, which is why this bug was not caught by the
-    existing test suite."""
+def test_within_the_covered_layer(cov_pct, p):
     terms = _terms(cov_pct)
     retention = float(terms["RetentionUSD"].iloc[0])
     gross = retention + 30_000_000.0
     expected = _verified_recovery(gross, retention, LIMIT, p)
     actual = _current_code_recovery(gross, terms)
     assert actual == pytest.approx(expected, rel=1e-9)
+    assert actual == pytest.approx(LAE * p * 30_000_000.0, rel=1e-9)
 
 
 @pytest.mark.parametrize("cov_pct,p", COVERAGE_LEVELS.items())
-def test_at_e_equals_limit_boundary_still_agrees(cov_pct, p):
-    """At E == K exactly, min(E,K) == E == K in both orderings, so the two
-    formulas still agree. This is the last point of agreement."""
+def test_at_e_equals_k(cov_pct, p):
+    """At E == K exactly, both formula orderings agree (this was already
+    true before the patch, since (1+a)*p <= 0.99 < 1 at every coverage
+    level: E==K is not yet past the true saturation point)."""
     terms = _terms(cov_pct)
     retention = float(terms["RetentionUSD"].iloc[0])
     gross = retention + LIMIT
     expected = _verified_recovery(gross, retention, LIMIT, p)
     actual = _current_code_recovery(gross, terms)
     assert actual == pytest.approx(expected, rel=1e-9)
+    assert actual == pytest.approx(LAE * p * LIMIT, rel=1e-9)
+    assert actual < LIMIT  # not yet saturated
 
 
 @pytest.mark.parametrize("cov_pct,p", COVERAGE_LEVELS.items())
-def test_far_above_limit_current_code_UNDER_recovers(cov_pct, p):
-    """This is the confirmed defect. Once E > K, the contract (Article
-    IV(1)) requires the Company to recover up to its full Limit K. The
-    current code plateaus at (1+a)*p*K, which is strictly below K for every
-    coverage election (0.99K at 90%, 0.825K at 75%, 0.495K at 45%)."""
+def test_at_the_actual_saturation_point(cov_pct, p):
+    """E = K / (1.10*p) is exactly where the verified formula's scaled
+    excess first equals K -- the true saturation point, strictly beyond
+    E=K for every coverage election (since 1.10*p <= 0.99 < 1). Before the
+    patch, current code had already been plateaued at (1+a)*p*K since
+    E=K, so this was exactly where the pre-patch code's under-recovery was
+    largest in relative terms yet still small in absolute terms; after the
+    patch, this is the last point where recovery is still (just) reaching
+    K rather than being capped short of it."""
     terms = _terms(cov_pct)
     retention = float(terms["RetentionUSD"].iloc[0])
-    gross = retention + 3.0 * LIMIT  # E = 3K, deep in "far above the limit"
+    saturation_excess = LIMIT / (LAE * p)
+    gross = retention + saturation_excess
     expected = _verified_recovery(gross, retention, LIMIT, p)
     actual = _current_code_recovery(gross, terms)
-
-    assert expected == pytest.approx(LIMIT, rel=1e-9)  # contract: full Limit is reached
-    assert actual == pytest.approx(LAE * p * LIMIT, rel=1e-9)  # current code: plateaus below Limit
-    assert actual < expected  # confirmed under-recovery
-    shortfall_fraction = (expected - actual) / expected
-    assert shortfall_fraction == pytest.approx(1.0 - LAE * p, rel=1e-6)
+    assert expected == pytest.approx(LIMIT, rel=1e-9)
+    assert actual == pytest.approx(LIMIT, rel=1e-9)  # patch: now reaches the true Limit
 
 
-def test_shortfall_is_largest_at_the_45_percent_election():
-    """Numerical headline for the report: at 45% coverage, current code
-    recovers only 49.5% of the Company's actual contractual Limit once
-    losses are far above it (versus 99% at 90% coverage)."""
-    terms45 = _terms(45)
-    terms90 = _terms(90)
-    retention45 = float(terms45["RetentionUSD"].iloc[0])
-    retention90 = float(terms90["RetentionUSD"].iloc[0])
+@pytest.mark.parametrize("cov_pct,p", COVERAGE_LEVELS.items())
+def test_well_above_saturation_reaches_full_limit(cov_pct, p):
+    """Regression test for the confirmed formula-order defect. Once E is
+    well past saturation, the contract (Article IV(1)) requires the
+    Company to recover its full Limit K, and the patched code now does."""
+    terms = _terms(cov_pct)
+    retention = float(terms["RetentionUSD"].iloc[0])
+    gross = retention + 3.0 * LIMIT  # E = 3K, deep past saturation
+    expected = _verified_recovery(gross, retention, LIMIT, p)
+    actual = _current_code_recovery(gross, terms)
+    assert expected == pytest.approx(LIMIT, rel=1e-9)
+    assert actual == pytest.approx(LIMIT, rel=1e-9)
 
-    gross45 = retention45 + 3.0 * LIMIT
-    gross90 = retention90 + 3.0 * LIMIT
 
-    recovery45 = _current_code_recovery(gross45, terms45)
-    recovery90 = _current_code_recovery(gross90, terms90)
-
-    assert recovery45 / LIMIT == pytest.approx(0.495, rel=1e-6)
-    assert recovery90 / LIMIT == pytest.approx(0.99, rel=1e-6)
-    assert (LIMIT - recovery45) > (LIMIT - recovery90)
+def test_saturation_shortfall_no_longer_depends_on_coverage_election():
+    """Before the patch, current code plateaued at (1+a)*p*K, so the
+    relative shortfall against the true Limit K grew as coverage election
+    fell (49.5% recovered at 45% vs. 99% at 90%). After the patch, all
+    three elections correctly reach the full Limit once losses are deep
+    enough past saturation."""
+    for cov_pct, p in COVERAGE_LEVELS.items():
+        terms = _terms(cov_pct)
+        retention = float(terms["RetentionUSD"].iloc[0])
+        gross = retention + 3.0 * LIMIT
+        recovery = _current_code_recovery(gross, terms)
+        assert recovery == pytest.approx(LIMIT, rel=1e-9)
 
 
 # ---------------------------------------------------------------------------
-# 2. Aggregation-level verification: one company total row vs. multiple
-#    county rows, through the ACTUAL production wrapper
+# 2. Aggregation-level verification, through the ACTUAL production wrapper
 #    (attach_fhcf_terms_for_losses + apply_fhcf_recovery), per runner.py's
-#    call path (steps 5.1-5.3).
+#    call path (steps 5.1-5.3). Covers: unequal county splits, a case where
+#    every county row is individually below retention but the company sum
+#    is above it, a case that exhausts the company limit, and zero-loss
+#    rows. Private insurers and combined Citizens are both covered (Section
+#    4 repeats the Citizens-specific comparison against its own terms path).
 # ---------------------------------------------------------------------------
 
-def _company_keys_and_market_share():
-    market_share_df = pd.DataFrame([{"Company": "TestCo", "StatEntityKey": "SK1"}])
+def _company_keys_and_market_share(company="TestCo", key="SK1", naic="99999"):
+    market_share_df = pd.DataFrame([{"Company": company, "StatEntityKey": key}])
     company_crosswalk_df = pd.DataFrame([{
-        "StatEntityKey": "SK1", "NAIC": "99999", "fhcf_participant": True,
+        "StatEntityKey": key, "NAIC": naic, "fhcf_participant": True,
     }])
     return market_share_df, company_crosswalk_df
 
 
-def _terms_with_naic(coverage_pct: int, premium: float = PREMIUM) -> pd.DataFrame:
+def _terms_with_naic(coverage_pct: int, premium: float = PREMIUM,
+                      company: str = "TestCo", naic: str = "99999") -> pd.DataFrame:
     raw = pd.DataFrame([{
-        "Company": "TestCo", "NAIC": "99999", "FHCFPremium": premium, "CoveragePct": coverage_pct,
+        "Company": company, "NAIC": naic, "FHCFPremium": premium, "CoveragePct": coverage_pct,
     }])
     return normalize_fhcf_terms(raw)
 
 
-def _recover_via_production_wrapper(loss_df: pd.DataFrame, terms_norm: pd.DataFrame) -> float:
+def _recover_via_production_wrapper(loss_df: pd.DataFrame, terms_norm: pd.DataFrame,
+                                     company: str = "TestCo", key: str = "SK1",
+                                     naic: str = "99999") -> pd.DataFrame:
     """Exercises the same two-call sequence as fl_risk_model.runner
     (attach_fhcf_terms_for_losses then apply_fhcf_recovery), not just
-    apply_fhcf_recovery in isolation."""
-    market_share_df, company_crosswalk_df = _company_keys_and_market_share()
+    apply_fhcf_recovery in isolation. Returns the full row-level output
+    (not just the summed recovery) so callers can check per-row
+    reconciliation."""
+    market_share_df, company_crosswalk_df = _company_keys_and_market_share(company, key, naic)
     terms_for_company = attach_fhcf_terms_for_losses(
         loss_df=loss_df,
         terms_df=terms_norm,
@@ -206,57 +220,130 @@ def _recover_via_production_wrapper(loss_df: pd.DataFrame, terms_norm: pd.DataFr
         company_crosswalk_df=company_crosswalk_df,
         qa_strict=False,
     )
-    out = apply_fhcf_recovery(loss_df, terms_for_company)
-    return float(out["RecoveryUSD"].sum())
+    return apply_fhcf_recovery(loss_df, terms_for_company)
 
 
-def test_company_total_vs_county_split_diverge_under_current_code():
-    """Article V(26)/(28): Retention and Ultimate Net Loss apply once to
-    the Company's full book for the Covered Event, so splitting the SAME
-    total loss across counties must not change total recovery. Demonstrates
-    that it currently does, using the real production wrapper.
-
-    Each of the 3 county rows is independently large enough (Retention +
-    2*Limit) that, on its own, its excess-over-retention already exceeds the
-    Limit -- exactly the "far above the limit" fixture, replicated per
-    county. The one-row case uses the identical TOTAL gross loss (the sum
-    of the three county losses) so this isolates the effect of granularity
-    alone, holding total loss fixed.
-    """
+def test_unequal_county_split_matches_one_row_total():
+    """Regression test: unequal county splits of the same company total now
+    give the same total recovery as a single aggregated row (the
+    aggregation defect is fixed)."""
     cov_pct, p = 90, 0.90
     terms = _terms_with_naic(cov_pct)
     retention = float(terms["RetentionUSD"].iloc[0])
 
-    per_county_gross = retention + 2.0 * LIMIT
+    total_gross = retention + 3.0 * LIMIT
+    # Deliberately unequal split: 60% / 30% / 10%.
     county_rows = pd.DataFrame([
-        {"Company": "TestCo", "County": "A", "GrossWindLossUSD": per_county_gross},
-        {"Company": "TestCo", "County": "B", "GrossWindLossUSD": per_county_gross},
-        {"Company": "TestCo", "County": "C", "GrossWindLossUSD": per_county_gross},
+        {"Company": "TestCo", "County": "A", "GrossWindLossUSD": 0.6 * total_gross},
+        {"Company": "TestCo", "County": "B", "GrossWindLossUSD": 0.3 * total_gross},
+        {"Company": "TestCo", "County": "C", "GrossWindLossUSD": 0.1 * total_gross},
     ])
-    recovery_county_split = _recover_via_production_wrapper(county_rows, terms)
+    out_split = _recover_via_production_wrapper(county_rows, terms)
 
-    total_gross = 3.0 * per_county_gross  # same total loss, single row
     one_row = pd.DataFrame([{"Company": "TestCo", "GrossWindLossUSD": total_gross}])
-    recovery_one_row = _recover_via_production_wrapper(one_row, terms)
+    out_one = _recover_via_production_wrapper(one_row, terms)
 
-    # One row: Excess = total_gross - retention (retention subtracted ONCE)
-    # is far above K, so recovery correctly plateaus at (1+a)*p*K.
-    assert recovery_one_row == pytest.approx(LAE * p * LIMIT, rel=1e-6)
-
-    # BUG: with the SAME total loss split into 3 counties, retention is
-    # subtracted once PER ROW, so each row's excess (2*Limit) already
-    # exceeds Limit on its own and each row independently plateaus at
-    # (1+a)*p*K -- tripling total recovery for identical total loss.
-    assert recovery_county_split == pytest.approx(3.0 * LAE * p * LIMIT, rel=1e-6)
-    assert recovery_county_split > recovery_one_row
-    assert recovery_county_split > LIMIT  # exceeds the Company's actual contractual maximum
+    expected = _verified_recovery(total_gross, retention, LIMIT, p)
+    assert float(out_split["RecoveryUSD"].sum()) == pytest.approx(expected, rel=1e-9)
+    assert float(out_one["RecoveryUSD"].sum()) == pytest.approx(expected, rel=1e-9)
+    assert float(out_split["RecoveryUSD"].sum()) == pytest.approx(float(out_one["RecoveryUSD"].sum()), rel=1e-9)
 
 
-def test_company_total_vs_county_split_would_agree_under_aggregate_first_fix():
-    """Sanity check for the proposed fix: if GrossWindLossUSD is summed to
-    company level BEFORE calling apply_fhcf_recovery (as Article V(26)/(28)
-    requires), the one-row and county-split representations of the same
-    total loss agree exactly."""
+def test_each_county_below_retention_alone_but_company_sum_above_it():
+    """The case the brief specifically calls out: no single county's loss
+    exceeds the company's Retention on its own, but the company's SUMMED
+    loss does. Before the patch this produced zero recovery everywhere
+    (each row's own excess was zero); the patch correctly recognizes the
+    company-level excess."""
+    cov_pct, p = 75, 0.75
+    terms = _terms_with_naic(cov_pct)
+    retention = float(terms["RetentionUSD"].iloc[0])
+
+    per_county = retention * 0.4  # each row alone: well below retention
+    n_counties = 4  # 4 * 0.4 * retention = 1.6 * retention > retention
+    county_rows = pd.DataFrame([
+        {"Company": "TestCo", "County": f"C{i}", "GrossWindLossUSD": per_county}
+        for i in range(n_counties)
+    ])
+    total_gross = n_counties * per_county
+    assert total_gross > retention  # sanity check on the fixture itself
+
+    out = _recover_via_production_wrapper(county_rows, terms)
+    expected = _verified_recovery(total_gross, retention, LIMIT, p)
+    assert expected > 0.0  # the company IS eligible for recovery in aggregate
+    assert float(out["RecoveryUSD"].sum()) == pytest.approx(expected, rel=1e-9)
+    # Every individual row shows zero excess on its own -- the recovery is
+    # correctly attributed at the company level, not fabricated per row.
+    assert (per_county < retention)
+
+
+def test_company_limit_exhausted_case_reconciles_across_county_rows():
+    """A case that exhausts the company Limit, split unevenly across
+    counties with one zero-loss row included. Recovery must reconcile
+    exactly to the company-level capped amount, and the zero-loss row must
+    receive exactly zero recovery (defined 0/0 share, not NaN)."""
+    cov_pct, p = 90, 0.90
+    terms = _terms_with_naic(cov_pct)
+    retention = float(terms["RetentionUSD"].iloc[0])
+
+    total_gross = retention + 5.0 * LIMIT  # deep past saturation
+    county_rows = pd.DataFrame([
+        {"Company": "TestCo", "County": "A", "GrossWindLossUSD": 0.7 * total_gross},
+        {"Company": "TestCo", "County": "B", "GrossWindLossUSD": 0.3 * total_gross},
+        {"Company": "TestCo", "County": "Zero", "GrossWindLossUSD": 0.0},
+    ])
+    out = _recover_via_production_wrapper(county_rows, terms)
+
+    assert float(out["RecoveryUSD"].sum()) == pytest.approx(LIMIT, rel=1e-9)
+    zero_row = out[out["County"] == "Zero"].iloc[0]
+    assert zero_row["RecoveryUSD"] == 0.0
+    assert not np.isnan(zero_row["RecoveryUSD"])
+    assert zero_row["NetWindUSD"] == 0.0
+
+    # Reconciliation: gross == net + recovery for every row, no negative
+    # values, no NaNs, and CompanyRecoveryUSD is the same broadcast value
+    # on every row of this company.
+    recon = (out["NetWindUSD"] + out["RecoveryUSD"] - out["GrossWindLossUSD"]).abs()
+    assert (recon < 1e-6).all()
+    assert (out["NetWindUSD"] >= -1e-6).all()
+    assert out["RecoveryUSD"].notna().all()
+    assert out["CompanyRecoveryUSD"].nunique() == 1
+
+
+def test_zero_loss_company_has_zero_recovery_and_no_nan():
+    terms = _terms_with_naic(90)
+    county_rows = pd.DataFrame([
+        {"Company": "TestCo", "County": "A", "GrossWindLossUSD": 0.0},
+        {"Company": "TestCo", "County": "B", "GrossWindLossUSD": 0.0},
+    ])
+    out = _recover_via_production_wrapper(county_rows, terms)
+    assert (out["RecoveryUSD"] == 0.0).all()
+    assert (out["NetWindUSD"] == 0.0).all()
+    assert out["RecoveryUSD"].notna().all()
+    assert out["CompanyGrossWindLossUSD"].eq(0.0).all()
+
+
+def test_row_order_and_row_count_preserved():
+    """No rows are dropped, added, or reordered by the aggregation fix."""
+    terms = _terms_with_naic(90)
+    county_rows = pd.DataFrame([
+        {"Company": "TestCo", "County": "Z", "GrossWindLossUSD": 5_000_000.0},
+        {"Company": "TestCo", "County": "A", "GrossWindLossUSD": 200_000_000.0},
+        {"Company": "TestCo", "County": "M", "GrossWindLossUSD": 0.0},
+    ])
+    out = _recover_via_production_wrapper(county_rows, terms)
+    assert len(out) == len(county_rows)
+    assert list(out["County"]) == ["Z", "A", "M"]
+    assert not out.duplicated(subset=["Company", "County"]).any()
+
+
+def test_company_total_vs_county_split_still_agrees_after_patch():
+    """Direct regression test on the exact fixture the earlier
+    (pre-patch) version of this file used to demonstrate the defect: same
+    total loss represented as one row vs. three equal county rows, each
+    individually already past the company's own saturation point. Both
+    representations now recover the company's full Limit, not a multiple
+    of it."""
     cov_pct, p = 90, 0.90
     terms = _terms_with_naic(cov_pct)
     retention = float(terms["RetentionUSD"].iloc[0])
@@ -267,93 +354,110 @@ def test_company_total_vs_county_split_would_agree_under_aggregate_first_fix():
         {"Company": "TestCo", "County": "B", "GrossWindLossUSD": per_county_gross},
         {"Company": "TestCo", "County": "C", "GrossWindLossUSD": per_county_gross},
     ])
-    aggregated_first = (
-        county_rows.groupby("Company", as_index=False)["GrossWindLossUSD"].sum()
-    )
-    recovery_aggregated_first = _recover_via_production_wrapper(aggregated_first, terms)
+    recovery_county_split = float(_recover_via_production_wrapper(county_rows, terms)["RecoveryUSD"].sum())
 
     total_gross = 3.0 * per_county_gross
     one_row = pd.DataFrame([{"Company": "TestCo", "GrossWindLossUSD": total_gross}])
-    recovery_one_row = _recover_via_production_wrapper(one_row, terms)
+    recovery_one_row = float(_recover_via_production_wrapper(one_row, terms)["RecoveryUSD"].sum())
 
-    assert recovery_aggregated_first == pytest.approx(recovery_one_row, rel=1e-9)
+    # Pre-patch record (see fhcf_contract_verification.md): one-row recovery
+    # was LAE*p*LIMIT (~99% of Limit) and the 3-county split recovered
+    # 3x that (>3x the company's actual Limit). Both are now the full Limit.
+    assert recovery_one_row == pytest.approx(LIMIT, rel=1e-9)
+    assert recovery_county_split == pytest.approx(LIMIT, rel=1e-9)
+    assert recovery_county_split == pytest.approx(recovery_one_row, rel=1e-9)
+    assert recovery_county_split <= LIMIT + 1e-6  # no longer exceeds the Company's actual maximum
 
 
 # ---------------------------------------------------------------------------
-# 3. Statewide cap: two insurers + Citizens, below/at/above the $17B cap.
-#    Exercises fl_risk_model.runner._apply_industry_season_cap directly,
-#    which is the actual production wrapper for the statewide constraint.
+# 3. Statewide cap integration: recoveries for at least two private insurers
+#    AND Citizens are computed via the real apply_fhcf_recovery (not
+#    supplied as dummy pre-cap frames) and then passed through
+#    fl_risk_model.runner._apply_industry_season_cap, below/at/above the
+#    cap.
 # ---------------------------------------------------------------------------
 
-from fl_risk_model.runner import _apply_industry_season_cap  # noqa: E402
-
-
-def _precap_frame(rows):
-    return pd.DataFrame(rows)
-
-
-def test_statewide_cap_below_capacity_no_scaling():
-    cap = 17_000_000_000.0
-    private = _precap_frame([
-        {"Company": "InsA", "County": "X", "GrossWindLossUSD": 3e9, "FHCF_RecoveryPreCapUSD": 2e9},
-        {"Company": "InsB", "County": "X", "GrossWindLossUSD": 4e9, "FHCF_RecoveryPreCapUSD": 3e9},
+def _computed_precap_frame(company, naic, coverage_pct, premium, gross_by_county):
+    terms = _terms_with_naic(coverage_pct, premium, company=company, naic=naic)
+    loss_df = pd.DataFrame([
+        {"Company": company, "County": c, "GrossWindLossUSD": g}
+        for c, g in gross_by_county.items()
     ])
-    citizens = _precap_frame([
-        {"Company": "Citizens", "County": "X", "GrossWindLossUSD": 2e9, "FHCF_RecoveryPreCapUSD": 1.5e9},
-    ])
-    p, c, diag = _apply_industry_season_cap(private, citizens, cap)
-    assert diag["fhcf_total_precap_usd"] == pytest.approx(6.5e9)
-    assert diag["fhcf_scaling_factor"] == pytest.approx(1.0)
-    assert diag["fhcf_cap_binding"] is False
-    assert diag["fhcf_shortfall_usd"] == pytest.approx(0.0)
-    # Reconciliation: recoveries unscaled, net = gross - recovery, no leakage.
-    assert p["FHCF_RecoveryUSD"].sum() == pytest.approx(5e9)
-    assert c["FHCF_RecoveryUSD"].sum() == pytest.approx(1.5e9)
-    assert (p["NetWindUSD"] >= 0).all() and (c["NetWindUSD"] >= 0).all()
+    out = _recover_via_production_wrapper(loss_df, terms, company=company, key=f"SK-{naic}", naic=naic)
+    return out.rename(columns={"RecoveryUSD": "FHCF_RecoveryPreCapUSD"})[
+        ["Company", "County", "GrossWindLossUSD", "FHCF_RecoveryPreCapUSD"]
+    ]
 
 
-def test_statewide_cap_exactly_at_capacity():
-    cap = 6.5e9
-    private = _precap_frame([{"Company": "InsA", "County": "X", "GrossWindLossUSD": 5e9,
-                               "FHCF_RecoveryPreCapUSD": 4.5e9}])
-    citizens = _precap_frame([{"Company": "Citizens", "County": "X", "GrossWindLossUSD": 3e9,
-                                "FHCF_RecoveryPreCapUSD": 2e9}])
-    p, c, diag = _apply_industry_season_cap(private, citizens, cap)
-    assert diag["fhcf_scaling_factor"] == pytest.approx(1.0)
-    assert diag["fhcf_cap_binding"] is False  # scale==1.0 is not "binding" by the model's own definition
-    assert diag["fhcf_shortfall_usd"] == pytest.approx(0.0)
+def _two_insurers_and_citizens(scale: float):
+    """Two private insurers (different coverage elections, multi-county)
+    plus Citizens, each with REAL computed pre-cap recovery. `scale`
+    multiplies every company's loss uniformly so the same fixture can probe
+    below/at/above the statewide cap."""
+    # Premiums sized so Retention (Premium x retention multiple) is well
+    # below the fixture's gross losses, so each company has genuine
+    # recoverable excess to feed the statewide cap (a too-large premium
+    # relative to loss, as in an earlier draft of this fixture, makes
+    # Retention exceed Gross and every recovery zero).
+    insA = _computed_precap_frame(
+        "InsA", "11111", 90, PREMIUM * 3,  # larger insurer
+        {"X": 200_000_000.0 * scale, "Y": 150_000_000.0 * scale},
+    )
+    insB = _computed_precap_frame(
+        "InsB", "22222", 45, PREMIUM * 1,
+        {"X": 90_000_000.0 * scale, "Z": 40_000_000.0 * scale},
+    )
+    private = pd.concat([insA, insB], ignore_index=True)
+    citizens = _computed_precap_frame(
+        "Citizens", "10064", 90, PREMIUM * 4,
+        {"X": 250_000_000.0 * scale, "Y": 100_000_000.0 * scale},
+    )
+    return private, citizens
 
 
-def test_statewide_cap_above_capacity_prorates_private_and_citizens_together():
-    cap = 5.0e9
-    private = _precap_frame([
-        {"Company": "InsA", "County": "X", "GrossWindLossUSD": 5e9, "FHCF_RecoveryPreCapUSD": 4.0e9},
-        {"Company": "InsB", "County": "X", "GrossWindLossUSD": 5e9, "FHCF_RecoveryPreCapUSD": 4.0e9},
-    ])
-    citizens = _precap_frame([{"Company": "Citizens", "County": "X", "GrossWindLossUSD": 3e9,
-                                "FHCF_RecoveryPreCapUSD": 2.0e9}])
-    p, c, diag = _apply_industry_season_cap(private, citizens, cap)
+def test_statewide_cap_integration_below_at_and_above_capacity_with_real_recoveries():
+    # Determine, from the fixture itself, the pre-cap total at scale=1.0.
+    private1, citizens1 = _two_insurers_and_citizens(scale=1.0)
+    pre_total_1 = float(private1["FHCF_RecoveryPreCapUSD"].sum() + citizens1["FHCF_RecoveryPreCapUSD"].sum())
+    assert pre_total_1 > 0.0
 
-    pre_total = 10.0e9
-    expected_scale = cap / pre_total  # 0.5
-    assert diag["fhcf_scaling_factor"] == pytest.approx(expected_scale)
-    assert diag["fhcf_cap_binding"] is True
-    assert diag["fhcf_total_postcap_usd"] == pytest.approx(cap)
-    assert diag["fhcf_shortfall_usd"] == pytest.approx(pre_total - cap)
+    below_cap = pre_total_1 * 10.0  # cap far above pre-cap demand
+    at_cap = pre_total_1  # cap exactly equal to pre-cap demand
+    above_cap = pre_total_1 * 0.4  # cap well below pre-cap demand
 
-    # Both private AND Citizens are scaled by the SAME factor (single,
-    # combined statewide constraint -- Article IV(3): "reduce ... uniformly
-    # among all insurers").
-    assert p["FHCF_RecoveryUSD"].sum() == pytest.approx(8.0e9 * expected_scale)
-    assert c["FHCF_RecoveryUSD"].sum() == pytest.approx(2.0e9 * expected_scale)
-    total_post = p["FHCF_RecoveryUSD"].sum() + c["FHCF_RecoveryUSD"].sum()
-    assert total_post == pytest.approx(cap)
+    for cap_usd, expect_binding in [(below_cap, False), (at_cap, False), (above_cap, True)]:
+        private, citizens = _two_insurers_and_citizens(scale=1.0)
+        pre_total = float(private["FHCF_RecoveryPreCapUSD"].sum() + citizens["FHCF_RecoveryPreCapUSD"].sum())
+        p_out, c_out, diag = _apply_industry_season_cap(private, citizens, cap_usd)
 
-    # Reconciliation: retained (net) losses plus recovered amounts equal
-    # gross losses for every row; no duplicated recoveries.
-    combined = pd.concat([p, c], ignore_index=True)
-    recon = (combined["NetWindUSD"] + combined["FHCF_RecoveryUSD"] - combined["GrossWindLossUSD"]).abs()
-    assert (recon < 1e-6).all()
+        expected_scale = 1.0 if pre_total <= cap_usd else cap_usd / pre_total
+        assert diag["fhcf_scaling_factor"] == pytest.approx(expected_scale, rel=1e-9)
+        assert diag["fhcf_cap_binding"] == expect_binding
+        assert diag["fhcf_total_postcap_usd"] == pytest.approx(min(pre_total, cap_usd), rel=1e-9)
+        assert diag["fhcf_shortfall_usd"] == pytest.approx(max(pre_total - cap_usd, 0.0), rel=1e-6)
+
+        # Both private companies AND Citizens are scaled by the SAME factor
+        # (Article IV(3): reduce uniformly among all insurers).
+        combined = pd.concat([p_out, c_out], ignore_index=True)
+        for company in combined["Company"].unique():
+            rows = combined[combined["Company"] == company]
+            pre = rows["FHCF_RecoveryPreCapUSD"].sum()
+            post = rows["FHCF_RecoveryUSD"].sum()
+            if pre > 0:
+                assert post / pre == pytest.approx(expected_scale, rel=1e-6)
+
+        # Each company's OWN limit is still respected: post-cap recovery
+        # never exceeds what apply_fhcf_recovery already capped it at
+        # (scaling can only reduce it further, never restore it above the
+        # company's own pre-cap, already-Limit-respecting amount).
+        assert (combined["FHCF_RecoveryUSD"] <= combined["FHCF_RecoveryPreCapUSD"] + 1e-6).all()
+
+        # Reconciliation after scaling: gross == net + recovery, no negative
+        # net, statewide total recovery equals min(pre_total, cap).
+        recon = (combined["NetWindUSD"] + combined["FHCF_RecoveryUSD"] - combined["GrossWindLossUSD"]).abs()
+        assert (recon < 1e-6).all()
+        assert (combined["NetWindUSD"] >= -1e-6).all()
+        assert combined["FHCF_RecoveryUSD"].sum() == pytest.approx(min(pre_total, cap_usd), rel=1e-9)
 
 
 # ---------------------------------------------------------------------------
@@ -375,7 +479,8 @@ def test_statewide_cap_above_capacity_prorates_private_and_citizens_together():
 # (config.py: "Premium x PayoutMultiplier x CoveragePct"), inconsistent with
 # Article V(17). It is imported into runner.py but its only call site there
 # is commented out -- it is unreachable dead code under the current
-# runner.py, not merely inactive for the current data.
+# runner.py, not merely inactive for the current data. Not patched, per the
+# brief ("leave unrelated dead code alone").
 # ---------------------------------------------------------------------------
 
 from fl_risk_model.branches.citizens import citizens_fhcf_terms_from_cfg_or_csv  # noqa: E402
@@ -386,12 +491,12 @@ def test_live_citizens_fallback_matches_general_path_formula():
     """The live runner.py fallback (_citizens_terms_fallback_row +
     normalize_fhcf_terms) omits the coverage factor from Limit, exactly
     like the general company path -- both are consistent with Article
-    V(17)."""
+    V(17), and both now use the patched, company-aggregated
+    apply_fhcf_recovery."""
     premium = cfg.CITIZENS_FHCF_PREMIUM_USD
     cov_pct = cfg.CITIZENS_FHCF_COVERAGE_PCT * 100  # 0.90 -> 90
     live_fallback_terms = normalize_fhcf_terms(pd.DataFrame([{
-        "Company": cfg.CITIZENS_COMPANY_NAME if hasattr(cfg, "CITIZENS_COMPANY_NAME")
-        else "Citizens Property Insurance Corporation",
+        "Company": getattr(cfg, "CITIZENS_COMPANY_NAME", "Citizens Property Insurance Corporation"),
         "FHCFPremium": premium,
         "CoveragePct": cov_pct,
     }]))
@@ -403,11 +508,38 @@ def test_live_citizens_fallback_matches_general_path_formula():
     assert float(live_fallback_terms["LimitUSD"].iloc[0]) == pytest.approx(premium * FHCF_PAYOUT_MULTIPLE)
 
 
+def test_citizens_multi_county_aggregation_via_live_path():
+    """Citizens' combined (single-entity) representation, exercised across
+    multiple counties, reconciles the same way a private insurer's does."""
+    premium = cfg.CITIZENS_FHCF_PREMIUM_USD
+    cov_pct = int(round(cfg.CITIZENS_FHCF_COVERAGE_PCT * 100))
+    terms = normalize_fhcf_terms(pd.DataFrame([{
+        "Company": "Citizens Property Insurance Corporation",
+        "NAIC": "10064",
+        "FHCFPremium": premium,
+        "CoveragePct": cov_pct,
+    }]))
+    retention = float(terms["RetentionUSD"].iloc[0])
+    limit = float(terms["LimitUSD"].iloc[0])
+    total_gross = retention + 2.0 * limit
+    county_rows = pd.DataFrame([
+        {"Company": "Citizens Property Insurance Corporation", "County": "X", "GrossWindLossUSD": 0.5 * total_gross},
+        {"Company": "Citizens Property Insurance Corporation", "County": "Y", "GrossWindLossUSD": 0.5 * total_gross},
+    ])
+    out = _recover_via_production_wrapper(
+        county_rows, terms, company="Citizens Property Insurance Corporation", key="C6949", naic="10064"
+    )
+    p = cov_pct / 100.0
+    expected = _verified_recovery(total_gross, retention, limit, p)
+    assert float(out["RecoveryUSD"].sum()) == pytest.approx(expected, rel=1e-9)
+    assert expected == pytest.approx(limit, rel=1e-9)  # this fixture is deep past saturation
+
+
 def test_dead_cfg_helper_would_apply_coverage_factor_twice_if_ever_called():
     """Documents (does not exercise via any reachable call path) the
     inconsistency in the unreachable citizens_fhcf_terms_from_cfg_or_csv /
-    CITIZENS_FHCF_LIMIT_USD combination, for the record."""
-    naic = str(getattr(cfg, "CITIZENS_NAIC", "10064"))
+    CITIZENS_FHCF_LIMIT_USD combination, for the record. Left unpatched:
+    unrelated dead code, out of scope for this correction."""
     empty_terms_norm = pd.DataFrame(columns=["NAIC", "StatEntityKey", "CoveragePct_norm",
                                               "RetentionUSD", "LimitUSD"])
     empty_company_keys = pd.DataFrame(columns=["NAIC", "StatEntityKey"])

@@ -145,6 +145,33 @@ approximation is evaluable rather than merely asserted.
 
 ## C3. FHCF coverage election possibly applied twice (Section 4; AUTHOR CHECK S4-FHCF; Reviewer 2 Eq. 9)
 
+> **PATCHED, FHCF corrections and pilot task (base commit `e584cef`).**
+> Both defects described in the superseding box immediately below are now
+> fixed in `fl_risk_model/fhcf.py::apply_fhcf_recovery`, covered by 46
+> passing regression tests, and exercised in a local pilot on real
+> historical-scenario data (Great Miami, Andrew, Lake Okeechobee, Irma, and
+> three sequential scenarios; 2,800 iterations across 4 code variants).
+> Company-limit reconciliation from `fl_risk_model/data/24fin_fhcf.csv`
+> (138 participants, premiums summing to $1,435,205,092, implying aggregate
+> nominal company limits of $16,127,112,578 -- below the $17B statewide
+> cap) shows the statewide cap is now structurally incapable of binding
+> under the current premium snapshot; the pilot confirms this empirically
+> (`fhcf_shortfall_usd` = 0 in all 2,800 iterations, including scenarios
+> where the pre-patch code showed the cap binding up to 93% of the time).
+> Both defects mattered in *both* directions across the pilot scenarios --
+> wind-concentrated severe scenarios (Great Miami and its sequential
+> variants) were over-recovering before the fix (statewide cap masking a
+> per-company over-count); diffuse/flood-dominated scenarios (Lake
+> Okeechobee, Irma) were badly under-recovering (some companies' per-county
+> losses never individually exceeded Retention even though their company
+> total did). See `docs/earths_future_revision/fhcf_patch_and_pilot_report.md`
+> for the full patch description, test results, pilot comparison, and
+> rerun manifest. No production-scale (ERA5 baseline or GCM) rerun has been
+> executed; that remains the next step. The superseding box below (from the
+> prior verification-only pass) and the original C3 text under it are
+> preserved unmodified for the history of what was suspected, then
+> verified, then patched.
+
 > **SUPERSEDED, 2026-09 FHCF verification pass.** The inference-only
 > hypothesis below (removing the `* coverage_frac` term entirely) is **not**
 > what the primary contract supports and should not be implemented as
@@ -301,7 +328,7 @@ Un/underinsured wind 9.7B -> **6.8B** (was reported as an increase to
 (corrected, non-overlapping definition) 2.7B (submitted, legacy def.) ->
 **1.5B**.
 
-**Remaining work.** The 11-level x 5-GCM building-code sweep
+**Remaining work.** The 13-level x 5-GCM building-code sweep (corrected count, see item R3)
 (`results/mc_runs/emanuel_{gcm}_ssp245cal_buildingcode_w*f*_*/`) has the same
 bug and the same post-hoc reconstruction applies; SI Figure S3 and the
 climate-offset crossing calculation (Methods "Loss reductions needed to
@@ -314,6 +341,18 @@ to every sweep directory.
 
 ## R3. `w##f##` sweep labels are parameter encodings, not percentages (Section 9)
 
+> **PARTIALLY RESOLVED (FHCF corrections and pilot task).** Re-counted
+> directly from the repository inventory (`ls results/mc_runs | grep
+> buildingcode`, not from the manuscript's prose): the sweep is **13**
+> distinct `w##f##` settings x 5 GCMs = **65** directories, matching the
+> manuscript's stated 13 levels exactly, not "11-level" as this item and
+> `docs/earths_future_revision/report.md`/`data_inventory.md` previously
+> stated. The 13 settings observed are w00f00, w20f13, w30f20, w40f27,
+> w50f33, w60f40, w70f47, w80f53, w90f60, w100f67, w110f70, w120f80,
+> w130f90. This corrects the earlier count only; the exact formula mapping
+> each `w##f##` label to a (wind_reduction, flood_reduction) pair, and the
+> reconciliation with the stated 3:2 wind:flood ratio, remain open (below).
+
 **Evidence.** Archived directory names include `buildingcode_w120f80` and
 `buildingcode_w130f90`. A wind-loss-*reduction* of 120% or 130% is not
 physically valid (it would imply losses become negative). Inspection of
@@ -322,19 +361,21 @@ physically valid (it would imply losses become negative). Inspection of
 100 in a `w<remaining%>f<remaining%>` scheme relative to a different
 reference, not a direct reduction percentage; the "MAJOR" building-code
 scenario used elsewhere (30% wind / 25% flood reduction) corresponds to
-`w70f75`-equivalent remaining fractions, and the observed sweep covers 11
-distinct settings, not 13.
+`w70f75`-equivalent remaining fractions.
 
-**Status.** UNRESOLVED (author decision / follow-up needed). This pass
-confirmed the labels are parameter encodings (not invalid physical
-percentages) and located the generating script, but did not fully
-re-derive the exact formula mapping `w##f##` to (wind_reduction,
-flood_reduction) pairs, nor reconcile the observed 11 settings against the
-manuscript's stated 13 levels and 3:2 wind:flood ratio. Do not infer the
-mapping from the filenames alone (per the brief); the exact formula must be
-read from `run_climate_buildingcode_sensitivity_windfloods.py`'s scenario
-generation loop, which was inspected but not fully transcribed here due to
-time.
+**Status.** UNRESOLVED (author decision / follow-up needed) for the exact
+formula; RESOLVED for the count (13, confirmed above). This pass confirmed
+the labels are parameter encodings (not invalid physical percentages) and
+located the generating script, but did not fully re-derive the exact
+formula mapping `w##f##` to (wind_reduction, flood_reduction) pairs, nor
+reconcile the 3:2 wind:flood ratio against the specific w/f values listed
+above (e.g. w20f13 is not an exact 3:2 ratio of 20:13; the exact
+encoding -- linear remaining-fraction spacing with independent
+per-hazard rounding, or something else -- was not derived). Do not infer
+the mapping from the filenames alone (per the brief); the exact formula
+must be read from
+`run_climate_buildingcode_sensitivity_windfloods.py`'s scenario generation
+loop, which was inspected but not fully transcribed here due to time.
 
 **Remaining command.**
 ```

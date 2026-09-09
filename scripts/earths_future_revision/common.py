@@ -64,6 +64,13 @@ OUT_DIR = RESULTS_DIR / "earths_future_revision"
 
 RETURN_PERIODS = [10, 25, 50, 100, 250, 500, 1000]
 
+# Display name for the corrected, non-overlapping 3-component aggregate
+# (FIGA residual deficit + Citizens residual deficit + NFIP financing
+# requirement). Per the author's editorial decision, this is the name used
+# in tables/figures; the legacy 4-component (FHCF-inclusive) sum is kept
+# only for explicit reconciliation, never as the primary reported quantity.
+RESIDUAL_FINANCING_REQUIREMENT_LABEL = "Residual financing requirement"
+
 # Original (submitted) definition -- retained for reconciliation only.
 LEGACY_BURDEN_COMPONENTS = [
     "fhcf_shortfall_usd",

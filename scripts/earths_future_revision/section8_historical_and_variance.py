@@ -103,7 +103,7 @@ def historical_scenario_table(dirs: dict[str, str]) -> pd.DataFrame:
         for out_label, col in [
             ("Total loss", "total_damage_usd"),
             ("Total public burden (legacy 4-comp.)", "public_burden_legacy_usd"),
-            ("Total public burden (corrected, non-overlapping)", "public_burden_corrected_usd"),
+            ("Residual financing requirement (FIGA+Citizens+NFIP)", "public_burden_corrected_usd"),
             ("FHCF shortfall (diagnostic)", "fhcf_shortfall_usd"),
             ("FIGA residual", "figa_residual_deficit_usd"),
             ("Citizens deficit", "citizens_residual_deficit_usd"),

@@ -58,7 +58,7 @@ METRICS = {
     "figa_residual_deficit_usd": "FIGA residual deficit",
     "citizens_residual_deficit_usd": "Citizens residual deficit",
     "nfip_borrowed_usd": "NFIP Treasury borrowing",
-    "public_burden_corrected_usd": "Total public burden (corrected)",
+    "public_burden_corrected_usd": "Residual financing requirement",
     "defaults_post": "Insurer defaults (count)",
     "largest_entity_deficit_usd": "Largest entity deficit",
 }
