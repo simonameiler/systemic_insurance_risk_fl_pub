@@ -76,18 +76,32 @@ def _fhcf_terms(company: str, premium: float, coverage_pct: float) -> pd.DataFra
 
 
 def test_fhcf_shortfall_propagates_into_downstream_default_deficit():
-    """Case A: an insurer's FHCF-eligible loss is far enough past its own
-    Limit that recovery has saturated at the full Limit (verified formula,
-    Article IV(1); see docs/earths_future_revision/fhcf_contract_verification.md),
-    producing an FHCF shortfall borne by that insurer. That insurer's
-    remaining (post-recovery) loss then exceeds its own capital, producing a
-    default. The resulting FIGA-style deficit (net loss minus capital)
-    already contains the FHCF shortfall dollar-for-dollar, because capital
+    """Case A: an insurer's FHCF-eligible loss is far enough past ITS OWN
+    company Limit that recovery has saturated at that Limit (verified
+    formula, Article IV(1); see
+    docs/earths_future_revision/fhcf_contract_verification.md), leaving an
+    uncovered amount borne by that insurer. That insurer's remaining
+    (post-recovery) loss then exceeds its own capital, producing a default.
+    The resulting FIGA-style deficit (net loss minus capital) already
+    contains that uncovered amount dollar-for-dollar, because capital
     depletion in fl_risk_model.runner.run_one_scenario is applied to
     NetWindUSD = Gross - Recovery (see runner.py step 8-9), i.e. after FHCF
-    recovery. Adding the statewide FHCF shortfall AND this deficit therefore
-    double-counts the overlapping dollars. This fixture uses a single-row
-    (single-company) loss_df, so it is unaffected by the separate
+    recovery.
+
+    Terminology note (independent review, item 7): "uncovered amount above
+    this one company's own Limit" here is a different diagnostic from the
+    production `fhcf_shortfall_usd` column, which specifically measures
+    recovery removed by the industry-wide STATEWIDE $17B proportional cap
+    across all companies (fl_risk_model.runner._apply_industry_season_cap,
+    not exercised by this single-company fixture at all -- see
+    test_fhcf_contract_verification.py's
+    test_statewide_cap_integration_below_at_and_above_capacity_with_real_recoveries
+    for that separate, passing integration test). The two diagnostics can
+    both be nonzero, both zero, or only one nonzero in the same season; this
+    fixture's arithmetic is valid for its own point (an individual company's
+    own-Limit shortfall overlaps with its own downstream deficit) and is not
+    a claim about the statewide diagnostic. This fixture uses a single-row
+    (single-company) loss_df, so it is also unaffected by the separate
     company-aggregation defect/fix (see test_fhcf_contract_verification.py).
     """
     company = "TestCo"
@@ -135,7 +149,9 @@ def test_fhcf_shortfall_propagates_into_downstream_default_deficit():
     # unrecovered-above-limit loss.
     assert deficit == pytest.approx(extra_shortfall, rel=1e-9)
 
-    # Legacy aggregate double-counts: (statewide FHCF shortfall) + (FIGA
+    # Legacy aggregate double-counts: (this company's own-Limit shortfall,
+    # the same dollars that would be aggregated statewide into
+    # fhcf_shortfall_usd if this were the only contributing company) + (FIGA
     # deficit that already contains that shortfall).
     legacy_aggregate = extra_shortfall + deficit
     corrected_aggregate = deficit  # FIGA deficit alone already reflects it
@@ -165,9 +181,10 @@ def test_fhcf_shortfall_absorbed_by_capital_is_not_double_counted_when_dropped()
     ending_capital = starting_capital - net_loss
     assert ending_capital > 0.0  # solvent: no default, no FIGA deficit
 
-    # This insurer contributes 0 to FIGA. The statewide FHCF shortfall from
-    # this company is a private capital loss only -- it must not be added to
-    # the public/quasi-public burden aggregate.
+    # This insurer contributes 0 to FIGA. This company's own-Limit FHCF
+    # shortfall (the amount it would contribute to the statewide
+    # fhcf_shortfall_usd total) is a private capital loss only here -- it
+    # must not be added to the public/quasi-public burden aggregate.
     figa_contribution = 0.0
     assert figa_contribution == 0.0
 

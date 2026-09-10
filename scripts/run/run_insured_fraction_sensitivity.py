@@ -71,6 +71,12 @@ def _load_year_sets(path=None):
 
 
 def _run_year(year_id, event_stems, rng, common_inputs, group_threshold=10.0):
+    """Run one stochastic year. On failure, returns an explicit error-marker
+    row (scenario='error') rather than None, so a per-year exception cannot
+    silently shrink the output row count while the job still exits 0 (see
+    scripts/cluster/earths_future.sh 'check'/'pilot-report', which reject a
+    run whose iterations.csv row count does not match its expected season
+    count, or that contains any scenario=='error' row)."""
     try:
         rec = run_one_iteration(
             scenario_name=f"year_{year_id}",
@@ -86,7 +92,7 @@ def _run_year(year_id, event_stems, rng, common_inputs, group_threshold=10.0):
         return rec
     except Exception as e:
         print(f"  [ERROR] year {year_id}: {e}")
-        return None
+        return {"year_id": year_id, "scenario": "error", "error": str(e)}
 
 
 # ---------------------------------------------------------------------------
@@ -118,6 +124,7 @@ def run_sweep(fractions: list[float],
         }, f, indent=2)
 
     common_inputs = _prepare_common_inputs()
+    failed_fractions: dict[float, int] = {}
 
     for frac in fractions:
         print(f"\n{'='*60}")
@@ -133,6 +140,7 @@ def run_sweep(fractions: list[float],
         for year_id in range(1, total_years + 1):
             ydf = year_sets[year_sets["year_id"] == year_id]
             if ydf["event_id"].isna().all():
+                # Zero-event season: recorded explicitly, not dropped.
                 rows.append({
                     "year_id": year_id,
                     "insured_frac": frac,
@@ -143,9 +151,12 @@ def run_sweep(fractions: list[float],
 
             event_stems = ydf["event_id"].dropna().tolist()
             rec = _run_year(year_id, event_stems, rng, common_inputs)
-            if rec is not None:
-                rec["insured_frac"] = frac
-                rows.append(rec)
+            # _run_year always returns a row now (an explicit error marker on
+            # failure, never None), so every year_id in [1, total_years] is
+            # guaranteed exactly one row in rows -- the realized count below
+            # can only fall short of total_years if this invariant is broken.
+            rec["insured_frac"] = frac
+            rows.append(rec)
 
             if year_id % 1000 == 0:
                 print(f"  [{frac:.2f}] {year_id:,}/{total_years:,}")
@@ -153,13 +164,32 @@ def run_sweep(fractions: list[float],
         df_frac = pd.DataFrame(rows)
         frac_csv = run_dir / f"iterations_frac_{frac:.2f}.csv"
         df_frac.to_csv(frac_csv, index=False)
-        print(f"  Saved -> {frac_csv}  ({len(df_frac)} rows)")
+
+        n_error = int((df_frac.get("scenario") == "error").sum()) if "scenario" in df_frac.columns else 0
+        if len(df_frac) != total_years or n_error > 0:
+            failed_fractions[frac] = n_error
+            print(f"  [ERROR] frac={frac:.2f}: expected {total_years} rows, got "
+                  f"{len(df_frac)} ({n_error} error rows) -> {frac_csv}")
+        else:
+            print(f"  Saved -> {frac_csv}  ({len(df_frac)} rows, 0 errors)")
 
     # Reset
     cfg.FIXED_INSURED_FRAC = None
     _mce._USE_STOCHASTIC_EVENTS = False
 
     print(f"\n  All results -> {run_dir}")
+
+    if failed_fractions:
+        # Results are still saved above (partial success is preserved for
+        # inspection), but the job must NOT exit 0: a silently truncated or
+        # error-containing CSV must never be reported as a completed run.
+        print(f"\n  [FAILED] {len(failed_fractions)} fraction(s) had missing or "
+              f"errored seasons: {failed_fractions}")
+        raise RuntimeError(
+            f"insured-fraction sweep incomplete for fractions {list(failed_fractions)}; "
+            f"see {run_dir} for partial output and per-year error detail"
+        )
+
     return run_dir
 
 
@@ -316,6 +346,10 @@ def main():
     parser.add_argument("--seed", type=int, default=RNG_SEED)
     parser.add_argument("--results_dir", type=str, default=None,
                         help="Path to results dir (for --mode analyze)")
+    parser.add_argument("--out_dir", type=str, default="results/mc_runs",
+                        help="Output directory root (default: results/mc_runs). "
+                             "Does not change the fraction sweep or sampling rules, "
+                             "only where the run directory is created.")
 
     args = parser.parse_args()
 
@@ -328,6 +362,7 @@ def main():
             fractions=args.fractions,
             seed=args.seed,
             n_years=args.n_years,
+            out_dir=Path(args.out_dir),
         )
         print(f"\n  To analyze:\n    python {__file__} --mode analyze --results_dir {run_dir}")
 

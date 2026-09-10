@@ -36,6 +36,7 @@ and the Table S7 variance-decomposition audit.
 from __future__ import annotations
 
 import argparse
+import json
 from pathlib import Path
 
 import numpy as np
@@ -85,10 +86,25 @@ def season_count_categories(baseline_path: Path) -> dict:
     }
 
 
+def _resolve_iterations_path(dirname_or_path: str) -> Path:
+    """Accepts either a bare directory name under MC_ROOT (the March-archive
+    convention) or an absolute/relative path to a run directory (or its
+    iterations.csv directly) -- the latter is what a --scenario-map JSON
+    pointing at fresh, post-FHCF-patch output directories will supply
+    (independent review, item 4: "historical and policy postprocessors
+    retain March archive names")."""
+    p = Path(dirname_or_path)
+    if p.is_absolute() or p.exists():
+        candidate = p if p.name == "iterations.csv" else p / "iterations.csv"
+        if candidate.exists():
+            return candidate
+    return MC_ROOT / dirname_or_path / "iterations.csv"
+
+
 def historical_scenario_table(dirs: dict[str, str]) -> pd.DataFrame:
     rows = []
     for label, dirname in dirs.items():
-        path = MC_ROOT / dirname / "iterations.csv"
+        path = _resolve_iterations_path(dirname)
         if not path.exists():
             print(f"  [skip] {label}: {path} not found")
             continue
@@ -129,8 +145,16 @@ def main():
     ap.add_argument("--baseline", type=Path,
                      default=MC_ROOT / "emanuel_era5_baseline_20260326_141913" / "iterations.csv")
     ap.add_argument("--out-dir", type=Path, default=OUT_DIR / "historical")
+    ap.add_argument("--scenario-map", type=Path, default=None,
+                     help="JSON {label: run_dir_or_dirname} to reprocess instead of the "
+                          "hardcoded March-archive HISTORICAL_DIRS.")
     args = ap.parse_args()
     args.out_dir.mkdir(parents=True, exist_ok=True)
+
+    scenario_map = HISTORICAL_DIRS
+    if args.scenario_map is not None:
+        with open(args.scenario_map) as f:
+            scenario_map = json.load(f)
 
     print("=== Season-count category verification (register item R2) ===")
     cats = season_count_categories(args.baseline)
@@ -138,7 +162,7 @@ def main():
         print(f"  {k}: {v}")
 
     print("\n=== Historical scenario table (SI Table S3), corrected ===")
-    hist = historical_scenario_table(HISTORICAL_DIRS)
+    hist = historical_scenario_table(scenario_map)
     hist.to_csv(args.out_dir / "table_S3_corrected.csv", index=False)
     print(hist.to_string(index=False))
 

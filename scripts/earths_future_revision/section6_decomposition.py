@@ -105,8 +105,18 @@ def assign_bins(df: pd.DataFrame, min_count: int) -> pd.Series:
     codes[df["total_damage_usd"] <= 0.0] = -1  # -1 reserved for "Zero loss"
 
     # Merge sparse bins into the next-lower-severity bin, repeating until no
-    # non-zero-loss bin (other than the lowest, index 0) is below min_count
-    # -- this correctly handles a merge cascade, not just one sparse bin.
+    # non-zero-loss bin (other than the lowest OCCUPIED positive-loss bin) is
+    # below min_count -- this correctly handles a merge cascade, not just one
+    # sparse bin. The lowest occupied bin is protected from merge-seeking
+    # (there is nothing lower to merge it into within the positive-loss
+    # range), but "lowest occupied" is evaluated against `present` (the bins
+    # that actually have at least one season), not against the fixed bin
+    # code 0: if code 0 itself has zero seasons in a given dataset, it is
+    # simply absent from `present`, and code 0 must not be assumed to still
+    # be there as a merge target for a higher, sparse bin (independent
+    # review, item 6; the archived ERA5 baseline does not trigger this case
+    # because its lowest bin is always populated, but a future or
+    # differently-severity-distributed run could).
     lo_edges = list(BIN_EDGES_USD[:-1])
     hi_edges = list(BIN_EDGES_USD[1:])
     changed = True
@@ -114,8 +124,11 @@ def assign_bins(df: pd.DataFrame, min_count: int) -> pd.Series:
         changed = False
         counts = codes.value_counts()
         present = sorted(c for c in codes.dropna().unique() if c >= 0)
+        if not present:
+            break
+        lowest_occupied = present[0]
         for c in present:
-            if c == 0:
+            if c == lowest_occupied:
                 continue
             if counts.get(c, 0) < min_count:
                 prev = max(x for x in present if x < c)

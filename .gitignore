@@ -120,6 +120,13 @@ results/tables/
 results/debug/
 results/mc_runs/*/debug/
 
+# scripts/cluster/earths_future.sh fresh output roots (Sherlock FHCF-patch
+# campaign): raw driver outputs and cluster manifests/reports/postprocessed
+# tables. Never mix these with the results/mc_runs/ March archives above or
+# the results/earths_future_revision/ local-pilot outputs tracked elsewhere.
+results/mc_runs_fhcf_patched/
+results/earths_future_revision/fhcf_cluster/
+
 # Private calibration/validation scripts (use proprietary FLOIR data)
 scripts/hazard/evaluate_losses.py
 

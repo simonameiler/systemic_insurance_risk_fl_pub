@@ -64,18 +64,24 @@ def run_climate_buildingcode_sensitivity(
     event_set: str = None,
     impact_dir: str = None,
     climate_scenario: str = "era5",
-    seed: int = 42
+    seed: int = 42,
+    out_dir: str = None,
 ):
     """
     Run Monte Carlo simulation with climate change + building codes.
-    
+
     Parameters
     ----------
     code_level_idx : int
         Index into BUILDING_CODE_LEVELS (0-12)
     event_set : str, optional
-        GCM event set name (e.g., 'FL_canesm_ssp245cal'). If provided, uses 
+        GCM event set name (e.g., 'FL_canesm_ssp245cal'). If provided, uses
         direct GCM impacts instead of climate scaling.
+    out_dir : str, optional
+        Output directory root passed straight through to
+        run_stochastic_tc_monte_carlo (default: its own default, "results/mc_runs").
+        Does not change the 13 existing (wind, flood) parameter combinations
+        in BUILDING_CODE_LEVELS or any other experiment setting.
     impact_dir : str, optional
         Path to impact directory for GCM event set. Required if event_set is provided.
     climate_scenario : str, optional
@@ -87,7 +93,9 @@ def run_climate_buildingcode_sensitivity(
     
     if not (0 <= code_level_idx < len(BUILDING_CODE_LEVELS)):
         raise ValueError(f"code_level_idx must be 0-{len(BUILDING_CODE_LEVELS)-1}")
-    
+
+    actual_dir = None
+
     # Get building code parameters
     code_level = BUILDING_CODE_LEVELS[code_level_idx]
     wind_reduction = code_level["wind"]
@@ -145,15 +153,22 @@ def run_climate_buildingcode_sensitivity(
         print(f"Random Seed: {seed}")
         print("="*80)
         
+        run_kwargs = dict(
+            year_sets_csv=year_sets_csv,
+            n_years=10000,
+            policy_scenario_config=policy_scenario_config,
+            run_label=run_label,
+            seed=seed,
+        )
+        if out_dir is not None:
+            run_kwargs["out_dir"] = Path(out_dir)
         try:
-            # Run Monte Carlo with GCM event set
-            run_stochastic_tc_monte_carlo(
-                year_sets_csv=year_sets_csv,
-                n_years=10000,
-                policy_scenario_config=policy_scenario_config,
-                run_label=run_label,
-                seed=seed
-            )
+            # Run Monte Carlo with GCM event set. The function returns the
+            # actual output directory it created; use that directly instead
+            # of re-deriving it from a glob (which silently picks the wrong
+            # directory if an older run with the same run_label prefix
+            # already exists at the target out_dir).
+            actual_dir = run_stochastic_tc_monte_carlo(**run_kwargs)
         finally:
             # Restore original config
             cfg.SYNTHETIC_EVENT_DIR = original_event_dir
@@ -188,20 +203,22 @@ def run_climate_buildingcode_sensitivity(
         print("="*80)
         
         # Run Monte Carlo with climate scaling
-        run_stochastic_tc_monte_carlo(
+        run_kwargs = dict(
             n_years=10000,
             policy_scenario_config=policy_scenario_config,
             run_label=run_label,
-            seed=seed
+            seed=seed,
         )
-        
+        if out_dir is not None:
+            run_kwargs["out_dir"] = Path(out_dir)
+        actual_dir = run_stochastic_tc_monte_carlo(**run_kwargs)
+
         climate_info = {"scenario": climate_scenario, "ssp": climate_ssp, "period": climate_period}
-    
-    # Save metadata for analysis
-    import glob
-    matching_dirs = sorted(glob.glob(f"results/mc_runs/{run_label}_*"))
-    if matching_dirs:
-        actual_dir = Path(matching_dirs[-1])
+
+    # Save metadata for analysis, using the directory the simulation itself
+    # returned (not a glob re-derived from run_label, which can match a
+    # stale/unrelated prior run sharing the same label prefix).
+    if actual_dir is not None:
         metadata = {
             "wind_loss_reduction_pct": int(wind_reduction * 100),
             "flood_loss_reduction_pct": int(flood_reduction * 100),
@@ -229,8 +246,14 @@ if __name__ == "__main__":
         type=int,
         required=True,
         choices=range(len(BUILDING_CODE_LEVELS)),
-        help="Building code level index (0-5). "
-             "L0: 0%/0%, L1: 20%/13%, L2: 30%/20%, L3: 40%/27%, L4: 50%/33%, L5: 60%/40%"
+        # Pre-existing bug fixed here: literal '%' characters in an argparse
+        # help string are interpreted as % old-style format specifiers by
+        # HelpFormatter and crash --help; escaped as '%%' below. This is a
+        # display-only fix (the 13 BUILDING_CODE_LEVELS entries themselves,
+        # and the actual index range 0-12, are unchanged).
+        help="Building code level index (0-12). "
+             "L0: 0%%/0%%, L1: 20%%/13%%, L2: 30%%/20%%, L3: 40%%/27%%, "
+             "L4: 50%%/33%%, L5: 60%%/40%%, ..., L12: 100%%/90%%"
     )
     parser.add_argument(
         "--event_set",
@@ -257,17 +280,26 @@ if __name__ == "__main__":
         default=42,
         help="Random seed (default: 42)"
     )
-    
+    parser.add_argument(
+        "--out_dir",
+        type=str,
+        default=None,
+        help="Output directory root passed to run_stochastic_tc_monte_carlo "
+             "(default: its own default, results/mc_runs). Does not change "
+             "any of the 13 existing (wind, flood) parameter combinations."
+    )
+
     args = parser.parse_args()
-    
+
     # Validate event_set and impact_dir combination
     if args.event_set and not args.impact_dir:
         parser.error("--impact_dir is required when --event_set is provided")
-    
+
     run_climate_buildingcode_sensitivity(
         code_level_idx=args.code_level,
         event_set=args.event_set,
         impact_dir=args.impact_dir,
         climate_scenario=args.climate,
-        seed=args.seed
+        seed=args.seed,
+        out_dir=args.out_dir,
     )

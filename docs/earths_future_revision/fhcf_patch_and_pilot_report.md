@@ -165,9 +165,16 @@ sum above $16.127B). Consequently, **`fhcf_shortfall_usd` and
 `fhcf_cap_binding` are structurally zero after the aggregation fix**, for
 any input that draws its terms from this file. This was demonstrated, not
 merely asserted: the local pilot (Section 5) shows exactly 0.00 for both
-diagnostics across all 2,800 pilot iterations (7 scenarios x 4 code
-variants x 100 iterations), including scenarios where the pre-patch code
-showed the cap binding in up to 93% of iterations (Double Great Miami).
+diagnostics across the **1,400 iterations run under the two
+aggregation-correcting variants** (`aggregation_fix_only` and `both_fixed`;
+7 scenarios x 2 variants x 100 iterations). The two deliberately buggy
+variants that still apply the company-level cap independently to every
+county row (`old_both_bugs`, `formula_fix_only`; the other 1,400
+iterations) still show the statewide cap binding, up to 93% of iterations
+for Double Great Miami under `formula_fix_only`. *[Corrected per the
+independent review, item 1: an earlier version of this paragraph
+incorrectly stated the zero-shortfall result held across all 2,800
+iterations, including the intentionally buggy variants.]*
 
 This does **not** mean company-level FHCF capacity is unlimited, and it
 does not mean FHCF recoveries stop affecting downstream finances -- company
@@ -243,6 +250,18 @@ identical, confirming the flood/NFIP side is untouched by this patch.
 Outputs, the full comparison table, and a manifest with a git revision tag
 and SHA-256 (16-hex-char) checksums of every hazard and premium/surplus
 input are saved under `results/earths_future_revision/fhcf_pilot/`.
+**Known gaps in that manifest** (independent review, item 3): its
+`code_revision_git_describe` recorded `e584cef-dirty` (the working tree at
+the time, not a clean committed revision), and its input-hash list omits
+several other active inputs the run also depends on (Citizens' own capital/
+exposure tables, NFIP county and claims tables, and the catastrophe-bond
+table). The paired old-vs-corrected comparison itself is unaffected by this
+gap -- both sides of every comparison read the exact same files on the exact
+same disk at the exact same moment -- but the manifest alone does not fully
+pin or uniquely identify that state for someone reproducing it later. The
+cluster manifest introduced in this task's `scripts/cluster/earths_future.sh`
+(see the companion runbook) records a clean, committed revision and hashes
+every active financial input, not just hazard and premium/surplus files.
 
 **Results** (means across 100 iterations; USD unless noted; "RFR" =
 residual financing requirement = FIGA residual + Citizens residual + NFIP
@@ -283,8 +302,18 @@ scenario's losses are distributed across counties and companies:**
   rows. Only once the aggregation fix is also applied does each company's
   demand correctly cap at its own Limit, precap demand drops below the
   $17B aggregate ceiling, and the shortfall (and cap-binding rate) collapse
-  to exactly zero. FIGA/Citizens residual deficits and defaults fall
-  correspondingly once true FHCF recovery is available to companies.
+  to exactly zero. This does not translate into a uniform fall in
+  FIGA/Citizens residual deficits and defaults across these three
+  scenarios: for the single-event **Great Miami** scenario, RFR and
+  defaults both fall (23.93B -> 22.67B; 18.16 -> 17.60). For the two
+  **compound** scenarios, RFR rises slightly instead (Great Miami then
+  Andrew: 45.30B -> 45.78B, +1.0%; Double Great Miami: 57.48B -> 58.16B,
+  +1.2%), and average defaults rise slightly for Great Miami then Andrew
+  specifically (21.35 -> 21.45; Double Great Miami's defaults are
+  essentially flat, 22.15 -> 22.12). *[Corrected per the independent
+  review, item 2: an earlier version of this paragraph stated deficits and
+  defaults fall across all three scenarios in this group; the numeric
+  table above was always correct, only this prose summary was wrong.]*
 - **Lake Okeechobee, Irma, Double Irma** (flood-dominated / diffuse wind,
   lower severity per company): the OPPOSITE failure mode dominates.
   Pre-patch, most companies' *individual county* losses never exceeded
