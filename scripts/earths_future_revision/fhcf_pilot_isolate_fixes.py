@@ -207,8 +207,8 @@ def main():
     args.out_root.mkdir(parents=True, exist_ok=True)
     manifest = {
         "code_revision_git_describe": subprocess.run(
-            ["git", "-C", str(REPO_ROOT), "describe", "--always", "--dirty"],
-            capture_output=True, text=True
+            ["git", "describe", "--always", "--dirty"], cwd=REPO_ROOT,
+            capture_output=True, text=True, check=True
         ).stdout.strip(),
         "seed": args.seed,
         "n_iter": args.n_iter,

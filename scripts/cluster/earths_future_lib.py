@@ -28,6 +28,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import shlex
 import subprocess
@@ -166,8 +167,9 @@ def build_job_list(out_root: Path, impact_root: Path) -> list[dict]:
 # Small utilities
 # --------------------------------------------------------------------------- #
 
-def _run(cmd: list[str]) -> str:
-    return subprocess.run(cmd, capture_output=True, text=True).stdout.strip()
+def _run(cmd: list[str], *, cwd=None) -> str:
+    return subprocess.run(cmd, cwd=cwd, capture_output=True, text=True,
+                          check=True).stdout.strip()
 
 
 def file_sha256(path: Path) -> str:
@@ -179,22 +181,28 @@ def file_sha256(path: Path) -> str:
 
 
 def git_revision(require_ancestor_of_patch: bool = True) -> dict:
-    commit = _run(["git", "-C", str(REPO_ROOT), "rev-parse", "HEAD"])
-    describe = _run(["git", "-C", str(REPO_ROOT), "describe", "--always", "--dirty"])
-    branch = _run(["git", "-C", str(REPO_ROOT), "rev-parse", "--abbrev-ref", "HEAD"])
+    # Sherlock's system Git predates -C. Run Git in the checkout instead.
+    commit = _run(["git", "rev-parse", "HEAD"], cwd=REPO_ROOT)
+    describe = _run(["git", "describe", "--always", "--dirty"], cwd=REPO_ROOT)
+    branch = _run(["git", "rev-parse", "--abbrev-ref", "HEAD"], cwd=REPO_ROOT)
     # Distinguish source changes from ignored/untracked output files: only
     # tracked paths under fl_risk_model/ and scripts/ count as "dirty" for
     # the purposes of pinning a code revision. Untracked results/ output is
     # expected and irrelevant to which CODE ran.
-    source_status = _run(["git", "-C", str(REPO_ROOT), "status", "--porcelain",
-                           "--", "fl_risk_model", "scripts", "pyproject.toml"])
+    source_status = _run(["git", "status", "--porcelain", "--untracked-files=no",
+                         "--", "fl_risk_model", "scripts", "pyproject.toml"],
+                        cwd=REPO_ROOT)
     contains_patch = None
     if require_ancestor_of_patch:
         proc = subprocess.run(
-            ["git", "-C", str(REPO_ROOT), "merge-base", "--is-ancestor",
-             REVIEWED_PATCH_COMMIT, "HEAD"],
+            ["git", "merge-base", REVIEWED_PATCH_COMMIT, "HEAD"],
+            cwd=REPO_ROOT, capture_output=True, text=True,
         )
-        contains_patch = (proc.returncode == 0)
+        if proc.returncode not in (0, 1):
+            raise subprocess.CalledProcessError(proc.returncode, proc.args,
+                                                output=proc.stdout, stderr=proc.stderr)
+        contains_patch = (proc.returncode == 0 and
+                          proc.stdout.strip() == REVIEWED_PATCH_COMMIT)
     return {
         "commit": commit,
         "describe": describe,
@@ -225,22 +233,28 @@ def cmd_preflight(args) -> int:
     report: dict = {"timestamp": time.strftime("%Y-%m-%dT%H:%M:%S"), "problems": [], "ok": []}
 
     # 1. Code revision.
-    rev = git_revision(require_ancestor_of_patch=True)
-    report["code_revision"] = rev
-    if rev["contains_reviewed_fhcf_patch"] is False:
-        report["problems"].append(
-            f"current HEAD ({rev['commit']}) does not contain the reviewed FHCF patch "
-            f"{REVIEWED_PATCH_COMMIT}"
-        )
+    try:
+        rev = git_revision(require_ancestor_of_patch=True)
+    except (OSError, subprocess.CalledProcessError) as exc:
+        detail = (getattr(exc, "stderr", "") or str(exc)).strip()
+        report["code_revision"] = {"error": detail}
+        report["problems"].append(f"could not verify code revision: {detail}")
     else:
-        report["ok"].append("branch contains the reviewed FHCF patch")
-    if rev["is_dirty_tracked_source"]:
-        report["problems"].append(
-            "tracked source files (fl_risk_model/, scripts/) have uncommitted changes: "
-            f"{rev['dirty_tracked_source_paths']}"
-        )
-    else:
-        report["ok"].append("no uncommitted changes to tracked source files")
+        report["code_revision"] = rev
+        if rev["contains_reviewed_fhcf_patch"] is False:
+            report["problems"].append(
+                f"current HEAD ({rev['commit']}) does not contain the reviewed FHCF patch "
+                f"{REVIEWED_PATCH_COMMIT}"
+            )
+        else:
+            report["ok"].append("branch contains the reviewed FHCF patch")
+        if rev["is_dirty_tracked_source"]:
+            report["problems"].append(
+                "tracked source files (fl_risk_model/, scripts/) have uncommitted changes: "
+                f"{rev['dirty_tracked_source_paths']}"
+            )
+        else:
+            report["ok"].append("no uncommitted changes to tracked source files")
 
     # 2. Environment.
     try:
@@ -257,14 +271,17 @@ def cmd_preflight(args) -> int:
     except Exception as e:
         report["problems"].append(f"could not import fl_risk_model.mc_run_events: {e}")
 
-    conda_env = _run(["bash", "-lc", "echo ${CONDA_DEFAULT_ENV:-}"])
+    # A login shell can auto-activate base and report a different environment.
+    conda_env = os.environ.get("CONDA_DEFAULT_ENV", "")
     report["conda_env"] = conda_env or None
+    report["conda_prefix"] = os.environ.get("CONDA_PREFIX")
+    report["python_executable"] = sys.executable
     if conda_env == "climada_env":
         report["ok"].append("climada_env is the active conda environment")
     else:
         report["problems"].append(
             f"climada_env is not the active conda environment (got: {conda_env!r}); "
-            "this is a warning on a login/dev node, a hard requirement inside a Slurm job"
+            "activate climada_env before rerunning the check"
         )
 
     # 3. Required event-set impact caches (26).
@@ -329,9 +346,14 @@ def cmd_preflight(args) -> int:
             [sys.executable, "-m", "pytest", "fl_risk_model/tests/earths_future", "-q"],
             cwd=str(REPO_ROOT), capture_output=True, text=True,
         )
+        diagnostic_lines = (proc.stdout.strip() or proc.stderr.strip()).splitlines()
         report["tests"] = {
             "returncode": proc.returncode,
-            "summary": proc.stdout.strip().splitlines()[-1] if proc.stdout.strip() else "",
+            "python_executable": sys.executable,
+            "stdout": proc.stdout,
+            "stderr": proc.stderr,
+            "summary": diagnostic_lines[-1] if diagnostic_lines else
+                       f"pytest exited with status {proc.returncode} without output",
         }
         if proc.returncode != 0:
             report["problems"].append(f"pytest failed: {report['tests']['summary']}")

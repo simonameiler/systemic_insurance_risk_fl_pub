@@ -92,8 +92,8 @@ conda_activate_snippet() {
   cat <<'EOF'
 CONDA_BASE="$(conda info --base 2>/dev/null || true)"
 if [[ -n "${CONDA_BASE}" && -f "${CONDA_BASE}/etc/profile.d/conda.sh" ]]; then
-  source "${CONDA_BASE}/etc/profile.d/conda.sh"
-  conda activate climada_env
+  source "${CONDA_BASE}/etc/profile.d/conda.sh" || exit 1
+  conda activate climada_env || exit 1
 else
   echo "[ef] ERROR: could not find conda / climada_env" >&2
   exit 1
@@ -147,7 +147,10 @@ cmd_pilot() {
     echo "#SBATCH --partition=${PARTITION}"
     echo "set -u"
     echo 'echo "[ef] pilot job=${SLURM_JOB_ID} node=${SLURM_NODELIST} start=$(date)"'
-    echo "echo \"[ef] code_revision_at_execution commit=\$(git -C '${PROJECT_DIR}' rev-parse HEAD) describe=\$(git -C '${PROJECT_DIR}' describe --always --dirty)\""
+    echo "cd '${PROJECT_DIR}' || exit 1"
+    echo 'EF_JOB_COMMIT=$(git rev-parse HEAD) || exit 1'
+    echo 'EF_JOB_DESCRIBE=$(git describe --always --dirty) || exit 1'
+    echo 'echo "[ef] code_revision_at_execution commit=${EF_JOB_COMMIT} describe=${EF_JOB_DESCRIBE}"'
     conda_activate_snippet
     echo "cd '${PROJECT_DIR}'"
     echo "python scripts/earths_future_revision/fhcf_pilot_era5.py \\"
@@ -298,7 +301,10 @@ cmd_production() {
     echo 'OUT_DIR=$(printf "%s" "${LINE}" | cut -f3)'
     echo 'CMD=$(printf "%s" "${LINE}" | cut -f4-)'
     echo 'echo "[ef] task=${SLURM_ARRAY_TASK_ID} name=${NAME} job=${SLURM_JOB_ID} node=${SLURM_NODELIST} start=$(date)"'
-    echo "echo \"[ef] code_revision_at_execution commit=\$(git -C '${PROJECT_DIR}' rev-parse HEAD) describe=\$(git -C '${PROJECT_DIR}' describe --always --dirty)\""
+    echo "cd '${PROJECT_DIR}' || exit 1"
+    echo 'EF_JOB_COMMIT=$(git rev-parse HEAD) || exit 1'
+    echo 'EF_JOB_DESCRIBE=$(git describe --always --dirty) || exit 1'
+    echo 'echo "[ef] code_revision_at_execution commit=${EF_JOB_COMMIT} describe=${EF_JOB_DESCRIBE}"'
     conda_activate_snippet
     echo "cd '${PROJECT_DIR}'"
     echo 'mkdir -p "${OUT_DIR}"'

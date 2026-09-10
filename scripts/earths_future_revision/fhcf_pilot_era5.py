@@ -98,12 +98,12 @@ def _require_inputs(impact_dir: Path, year_sets_file: str) -> tuple[Path, Path]:
 
 def _git_revision() -> dict:
     def _run(args):
-        return subprocess.run(["git", "-C", str(REPO_ROOT)] + args,
-                               capture_output=True, text=True).stdout.strip()
+        return subprocess.run(["git"] + args, cwd=REPO_ROOT,
+                               capture_output=True, text=True, check=True).stdout.strip()
     return {
         "commit": _run(["rev-parse", "HEAD"]),
         "describe": _run(["describe", "--always", "--dirty"]),
-        "is_dirty_tracked_source": bool(_run(["status", "--porcelain",
+        "is_dirty_tracked_source": bool(_run(["status", "--porcelain", "--untracked-files=no",
                                                "--", "fl_risk_model", "scripts"])),
     }
 
