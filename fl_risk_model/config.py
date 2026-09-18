@@ -170,7 +170,7 @@ NFIP_PREMIUM_BASE_CSV = DATA_DIR / "nfip_FL_coverage_premium_by_year.csv"   # or
 NFIP_PREMIUM_BASE_YEAR = FIXED_YEAR
 
 # Cat bonds
-CATBONDS_CSV = DATA_DIR / "catbonds_2024.csv"
+CATBONDS_CSV = DATA_DIR / "catbonds_2024_reviewed.csv"
 CATBOND_DEFAULT_ATTACH_MULT = 1.0
 CATBOND_DEFAULT_EXH_MULT   = 2.0
 

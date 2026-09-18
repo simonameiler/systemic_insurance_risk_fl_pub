@@ -42,6 +42,7 @@
 #   scripts/cluster/earths_future.sh postprocess [--manifest PATH]
 #
 # Environment overrides (all optional; `check` validates, does not assume):
+#   EF_CAMPAIGN      fhcf (default) or catbond; prefer catbond_revision.sh.
 #   EF_PROJECT_DIR   Sherlock checkout root. Default: derived from this
 #                    script's own location (../.. from scripts/cluster/).
 #   EF_IMPACT_ROOT   Impact-cache root. Default:
@@ -61,10 +62,15 @@ PARTITION="${EF_PARTITION:-serc}"
 CONCURRENCY="${EF_CONCURRENCY:-20}"
 PY="${EF_PYTHON:-python3}"
 LIB="${SCRIPT_DIR}/earths_future_lib.py"
+CAMPAIGN="${EF_CAMPAIGN:-fhcf}"
+case "${CAMPAIGN}" in
+  fhcf|catbond) ;;
+  *) echo "[ef] Unknown campaign: ${CAMPAIGN}" >&2; exit 1 ;;
+esac
 
 LOG_DIR="${PROJECT_DIR}/logs"
-CLUSTER_OUT="${PROJECT_DIR}/results/earths_future_revision/fhcf_cluster"
-MC_OUT_ROOT="${PROJECT_DIR}/results/mc_runs_fhcf_patched"
+CLUSTER_OUT="${PROJECT_DIR}/results/earths_future_revision/${CAMPAIGN}_cluster"
+MC_OUT_ROOT="${PROJECT_DIR}/results/mc_runs_${CAMPAIGN}_patched"
 MANIFEST_DIR="${CLUSTER_OUT}/manifests"
 REPORT_DIR="${CLUSTER_OUT}/reports"
 PILOT_LATEST="${MANIFEST_DIR}/pilot_manifest_latest.json"
@@ -131,7 +137,7 @@ cmd_pilot() {
   mkdir -p "${out_root}"
 
   local impact_dir="${IMPACT_ROOT}/FL_era5_reanalcal"
-  echo "[ef] pilot: paired ERA5 comparison (old_both_bugs vs both_fixed), first 200 year IDs, seed 42"
+  echo "[ef] pilot: paired ERA5 ${CAMPAIGN} comparison, first 200 year IDs, seed 42"
   echo "[ef]   impact_dir=${impact_dir}"
   echo "[ef]   out_root=${out_root}"
 
@@ -153,12 +159,16 @@ cmd_pilot() {
     echo 'echo "[ef] code_revision_at_execution commit=${EF_JOB_COMMIT} describe=${EF_JOB_DESCRIBE}"'
     conda_activate_snippet
     echo "cd '${PROJECT_DIR}'"
+    if [[ "${CAMPAIGN}" == catbond ]]; then
+      echo "python scripts/earths_future_revision/catbond_pilot_era5.py --impact-dir '${impact_dir}' --n-years 200 --seed 42 --out-root '${out_root}'"
+    else
     echo "python scripts/earths_future_revision/fhcf_pilot_era5.py \\"
     echo "  --event-set FL_era5_reanalcal \\"
     echo "  --impact-dir '${impact_dir}' \\"
     echo "  --n-years 200 --seed 42 \\"
     echo "  --out-root '${out_root}' \\"
     echo "  --variants old_both_bugs both_fixed"
+    fi
     echo 'EXIT_CODE=$?'
     echo 'echo "[ef] pilot finished=$(date) exit=${EXIT_CODE}"'
     echo 'exit ${EXIT_CODE}'
@@ -211,11 +221,16 @@ run_pilot_report() {
   fi
 
   local report="${REPORT_DIR}/pilot_report_$(date +%Y%m%d_%H%M%S).json"
+  if [[ "${CAMPAIGN}" == catbond ]]; then
+    "${PY}" "${PROJECT_DIR}/scripts/earths_future_revision/catbond_pilot_era5.py" \
+      --report --out-root "${out_root}" --n-years 200 --report-out "${report}"
+  else
   "${PY}" "${LIB}" compare-pilot \
     --old-dir "${out_root}/old_both_bugs" \
     --new-dir "${out_root}/both_fixed" \
     --expected-seasons 200 \
     --report-out "${report}"
+  fi
   local rc=$?
   echo "[ef] full pilot-report: ${report}"
   if [[ $rc -eq 0 ]]; then

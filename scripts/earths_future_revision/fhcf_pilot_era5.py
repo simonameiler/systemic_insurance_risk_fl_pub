@@ -121,7 +121,7 @@ ACTIVE_INPUT_FILES = [
     "citizens_county_data_all_harmonized.csv",
     "NfipResidentialPenetrationRates.csv",
     "nfip_FL_coverage_premium_by_year.csv", "nfip_FL_claims_by_year.csv",
-    "catbonds_2024.csv",
+    "catbonds_2024.csv", "catbonds_2024_reviewed.csv",
     "county_region.csv", "fl_county_fips.csv", "florida_coastal_counties.csv",
     "florida_log_contribution_p95_present.csv",
 ]

@@ -1,10 +1,9 @@
 """
-catbonds.py - Stylized catastrophe bond recoveries
+catbonds.py - Catastrophe bond pricing and recovery calculations
 ------------------------------------------------------------------
 
-Uses a reviewed inventory and explicit beneficiary keys. Attachment and
-limits are stylized principal-based layers, applied once to aggregate losses.
-This does not reconstruct transaction-specific contractual payouts.
+Parses catastrophe bond terms and computes recovery rates for triggering
+events. Implements event-linked recovery calculations for ILS instruments.
 
 Public API
 ----------
@@ -32,44 +31,34 @@ def _norm_name(s: str) -> str:
 
 def _is_fl_relevant(perils: str) -> bool:
     if not isinstance(perils, str):
-        return False
+        return True  # conservative include
     p = perils.lower()
     if "excl. florida" in p or "exclude florida" in p:
         return False
     if "florida" in p:
         return True
-    # A US heading followed by an explicit state list is not nationwide cover.
-    if ":" in p:
-        return False
     if "us named storm" in p or "u.s. named storm" in p or "u.s named storm" in p:
         return True
     if "tropical cyclone" in p and ("us" in p or "u.s" in p):
         return True
     # “Florida multi-peril” or “US hurricane” variants will pass via 'florida'/'us named storm' above
-    return "us multi-peril" in p or "southeast us named storm" in p
+    return True  # default include
 
 def _in_force_for_season(issue_date_str: str, season_year: int = 2024) -> bool:
     """
     Pragmatic rule:
       - Jan..Sep of season_year => in force for that season
       - Oct..Dec of season_year => for next season (exclude)
-    Unparseable dates are excluded. This is a September 2024 snapshot,
-    not a reconstruction of coverage on each historical event date.
+    If parse fails, include (conservative).
     """
     try:
-        value = str(issue_date_str).strip()
-        if re.fullmatch(r"[A-Za-z]{3}\.\d{2}", value):
-            dt = pd.to_datetime(value, format="%b.%y", errors="raise")
-        else:
-            dt = pd.to_datetime(value, errors="raise")
-        if pd.isna(dt):
-            return False
+        dt = pd.to_datetime(issue_date_str, errors="raise")
         if dt.year != season_year:
             # If you later include 2023+, you can add a tenor heuristic here
             return dt.year < season_year  # include prior issues by default
         return dt.month <= 9
     except Exception:
-        return False
+        return True
 
 def load_catbond_table(path: str | pd.DataFrame,
                        season_year: int = 2024,
@@ -87,9 +76,6 @@ def load_catbond_table(path: str | pd.DataFrame,
        'Trigger_Type','Risks_Perils','Issue_Date', ...]
     """
     df = path.copy() if isinstance(path, pd.DataFrame) else pd.read_csv(path)
-    required = {"ModelInclude", "BeneficiaryStatEntityKeys", "EligibilityReason"}
-    if not required.issubset(df.columns):
-        raise ValueError("Use the reviewed bond inventory with explicit eligibility and beneficiary keys.")
     # Clean columns we care about
     if "Size_Million_USD" in df.columns:
         limit = pd.to_numeric(df["Size_Million_USD"], errors="coerce") * 1_000_000.0
@@ -98,7 +84,7 @@ def load_catbond_table(path: str | pd.DataFrame,
     else:
         limit = pd.Series(0.0, index=df.index)
 
-    issues = df.get("Issue_Date_Sort", df.get("Issue_Date", df.get("IssueDate", "")))
+    issues = df.get("Issue_Date", df.get("IssueDate", ""))
 
     out = pd.DataFrame({
         "Bond_Name": df.get("Bond_Name", df.get("BondName", "")),
@@ -108,10 +94,7 @@ def load_catbond_table(path: str | pd.DataFrame,
         "Risks_Perils": df.get("Risks_Perils", df.get("Perils","")),
         "Trigger_Type": df.get("Trigger_Type", df.get("TriggerType","")),
         "Issue_Date": issues,
-        "LimitUSD": limit.fillna(0.0),
-        "ModelInclude": df["ModelInclude"].astype(str).str.lower().isin(["1", "true"]),
-        "BeneficiaryStatEntityKeys": df["BeneficiaryStatEntityKeys"].fillna("").astype(str),
-        "EligibilityReason": df["EligibilityReason"],
+        "LimitUSD": limit.fillna(0.0)
     })
 
     out["BondID"] = (out["Issuer"].astype(str).str.strip() + ":" +
@@ -122,9 +105,7 @@ def load_catbond_table(path: str | pd.DataFrame,
 
     # Trigger normalization
     trig = out["Trigger_Type"].astype(str).str.lower()
-    out["TriggerClass"] = np.select(
-        [trig.str.contains("industry|pcs|index"), trig.str.fullmatch("indemnity")],
-        ["industry", "indemnity"], default="unsupported")
+    out["TriggerClass"] = np.where(trig.str.contains("industry|pcs|index"), "industry", "indemnity")
 
     # Defaults for layer points
     if "AttachmentUSD" in df.columns and "ExhaustionUSD" in df.columns:
@@ -142,10 +123,7 @@ def load_catbond_table(path: str | pd.DataFrame,
     out["ExhaustionUSD"] = np.maximum(out["ExhaustionUSD"], out["AttachmentUSD"] + 1.0)
 
     # Keep only what can matter this season in FL
-    out = out[out["ModelInclude"] & out["FL_relevant"] & out["InForce"]
-              & (out["LimitUSD"] > 0) & out["TriggerClass"].ne("unsupported")].copy()
-    if out["BeneficiaryStatEntityKeys"].str.strip().eq("").any():
-        raise ValueError("An included bond lacks explicit beneficiary keys.")
+    out = out[(out["FL_relevant"]) & (out["InForce"]) & (out["LimitUSD"] > 0)].copy()
     return out
 
 def _build_cedent_to_keys(crosswalk: pd.DataFrame) -> pd.DataFrame:
@@ -248,16 +226,6 @@ def apply_catbond_recovery(
     )
 
     cw = _build_cedent_to_keys(company_keys_df)
-    # Citizens uses its full legal name in the loss table and an abbreviated
-    # display name in market shares. Resolve both names through the crosswalk.
-    aliases = pd.concat([
-        cw[[name, "StatEntityKey"]].rename(columns={name: "Company"})
-        for name in ["Company_MS", "Company_FHCF"]
-    ], ignore_index=True).dropna().drop_duplicates()
-    if aliases.groupby("Company")["StatEntityKey"].nunique().gt(1).any():
-        raise ValueError("Company crosswalk maps one name to multiple legal entities")
-    aliases = aliases.drop_duplicates("Company").set_index("Company")["StatEntityKey"]
-    company_net["StatEntityKey"] = company_net["StatEntityKey"].fillna(company_net["Company"].map(aliases))
 
     if industry_insured_wind_pre_fhcf_usd is None:
         industry_driver = float(company_net["NetWindUSD"].sum())
@@ -269,19 +237,27 @@ def apply_catbond_recovery(
 
     for _, b in cb.iterrows():
         ced = str(b["Cedent_Sponsor"])
-        keys = [k.strip() for k in str(b.get("BeneficiaryStatEntityKeys", "")).split(";") if k.strip()]
-        available_keys = set(company_net["StatEntityKey"].dropna().astype(str))
-        if not keys or not set(keys).issubset(available_keys):
-            raise ValueError(f"Bond {b.get('BondID', ced)} has missing or unavailable beneficiary keys: {keys}")
-        if not set(keys).issubset(set(cw["StatEntityKey"].astype(str))):
-            raise ValueError(f"Unknown beneficiary keys for {b.get('BondID', ced)}")
-        sponsor_keys = keys
+        matches = _lookup_keys_for_cedent(ced, cw)
+
         if b["TriggerClass"] == "industry":
             driver = industry_driver
-        elif b["TriggerClass"] == "indemnity":
-            driver = float(company_net.loc[company_net["StatEntityKey"].isin(keys), "NetWindUSD"].sum())
+            sponsor_keys = []
         else:
-            raise ValueError(f"Unsupported trigger for {b.get('BondID', ced)}")
+            if matches.empty:
+                bond_diag.append({
+                    "BondID": b.get("BondID", ""),
+                    "Cedent": ced,
+                    "TriggerClass": b["TriggerClass"],
+                    "DriverUSD": 0.0,
+                    "AttachmentUSD": float(b.get("AttachmentUSD", 0.0)),
+                    "LimitUSD": float(b.get("LimitUSD", 0.0)),
+                    "PayoutUSD": 0.0,
+                    "Reason": "no_cedent_mapping",
+                })
+                continue
+            keys = matches["StatEntityKey"].dropna().astype(str).unique().tolist()
+            sponsor_keys = keys
+            driver = float(company_net.loc[company_net["StatEntityKey"].isin(keys), "NetWindUSD"].sum())
 
         attach = float(b.get("AttachmentUSD", 0.0))
         limit  = float(b.get("LimitUSD", 0.0))
@@ -299,33 +275,61 @@ def apply_catbond_recovery(
             })
             continue
 
-        # The trigger determines the payout; only named beneficiaries receive it.
-        sponsor_rows = company_net.loc[company_net["StatEntityKey"].isin(sponsor_keys)].copy()
-        tot = float(sponsor_rows["NetWindUSD"].sum())
-        if tot <= 0:
-            continue
-        sponsor_rows["alloc_share"] = sponsor_rows["NetWindUSD"] / tot
-        sponsor_rows["alloc_usd"]   = payout * sponsor_rows["alloc_share"]
+        # Allocate payout back to companies (indemnity vs industry)
+        if b["TriggerClass"] == "industry":
+            tot = float(company_net["NetWindUSD"].sum())
+            if tot <= 0:
+                continue
+            company_net["alloc_share"] = company_net["NetWindUSD"] / tot
+            company_net["alloc_usd"]   = payout * company_net["alloc_share"]
 
-        base_rows = pd.concat(
-            [
-                private_after_fhcf[["Company", "County", "NetWindUSD"]],
-                citizens_after_fhcf[["Company", "County", "NetWindUSD"]],
-            ],
-            ignore_index=True,
-        )
-        base_rows = base_rows.merge(
-            sponsor_rows[["Company", "NetWindUSD", "alloc_usd"]],
-            on="Company",
-            how="inner",
-            suffixes=("", "_comp"),
-        )
-        comp_tot = base_rows.groupby("Company")["NetWindUSD"].transform("sum")
-        base_rows["county_share"] = np.where(
-            base_rows["NetWindUSD"] > 0, base_rows["NetWindUSD"] / comp_tot, 0.0
-        )
-        base_rows["CatBondRecoveryUSD"] = base_rows["alloc_usd"] * base_rows["county_share"]
-        payouts.append(base_rows[["Company", "County", "CatBondRecoveryUSD"]])
+            base_rows = pd.concat(
+                [
+                    private_after_fhcf[["Company", "County", "NetWindUSD"]],
+                    citizens_after_fhcf[["Company", "County", "NetWindUSD"]],
+                ],
+                ignore_index=True,
+            )
+            base_rows = base_rows.merge(
+                company_net[["Company", "NetWindUSD", "alloc_usd"]],
+                on="Company",
+                how="left",
+                suffixes=("", "_comp"),
+            )
+            base_rows["county_share"] = np.where(
+                base_rows["NetWindUSD"] > 0,
+                base_rows["NetWindUSD"] / base_rows.groupby("Company")["NetWindUSD"].transform("sum"),
+                0.0,
+            )
+            base_rows["CatBondRecoveryUSD"] = base_rows["alloc_usd"] * base_rows["county_share"]
+            payouts.append(base_rows[["Company", "County", "CatBondRecoveryUSD"]])
+        else:
+            sponsor_rows = company_net.loc[company_net["StatEntityKey"].isin(sponsor_keys)].copy()
+            tot = float(sponsor_rows["NetWindUSD"].sum())
+            if tot <= 0:
+                continue
+            sponsor_rows["alloc_share"] = sponsor_rows["NetWindUSD"] / tot
+            sponsor_rows["alloc_usd"]   = payout * sponsor_rows["alloc_share"]
+
+            base_rows = pd.concat(
+                [
+                    private_after_fhcf[["Company", "County", "NetWindUSD"]],
+                    citizens_after_fhcf[["Company", "County", "NetWindUSD"]],
+                ],
+                ignore_index=True,
+            )
+            base_rows = base_rows.merge(
+                sponsor_rows[["Company", "NetWindUSD", "alloc_usd"]],
+                on="Company",
+                how="inner",
+                suffixes=("", "_comp"),
+            )
+            comp_tot = base_rows.groupby("Company")["NetWindUSD"].transform("sum")
+            base_rows["county_share"] = np.where(
+                base_rows["NetWindUSD"] > 0, base_rows["NetWindUSD"] / comp_tot, 0.0
+            )
+            base_rows["CatBondRecoveryUSD"] = base_rows["alloc_usd"] * base_rows["county_share"]
+            payouts.append(base_rows[["Company", "County", "CatBondRecoveryUSD"]])
 
         bond_diag.append({
             "BondID": b.get("BondID", ""),
@@ -340,12 +344,6 @@ def apply_catbond_recovery(
     if payouts:
         recov = pd.concat(payouts, ignore_index=True)
         recov = recov.groupby(["Company", "County"], as_index=False)["CatBondRecoveryUSD"].sum()
-        # Several layers must not credit more than the retained claim.
-        available = pd.concat([private_after_fhcf, citizens_after_fhcf], ignore_index=True)
-        available = available.groupby(["Company", "County"], as_index=False)["NetWindUSD"].sum()
-        recov = recov.merge(available, on=["Company", "County"], validate="one_to_one")
-        recov["CatBondRecoveryUSD"] = np.minimum(recov["CatBondRecoveryUSD"], recov["NetWindUSD"].clip(lower=0))
-        recov = recov.drop(columns="NetWindUSD")
         total_payout = float(recov["CatBondRecoveryUSD"].sum())
     else:
         recov = pd.DataFrame(columns=["Company", "County", "CatBondRecoveryUSD"])
@@ -367,7 +365,6 @@ def apply_catbond_recovery(
     diag = {
         "bond_diag": pd.DataFrame(bond_diag),
         "catbond_payout_total": total_payout,
-        "catbond_triggered_payout_total": float(sum(d.get("PayoutUSD", 0.0) for d in bond_diag)),
         "catbond_attachment_hits": int(sum(d.get("PayoutUSD", 0.0) > 0 for d in bond_diag)),
         "catbond_limit_in_force_usd": limit_in_force,
         "catbond_issue_volume_year_usd": issue_vol_year,
