@@ -113,3 +113,26 @@ of one default when group support leaves an insurer's balance exactly at zero.
 The strict default threshold and group-support calculation are unchanged in this
 correction. Use the same environment for paired comparisons and review such
 boundary cases before interpreting very small changes in default probabilities.
+
+
+## Pilot correction for seasons with zero wind losses
+
+The first cat-bond pilot (job 44171069) stopped production because 54 corrected
+seasons failed. The new beneficiary check incorrectly required each insurer to
+have rows in that season's loss table. The private FHCF branch legitimately
+returns an empty table when private wind losses are zero.
+
+The follow-up correction validates beneficiaries against the modeled market
+roster and the company crosswalk. An included insurer with no loss rows has a
+zero loss driver and zero indemnity-bond recovery; unknown or unmodeled
+beneficiaries still raise errors. The bond inventory and payout formula are
+unchanged. Regression tests reproduce the original error through the full
+financial pipeline for both zero damage and flood-only damage.
+
+After pulling the follow-up correction, repeat `check` and `pilot`, then run
+`pilot-report` when the new job finishes. Do not reuse the failed pilot. A fresh
+output directory and latest manifest are created automatically. The pilot now
+also returns a failing process status if its financial validation fails, so
+Slurm's status agrees with the outcome. For paired pilots, `status` defers output
+validation to `pilot-report` rather than checking the parent directory as though
+it contained one run.

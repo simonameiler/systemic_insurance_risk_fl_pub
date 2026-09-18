@@ -267,14 +267,18 @@ def apply_catbond_recovery(
     payouts: List[Dict[str, Any]] = []
     bond_diag: List[Dict[str, Any]] = []
 
+    # Eligibility is a property of the modeled roster, not this season's losses.
+    # The upstream FHCF branch returns no private rows when wind losses are zero.
+    modeled_keys = set(ms["StatEntityKey"].dropna().astype(str))
+    known_keys = set(cw["StatEntityKey"].dropna().astype(str))
+
     for _, b in cb.iterrows():
         ced = str(b["Cedent_Sponsor"])
         keys = [k.strip() for k in str(b.get("BeneficiaryStatEntityKeys", "")).split(";") if k.strip()]
-        available_keys = set(company_net["StatEntityKey"].dropna().astype(str))
-        if not keys or not set(keys).issubset(available_keys):
-            raise ValueError(f"Bond {b.get('BondID', ced)} has missing or unavailable beneficiary keys: {keys}")
-        if not set(keys).issubset(set(cw["StatEntityKey"].astype(str))):
-            raise ValueError(f"Unknown beneficiary keys for {b.get('BondID', ced)}")
+        if not keys or not set(keys).issubset(known_keys):
+            raise ValueError(f"Missing or unknown beneficiary keys for {b.get('BondID', ced)}: {keys}")
+        if not set(keys).issubset(modeled_keys):
+            raise ValueError(f"Beneficiary outside modeled market for {b.get('BondID', ced)}: {keys}")
         sponsor_keys = keys
         if b["TriggerClass"] == "industry":
             driver = industry_driver

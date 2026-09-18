@@ -794,7 +794,10 @@ def cmd_job_status(args) -> int:
     for job in manifest.get("jobs", []):
         state = classify_job(job)
         run_ok = None
-        if state.startswith("completed") and job.get("output_dir"):
+        # A paired pilot has two nested outputs; the generic single-run
+        # validator cannot assess its root. Use pilot-report for the pair.
+        paired_pilot = job.get("name") == "era5_pilot_paired"
+        if state.startswith("completed") and job.get("output_dir") and not paired_pilot:
             v = validate_run_dir(Path(job["output_dir"]), job.get("expected_seasons"))
             run_ok = v["pass"]
         rows.append({
@@ -804,6 +807,8 @@ def cmd_job_status(args) -> int:
             "queue_state": state,
             "output_dir": job.get("output_dir"),
             "output_valid": run_ok,
+            **({"validation_note": "Use pilot-report to validate both paired outputs."}
+               if paired_pilot else {}),
         })
     summary = {}
     for r in rows:

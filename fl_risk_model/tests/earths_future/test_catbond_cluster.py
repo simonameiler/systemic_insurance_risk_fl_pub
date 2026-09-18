@@ -115,6 +115,8 @@ def test_cluster_entrypoint_submits_catbond_pilot_to_separate_root(tmp_path, mon
     result = subprocess.run(['bash', str(ROOT / 'scripts/cluster/catbond_revision.sh'), 'pilot'],
                             capture_output=True, text=True)
     assert result.returncode == 0, result.stdout + result.stderr
+    assert 'catbond_revision.sh pilot-report' in result.stdout
+    assert 'earths_future.sh pilot-report' not in result.stdout
     out = tmp_path / 'checkout/results/mc_runs_catbond_patched'
     script, = out.glob('pilot_era5_*/submit_pilot.sh')
     text = script.read_text()
@@ -123,3 +125,25 @@ def test_cluster_entrypoint_submits_catbond_pilot_to_separate_root(tmp_path, mon
     assert 'fhcf_pilot_era5.py' not in text
     manifest = tmp_path / 'checkout/results/earths_future_revision/catbond_cluster/manifests/pilot_manifest_latest.json'
     assert json.loads(manifest.read_text())['jobs'][0]['slurm_job_id'] == '12345'
+
+
+@pytest.mark.parametrize('valid', [True, False])
+def test_pilot_process_exit_reflects_financial_validation(tmp_path, monkeypatch, valid):
+    monkeypatch.setattr(sys, 'argv', ['pilot', '--out-root', str(tmp_path)])
+    monkeypatch.setattr(pilot, 'run_pilot', lambda *args: {})
+    monkeypatch.setattr(pilot, 'report', lambda *args: {'pass': valid, 'problems': []})
+    assert pilot.main() == (0 if valid else 1)
+    assert json.loads((tmp_path / 'pilot_validation.json').read_text())['pass'] is valid
+
+
+def test_paired_status_defers_output_validation_to_pilot_report(tmp_path, monkeypatch, capsys):
+    from argparse import Namespace
+    manifest = tmp_path / 'manifest.json'
+    manifest.write_text(json.dumps({'jobs': [{'name': 'era5_pilot_paired',
+                        'slurm_job_id': '123', 'output_dir': str(tmp_path),
+                        'expected_seasons': 200}]}))
+    monkeypatch.setattr(pilot.cluster, 'classify_job', lambda job: 'completed')
+    assert pilot.cluster.cmd_job_status(Namespace(manifest=manifest)) == 0
+    job = json.loads(capsys.readouterr().out)['jobs'][0]
+    assert job['output_valid'] is None
+    assert 'pilot-report' in job['validation_note']

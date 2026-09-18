@@ -163,15 +163,17 @@ def main():
     parser.add_argument('--report', action='store_true')
     parser.add_argument('--report-out', type=Path)
     args = parser.parse_args()
-    if args.report:
-        result = report(args.out_root, args.n_years)
-        if args.report_out:
-            args.report_out.parent.mkdir(parents=True, exist_ok=True)
-            args.report_out.write_text(json.dumps(result, indent=2) + '\n')
-        print(json.dumps(result, indent=2))
-        return 0 if result['pass'] else 1
-    run_pilot(args.impact_dir, args.out_root, args.n_years, args.seed)
-    return 0
+    if not args.report:
+        run_pilot(args.impact_dir, args.out_root, args.n_years, args.seed)
+    result = report(args.out_root, args.n_years)
+    report_path = args.report_out or args.out_root / 'pilot_validation.json'
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(result, indent=2) + '\n')
+    print(json.dumps(result, indent=2))
+    # Monte Carlo records failed seasons instead of raising. Propagate the
+    # validation result so Slurm cannot label an invalid pilot successful.
+    return 0 if result['pass'] else 1
+
 
 
 if __name__ == '__main__':

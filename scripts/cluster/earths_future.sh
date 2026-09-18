@@ -67,6 +67,10 @@ case "${CAMPAIGN}" in
   fhcf|catbond) ;;
   *) echo "[ef] Unknown campaign: ${CAMPAIGN}" >&2; exit 1 ;;
 esac
+ENTRY_POINT="${SCRIPT_DIR}/earths_future.sh"
+if [[ "${CAMPAIGN}" == catbond ]]; then
+  ENTRY_POINT="${SCRIPT_DIR}/catbond_revision.sh"
+fi
 
 LOG_DIR="${PROJECT_DIR}/logs"
 CLUSTER_OUT="${PROJECT_DIR}/results/earths_future_revision/${CAMPAIGN}_cluster"
@@ -80,7 +84,7 @@ mkdir -p "${LOG_DIR}" "${MANIFEST_DIR}" "${REPORT_DIR}"
 
 usage() {
   cat <<EOF
-Usage: $0 {check|pilot|pilot-report|production|status|postprocess} [options]
+Usage: ${ENTRY_POINT} {check|pilot|pilot-report|production|status|postprocess} [options]
 See the header comment of this file, or
 docs/earths_future_revision/cluster_runbook.md, for details on each command.
 EOF
@@ -192,8 +196,8 @@ cmd_pilot() {
 
   echo "[ef] wrote manifest: ${manifest}"
   echo "[ef]   (symlinked as $(basename "${PILOT_LATEST}"))"
-  echo "[ef] check progress with: $0 status"
-  echo "[ef] once Slurm shows it completed, run: $0 pilot-report"
+  echo "[ef] check progress with: ${ENTRY_POINT} status"
+  echo "[ef] once Slurm shows it completed, run: ${ENTRY_POINT} pilot-report"
 }
 
 # --------------------------------------------------------------------------- #
@@ -202,7 +206,7 @@ cmd_pilot() {
 run_pilot_report() {
   local manifest="${1:-${PILOT_LATEST}}"
   if [[ ! -e "${manifest}" ]]; then
-    echo "[ef] ERROR: pilot manifest not found: ${manifest}. Run '$0 pilot' first." >&2
+    echo "[ef] ERROR: pilot manifest not found: ${manifest}. Run '${ENTRY_POINT} pilot' first." >&2
     return 1
   fi
   echo "[ef] pilot-report: ${manifest}"
@@ -269,14 +273,14 @@ cmd_production() {
 
   echo "[ef] production: gating on a passing pilot-report (same code revision + inputs)"
   if ! run_pilot_report "${PILOT_LATEST}"; then
-    echo "[ef] ERROR: pilot-report did not pass. Run '$0 pilot' then '$0 pilot-report' and" >&2
-    echo "[ef]        resolve any failures before '$0 production'." >&2
+    echo "[ef] ERROR: pilot-report did not pass. Run '${ENTRY_POINT} pilot' then '${ENTRY_POINT} pilot-report' and" >&2
+    echo "[ef]        resolve any failures before '${ENTRY_POINT} production'." >&2
     return 1
   fi
 
   echo "[ef] production: checking for a duplicate in-flight/completed campaign"
   if ! "${PY}" "${LIB}" guard-duplicate --manifest "${PRODUCTION_LATEST}" ${force_flag}; then
-    echo "[ef] Refusing to submit. Pass '$0 production --force' if this is intentional" >&2
+    echo "[ef] Refusing to submit. Pass '${ENTRY_POINT} production --force' if this is intentional" >&2
     echo "[ef] (e.g. deliberately re-running under the same code+inputs)." >&2
     return 1
   fi
@@ -354,7 +358,7 @@ cmd_production() {
   ln -sf "$(basename "${manifest}")" "${PRODUCTION_LATEST}"
   echo "[ef] wrote manifest: ${manifest}"
   echo "[ef]   (symlinked as $(basename "${PRODUCTION_LATEST}"))"
-  echo "[ef] recorded ${i} jobs. Check progress with: $0 status"
+  echo "[ef] recorded ${i} jobs. Check progress with: ${ENTRY_POINT} status"
 }
 
 # --------------------------------------------------------------------------- #
@@ -384,7 +388,7 @@ cmd_status() {
     fi
   done
   if [[ ${any} -eq 0 ]]; then
-    echo "[ef] no pilot or production manifest found yet. Run '$0 pilot' or '$0 production' first."
+    echo "[ef] no pilot or production manifest found yet. Run '${ENTRY_POINT} pilot' or '${ENTRY_POINT} production' first."
   fi
 }
 
@@ -400,7 +404,7 @@ cmd_postprocess() {
     esac
   done
   if [[ ! -e "${manifest}" ]]; then
-    echo "[ef] ERROR: no production manifest found: ${manifest}. Run '$0 production' first." >&2
+    echo "[ef] ERROR: no production manifest found: ${manifest}. Run '${ENTRY_POINT} production' first." >&2
     return 1
   fi
 

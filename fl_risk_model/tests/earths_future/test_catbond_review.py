@@ -85,3 +85,44 @@ def test_reviewed_inventory():
 def test_unreviewed_inventory_rejected():
     with pytest.raises(ValueError):
         cb.load_catbond_table(cfg.DATA_DIR / 'catbonds_2024.csv')
+
+
+@pytest.mark.parametrize('remaining_rows', [[], [1]])
+def test_known_beneficiary_without_losses_receives_zero(remaining_rows):
+    claims, ms, keys = fixture_inputs()
+    recovery, diag = cb.apply_catbond_recovery(
+        claims.iloc[remaining_rows], claims.iloc[:0], pd.DataFrame([bond()]), ms, keys)
+    assert recovery.empty
+    assert diag['catbond_payout_total'] == 0
+    assert diag['catbond_limit_in_force_usd'] == 100
+    assert diag['bond_diag'].iloc[0]['DriverUSD'] == 0
+    assert diag['bond_diag'].iloc[0]['PayoutUSD'] == 0
+
+
+def test_crosswalk_only_beneficiary_is_not_a_modeled_insurer():
+    claims, ms, keys = fixture_inputs()
+    with pytest.raises(ValueError, match='modeled market'):
+        cb.apply_catbond_recovery(claims.iloc[1:], claims.iloc[:0],
+                                 pd.DataFrame([bond()]), ms.iloc[1:], keys)
+
+
+@pytest.mark.parametrize('flood_loss', [0.0, 1_000_000.0])
+def test_zero_wind_event_through_financial_pipeline(monkeypatch, flood_loss):
+    from fl_risk_model import mc_run_events as mc, runner
+    if not mc.EXPOSURE_FILE.exists() or not mc.MARKET_SHARE_XLSX.exists():
+        pytest.skip('Local insurer input spreadsheets unavailable')
+    common = mc._prepare_common_inputs()
+    counties = common[0][['County']].drop_duplicates()
+    wind = counties.assign(WindDamageUSD=0.0)
+    water = counties.assign(WaterDamageUSD=flood_loss / len(counties))
+    monkeypatch.setattr(mc, '_combine_events_for_scenario', lambda *args: (wind, water, {}))
+    # run_one_iteration replaces these loaders; restore them at test teardown.
+    monkeypatch.setattr(runner, 'load_wind_damage', runner.load_wind_damage)
+    monkeypatch.setattr(runner, 'load_water_damage_scenario', runner.load_water_damage_scenario)
+    monkeypatch.setattr(cfg, 'RUNTIME_WIND_SHARE_OVERRIDES', {}, raising=False)
+    row = mc.run_one_iteration('zero_wind_fixture', ['fixture'], np.random.default_rng(42), common)
+    assert row['wind_total_usd'] == 0
+    assert row['water_total_usd'] == pytest.approx(flood_loss)
+    assert row['catbond_payout_usd'] == 0
+    assert row['catbond_limit_in_force_usd'] == 2_540_000_000
+    assert row['defaults_post'] == 0
