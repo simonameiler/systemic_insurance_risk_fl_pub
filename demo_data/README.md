@@ -104,3 +104,7 @@ major Florida hurricane would exceed the capacity of the private insurance secto
 | Company wind exposure & surplus — S&P Capital IQ | **Not included** — commercial license required |
 | Synthetic TC event sets — WindRiskTech L.L.C. / MIT model | **Not included** — proprietary, available to researchers on request |
 | Gori et al. 2025 hazard matrices (public, DesignSafe-CI) | Not included; download separately for full hazard preprocessing |
+
+## Premiums used by the current demo
+
+The demo assumes an illustrative annual private premium total of USD 10 billion, distributed using `demo_market_share.csv`. These premiums are synthetic, like the market shares and surplus values. The public Citizens inputs are handled separately.

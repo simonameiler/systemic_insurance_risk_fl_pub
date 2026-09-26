@@ -93,6 +93,8 @@ import pandas as pd
 # ---------------------------------------------------------------------------
 DEMO_DATA_DIR  = REPO_ROOT / "demo_data"
 MODEL_DATA_DIR = REPO_ROOT / "fl_risk_model" / "data"
+# Illustrative annual private premium volume, allocated by synthetic shares.
+DEMO_PRIVATE_PREMIUM_TOTAL_USD = 10_000_000_000.0
 
 _REQUIRED_FILES = {
     "demo_market_share":  DEMO_DATA_DIR / "demo_market_share.csv",
@@ -103,7 +105,7 @@ _REQUIRED_FILES = {
     "nfip_policies":      MODEL_DATA_DIR / "nfip_FL_coverage_premium_by_year.csv",
     "fl_county_fips":     MODEL_DATA_DIR / "fl_county_fips.csv",
     "great_miami_event":  MODEL_DATA_DIR / "hazard" / "historical_events" / "1926255N15314.csv",
-    "catbonds":           MODEL_DATA_DIR / "catbonds_2024.csv",
+    "catbonds":           MODEL_DATA_DIR / "catbonds_2024_reviewed.csv",
 }
 
 _missing = {k: str(v) for k, v in _REQUIRED_FILES.items() if not v.exists()}
@@ -168,7 +170,8 @@ def _load_demo_market_share(path: Path, year: int = 2024) -> pd.DataFrame:
     total = df["Share"].sum()
     if total > 0:
         df["Share"] = df["Share"] / total   # normalise
-    return df[["Company", "StatEntityKey", "Share"]]
+    df["PremiumUSD"] = df["Share"] * DEMO_PRIVATE_PREMIUM_TOTAL_USD
+    return df[["Company", "StatEntityKey", "Share", "PremiumUSD"]]
 
 
 def _load_demo_surplus(path: Path) -> pd.DataFrame:
@@ -222,6 +225,14 @@ def _build_demo_common_inputs(
     # 2. Market share — demo CSV has 'Company', 'StatEntityKey', 'Share'
     #    The runner expects the column to be named 'Share' or MarketShare{year}.
     mshare = demo_mshare_df.copy()
+    # Citizens has its own exposure inputs, but must also be in the complete
+    # market roster so its catastrophe bonds have an eligible beneficiary.
+    mshare = pd.concat([mshare, pd.DataFrame([{
+        "Company": cfg.CITIZENS_COMPANY_NAME,
+        "StatEntityKey": cfg.CITIZENS_STATKEY,
+        "Share": 0.0,
+        "PremiumUSD": 0.0,
+    }])], ignore_index=True)
 
     # 3. County FIPS crosswalk (public).
     #    fl_county_fips.csv uses STATEFP+COUNTYFP; pre-build 'county_fips' so
@@ -268,31 +279,32 @@ def _build_demo_common_inputs(
 # Monkey-patch: redirect proprietary surplus loader to demo CSV
 # ---------------------------------------------------------------------------
 
-def _patch_surplus_loader(demo_surplus_df: pd.DataFrame):
+def _patch_financial_loaders(demo_surplus_df: pd.DataFrame, demo_mshare_df: pd.DataFrame):
     """
-    Return a context-free patch function that replaces load_surplus_data_with_groups
-    with a closure returning the pre-built demo DataFrame.
-
-    Usage:
-        orig, patch = _patch_surplus_loader(df)
-        <run model>
-        restore(orig)
+    Use synthetic surplus and premium data instead of the licensed loaders.
+    Return a callable that restores the original functions.
     """
     import fl_risk_model.runner  as _runner_mod
     import fl_risk_model.capital as _capital_mod
 
     orig_capital = _capital_mod.load_surplus_data_with_groups
     orig_runner  = _runner_mod.load_surplus_data_with_groups
+    orig_premium = _runner_mod.load_private_premium_base_from_market_share_xlsx
 
     def _demo_load(**kw):
         return demo_surplus_df.copy()
 
+    def _demo_premiums(**kw):
+        return demo_mshare_df[["Company", "StatEntityKey", "PremiumUSD"]].copy()
+
     _capital_mod.load_surplus_data_with_groups = _demo_load
     _runner_mod.load_surplus_data_with_groups  = _demo_load
+    _runner_mod.load_private_premium_base_from_market_share_xlsx = _demo_premiums
 
     def _restore():
         _capital_mod.load_surplus_data_with_groups = orig_capital
         _runner_mod.load_surplus_data_with_groups  = orig_runner
+        _runner_mod.load_private_premium_base_from_market_share_xlsx = orig_premium
 
     return _restore
 
@@ -362,7 +374,7 @@ def run_demo(
     common_inputs = _build_demo_common_inputs(demo_surplus_df, demo_mshare_df)
 
     # ── Patch surplus loader ────────────────────────────────────────────────
-    restore_fn = _patch_surplus_loader(demo_surplus_df)
+    restore_fn = _patch_financial_loaders(demo_surplus_df, demo_mshare_df)
 
     try:
         rng = np.random.default_rng(seed)
@@ -392,14 +404,17 @@ def run_demo(
                 }
                 rows.append(row)
             except Exception as exc:
-                rows.append({"iteration": i, "scenario": "error", "error": str(exc)})
+                detail = str(exc)
+                if exc.__cause__ is not None:
+                    detail += f": {exc.__cause__}"
+                rows.append({"iteration": i, "scenario": "error", "error": detail})
 
             if (i + 1) % max(1, n_iter // 4) == 0:
                 elapsed = time.time() - t0
                 print(f"  Completed {i+1:3d}/{n_iter} iterations  ({elapsed:.1f}s elapsed)")
 
         elapsed_total = time.time() - t0
-        print(f"\n  All {n_iter} iterations completed in {elapsed_total:.1f}s")
+        print(f"\n  Processed {n_iter} iterations in {elapsed_total:.1f}s")
 
     finally:
         restore_fn()   # always restore original loaders
@@ -453,8 +468,9 @@ def _print_summary(df: pd.DataFrame, n_iter: int) -> None:
     print(f"    NFIP flood            : {_fmt('flood_insured_capped_usd')}")
     print()
     print("  Un/underinsured losses:")
-    print(f"    Wind                 : {_fmt('wind_underinsured_usd')}")
-    print(f"    Flood                : {_fmt('flood_underinsured_usd')}")
+    valid["wind_un_underinsured_usd"] = valid["wind_uninsured_usd"] + valid["wind_underinsured_usd"]
+    print(f"    Wind                 : {_fmt('wind_un_underinsured_usd')}")
+    print(f"    Flood                : {_fmt('flood_un_derinsured_usd')}")
     print()
     print("  Systemic stress (% of iterations):")
     print(f"    Any private default  : {_pct('defaults_post', thresh=0)}")
@@ -463,7 +479,7 @@ def _print_summary(df: pd.DataFrame, n_iter: int) -> None:
     print(f"    Citizens deficit > 0 : {_pct('citizens_residual_deficit_usd', thresh=0)}")
     print(f"    NFIP borrowing > 0   : {_pct('nfip_borrowed_usd', thresh=0)}")
     print()
-    print("  Public institutional burden (mean):")
+    print("  Institutional financing outcomes (mean):")
     print(f"    FHCF shortfall       : {_fmt('fhcf_shortfall_usd')}")
     print(f"    NFIP borrowed        : {_fmt('nfip_borrowed_usd')}")
     print(f"    Citizens deficit     : {_fmt('citizens_residual_deficit_usd')}")
@@ -500,6 +516,8 @@ def main() -> None:
         help="Output directory, relative to repo root (default: demo_output)",
     )
     args = parser.parse_args()
+    if args.n_iter < 1:
+        parser.error("--n_iter must be positive")
 
     out_dir = REPO_ROOT / args.out
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -513,6 +531,8 @@ def main() -> None:
 
     # Print human-readable summary
     _print_summary(df_results, n_iter=args.n_iter)
+    if len(df_results) != args.n_iter or df_results["scenario"].eq("error").any():
+        sys.exit("Demo failed. Inspect the error column; no reference snapshot was created.")
 
     # Save expected output snapshot (first run only, for reviewer comparison)
     expected_path = out_dir / "expected_demo_summary.csv"
@@ -526,4 +546,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

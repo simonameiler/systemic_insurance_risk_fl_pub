@@ -1,0 +1,8 @@
+{
+  "software_version": "1.1.0",
+  "simulation_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+  "n_runs": 106,
+  "total_rows": 997000,
+  "manifest_sha256": "b8b20a97e68f7e8e59e576f59d0fc851b4dd1e8aa62cb2f35b0d521bfbc856f1",
+  "figure_s1": "published reference figure; licensed event catalog required for recomputation"
+}

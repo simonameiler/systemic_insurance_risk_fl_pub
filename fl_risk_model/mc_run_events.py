@@ -726,9 +726,8 @@ def run_one_iteration(scenario_name: str,
     # Expose sampled wind shares to any branch code that reads cfg at runtime
     cfg.RUNTIME_WIND_SHARE_OVERRIDES = dict(sampled)
 
-    # Totals for audit (BEFORE any scenario modifications)
-    wind_total = numsum(wind_df["WindDamageUSD"])
-    water_total = numsum(water_df["WaterDamageUSD"])
+    # Compute gross totals after physical loss reductions so all financial
+    # allocations and reported economic losses use the same damage inputs.
 
     # =============================================================================
     # SCENARIO APPLICATION: Building codes (BEFORE carveout)
@@ -763,7 +762,16 @@ def run_one_iteration(scenario_name: str,
             "wind": building_codes_diag_wind,
             "flood": building_codes_diag_flood,
         }
-    
+
+    # Totals for audit and reporting, taken AFTER any scenario modifications
+    # (building codes) so that total_damage_usd, wind_total_usd, and
+    # water_total_usd reflect whatever damage actually enters the financial
+    # model below. For scenarios that do not touch physical losses
+    # (market_exit, penetration, baseline), wind_df/water_df are unmodified
+    # at this point, so these totals are unchanged from before.
+    wind_total = numsum(wind_df["WindDamageUSD"])
+    water_total = numsum(water_df["WaterDamageUSD"])
+
     # IMPORTANT: Inject damage loaders AFTER building codes is applied
     # so that runner.load_wind_damage() gets the reduced wind damage
     _inject_damage_loaders(wind_df, water_df)

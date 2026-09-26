@@ -41,6 +41,9 @@ __all__ = [
     "load_citizens_capital_row_from_csv",
 ]
 
+# Balances smaller than one cent are zero for final solvency classification.
+INSURER_BALANCE_ZERO_TOLERANCE_USD = 0.01
+
 # =============================================================================
 # Helpers (header parsing & normalization)
 # =============================================================================
@@ -599,6 +602,12 @@ def apply_group_capital_contributions(
     res["AdjustedSurplusUSD"] = res["EndingSurplusUSD"] + pd.to_numeric(
         res["GroupContributionUSD"], errors="coerce"
     ).fillna(0.0)
+    # Cancellation in group transfers can leave a fully funded insurer a few
+    # floating-point units below zero. Normalize the balance itself so default
+    # counts, FIGA eligibility, and assessment membership use the same value.
+    near_zero = res["AdjustedSurplusUSD"].abs() < INSURER_BALANCE_ZERO_TOLERANCE_USD
+    res["SurplusRoundingAdjustmentUSD"] = -res["AdjustedSurplusUSD"].where(near_zero, 0.0)
+    res.loc[near_zero, "AdjustedSurplusUSD"] = 0.0
     res["DefaultFlag"] = res["AdjustedSurplusUSD"].lt(0).astype(bool)
     return res
 

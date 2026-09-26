@@ -1,0 +1,145 @@
+scenario,metric,label,point,p10,p90,interval,n_rows,n_ratio_defined,period,n_models
+Baseline,total_damage_usd,Total loss,19343788695.230297,0.0,39516147299.2766,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,wind_insured_private_usd,"Insured wind, private",5491050988.223578,0.0,11564345571.391754,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,wind_insured_citizens_usd,Citizens wind,1077922754.0709696,0.0,1780951732.8017519,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,flood_insured_capped_usd,"Insured flood, NFIP",644954483.8175347,0.0,887038810.5503619,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,wind_un_underinsured_usd,Un/underinsured wind,9735462654.356918,0.0,19752011507.290398,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,flood_un_derinsured_usd,Un/underinsured flood,2394397814.7612963,0.0,3851999255.2949986,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,residual_financing_requirement_usd,Residual financing requirement,2115436006.1673644,0.0,651765273.9300965,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,figa_residual_deficit_usd,FIGA residual deficit,1239944124.7563002,0.0,417275584.3858743,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,citizens_residual_deficit_usd,Citizens residual deficit,529494321.79326487,0.0,200104202.25,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,nfip_borrowed_usd,NFIP financing requirement,345997559.61779946,0.0,0.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,defaults_post,Private defaults,2.1399,0.0,10.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,largest_entity_deficit_usd,Largest single-entity deficit,312021237.2797463,0.0,264643590.59536967,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,fhcf_reimbursement_usd,FHCF reimbursements,1285463071.155005,0.0,4767699589.329744,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,fhcf_utilization,FHCF utilization factor,0.07561547477382384,0.0,0.28045291701939673,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,citizens_assessment_stress,Citizens assessment stress factor,0.5883951487685063,0.0,0.2223637478364922,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Baseline,figa_unfunded_share,FIGA unfunded share,0.5612051830847933,0.0,0.9874308187918399,"Across realizations, percentiles 10 and 90",10000.0,1728.0,,
+Baseline,nfip_florida_stress,NFIP Florida stress factor,0.46205019422191607,0.0,0.6354812083345798,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,total_damage_usd,Total loss,19343788695.230297,0.0,39516147299.2766,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,wind_insured_private_usd,"Insured wind, private",4663675580.318506,0.0,9788244188.552612,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,wind_insured_citizens_usd,Citizens wind,1905298161.9760423,0.0,3535701475.2541733,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,flood_insured_capped_usd,"Insured flood, NFIP",644954483.8175347,0.0,887038810.5503619,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,wind_un_underinsured_usd,Un/underinsured wind,9735462654.356918,0.0,19752011507.290398,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,flood_un_derinsured_usd,Un/underinsured flood,2394397814.7612963,0.0,3851999255.2949986,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,residual_financing_requirement_usd,Residual financing requirement,2441198340.0551357,0.0,857809557.1074961,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,figa_residual_deficit_usd,FIGA residual deficit,969637374.1592032,0.0,351601428.604711,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,citizens_residual_deficit_usd,Citizens residual deficit,1125563406.2781336,0.0,479786618.27136976,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,nfip_borrowed_usd,NFIP financing requirement,345997559.61779946,0.0,0.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,defaults_post,Private defaults,1.9402,0.0,9.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,largest_entity_deficit_usd,Largest single-entity deficit,250127044.03446737,0.0,263063784.72388202,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,fhcf_reimbursement_usd,FHCF reimbursements,1335004949.5445304,0.0,4433608261.818108,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,fhcf_utilization,FHCF utilization factor,0.07852970291438414,0.0,0.2608004859893004,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,citizens_assessment_stress,Citizens assessment stress factor,1.2507708215688615,0.0,0.5331579717018072,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Market exit,figa_unfunded_share,FIGA unfunded share,0.5447765372200823,0.0,0.9845883962495554,"Across realizations, percentiles 10 and 90",10000.0,1622.0,,
+Market exit,nfip_florida_stress,NFIP Florida stress factor,0.46205019422191607,0.0,0.6354812083345798,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,total_damage_usd,Total loss,19343788695.230297,0.0,39516147299.2766,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,wind_insured_private_usd,"Insured wind, private",8124658811.571468,0.0,17297546751.763382,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,wind_insured_citizens_usd,Citizens wind,1658003026.419411,0.0,2842360933.679979,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,flood_insured_capped_usd,"Insured flood, NFIP",1696722161.1726177,0.0,2411140359.6252284,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,wind_un_underinsured_usd,Un/underinsured wind,6521774558.660586,0.0,13383005997.142494,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,flood_un_derinsured_usd,Un/underinsured flood,1342630137.4062133,0.0,1967053099.1800933,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,residual_financing_requirement_usd,Residual financing requirement,4156498580.615133,0.0,866809007.0191885,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,figa_residual_deficit_usd,FIGA residual deficit,1962456000.173707,0.0,0.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,citizens_residual_deficit_usd,Citizens residual deficit,962844898.0106758,0.0,445618942.4629729,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,nfip_borrowed_usd,NFIP financing requirement,1231197682.4307497,0.0,0.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,defaults_post,Private defaults,1.9091,0.0,7.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,largest_entity_deficit_usd,Largest single-entity deficit,486446218.9176264,0.0,145918780.24088296,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,fhcf_reimbursement_usd,FHCF reimbursements,1623993241.6648183,0.0,8733642877.369122,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,fhcf_utilization,FHCF utilization factor,0.09552901421557755,0.0,0.5137436986687719,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,citizens_assessment_stress,Citizens assessment stress factor,1.0385219195183362,0.0,0.48064339381818716,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Insurance penetration,figa_unfunded_share,FIGA unfunded share,0.45926058064917036,0.0,0.9879742836631427,"Across realizations, percentiles 10 and 90",10000.0,1684.0,,
+Insurance penetration,nfip_florida_stress,NFIP Florida stress factor,1.2155443892258169,0.0,1.7273589058050807,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,total_damage_usd,Total loss,13692619701.590149,0.0,27937679985.22987,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,wind_insured_private_usd,"Insured wind, private",3843735691.7565045,0.0,8095041899.974229,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,wind_insured_citizens_usd,Citizens wind,754545927.8496786,0.0,1246666212.961226,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,flood_insured_capped_usd,"Insured flood, NFIP",483715862.86315095,0.0,665279107.9127713,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,wind_un_underinsured_usd,Un/underinsured wind,6814823858.049843,0.0,13826408055.10328,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,flood_un_derinsured_usd,Un/underinsured flood,1795798361.070972,0.0,2888999441.4712496,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,residual_financing_requirement_usd,Residual financing requirement,1244183727.8897924,0.0,391821027.4858127,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,figa_residual_deficit_usd,FIGA residual deficit,711989878.0816683,0.0,255175702.4390659,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,citizens_residual_deficit_usd,Citizens residual deficit,304686869.6707579,0.0,200104202.25,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,nfip_borrowed_usd,NFIP financing requirement,227506980.1373662,0.0,0.0,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,defaults_post,Private defaults,1.7239,0.0,8.100000000000364,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,largest_entity_deficit_usd,Largest single-entity deficit,189969349.66073385,0.0,261480646.26776275,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,fhcf_reimbursement_usd,FHCF reimbursements,1026405193.9231586,0.0,1877925727.0999424,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,fhcf_utilization,FHCF utilization factor,0.06037677611312698,0.0,0.11046621924117309,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,citizens_assessment_stress,Citizens assessment stress factor,0.33858016720665135,0.0,0.2223637478364922,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+Building codes,figa_unfunded_share,FIGA unfunded share,0.5229814756478353,0.0,0.9800960623466114,"Across realizations, percentiles 10 and 90",10000.0,1505.0,,
+Building codes,nfip_florida_stress,NFIP Florida stress factor,0.3465376456664371,0.0,0.47661090625093483,"Across realizations, percentiles 10 and 90",10000.0,10000.0,,
+2050 SSP2-4.5,total_damage_usd,Total loss,48471978566.8082,23581950128.951427,70265514922.0662,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,wind_insured_private_usd,"Insured wind, private",13865454619.066906,6736647040.857962,19855604873.190334,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,wind_insured_citizens_usd,Citizens wind,2615897913.8048673,1292361160.200148,3834480302.5023904,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,flood_insured_capped_usd,"Insured flood, NFIP",1530238691.0011697,772795704.4431396,2268721528.3062944,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,wind_un_underinsured_usd,Un/underinsured wind,24276112366.17545,11844308317.460186,35508440919.500626,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,flood_un_derinsured_usd,Un/underinsured flood,6184274976.759809,2935837905.9899898,8798267298.566566,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,residual_financing_requirement_usd,Residual financing requirement,5452544739.68607,2553803487.1963124,8606064913.437052,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,figa_residual_deficit_usd,FIGA residual deficit,3297640073.6805916,1506141108.724099,5096348814.626584,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,citizens_residual_deficit_usd,Citizens residual deficit,1330867713.2170093,635491635.650852,2154522944.2989016,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,nfip_borrowed_usd,NFIP financing requirement,824036952.7884694,412170742.8213617,1355193154.511565,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,defaults_post,Private defaults,5.1746,2.63546,6.9663200000000005,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,largest_entity_deficit_usd,Largest single-entity deficit,821701723.0440874,379775650.8292422,1237552476.4771,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,fhcf_reimbursement_usd,FHCF reimbursements,3086328698.444437,1565198179.0639114,4258986023.6144614,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,fhcf_utilization,FHCF utilization factor,0.18154874696731982,0.09207048112140656,0.2505285896243801,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,citizens_assessment_stress,Citizens assessment stress factor,1.4789131325477505,0.7061835795208345,2.394191582720836,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,figa_unfunded_share,FIGA unfunded share,0.7006731343476701,0.5899799090158654,0.7209490324166788,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP2-4.5,nfip_florida_stress,NFIP Florida stress factor,1.096274391640656,0.5536365965211811,1.6253289946673695,Across five GCM absolute deltas,,,ssp245cal,5.0
+2050 SSP5-8.5,total_damage_usd,Total loss,54110536797.83255,27178024038.567303,85861148919.37508,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,wind_insured_private_usd,"Insured wind, private",15388076743.348469,7775762629.385455,24318828926.332363,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,wind_insured_citizens_usd,Citizens wind,2943732642.8625703,1461901315.0290442,4639197669.219462,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,flood_insured_capped_usd,"Insured flood, NFIP",1652637105.5561223,839862805.7880607,2722779820.305549,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,wind_un_underinsured_usd,Un/underinsured wind,27512101443.561188,13724046489.810495,43377719867.18259,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,flood_un_derinsured_usd,Un/underinsured flood,6613988862.504195,3376450798.5542474,10802622636.335125,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,residual_financing_requirement_usd,Residual financing requirement,5968870510.5109215,3053661147.17565,10836157089.195312,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,figa_residual_deficit_usd,FIGA residual deficit,3607213420.144497,1855104357.7494836,6475210112.643646,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,citizens_residual_deficit_usd,Citizens residual deficit,1498969047.7092862,746007929.9319441,2689272252.414598,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,nfip_borrowed_usd,NFIP financing requirement,862688042.6571376,452548859.49422276,1671674724.1370702,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,defaults_post,Private defaults,5.8317,2.8661000000000003,8.11876,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,largest_entity_deficit_usd,Largest single-entity deficit,898524473.4722612,459559528.9053838,1555751686.1621037,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,fhcf_reimbursement_usd,FHCF reimbursements,3584993489.9017553,1690170069.6553833,4942298709.138573,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,fhcf_utilization,FHCF utilization factor,0.21088196999422099,0.09942176880325786,0.29072345347873957,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,citizens_assessment_stress,Citizens assessment stress factor,1.665714020953474,0.8289936810430495,2.98842628128563,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,figa_unfunded_share,FIGA unfunded share,0.7171446095053076,0.5847109204843847,0.7417389864849027,Across five GCM absolute deltas,,,ssp585cal,5.0
+2050 SSP5-8.5,nfip_florida_stress,NFIP Florida stress factor,1.183961527146439,0.6016839672734537,1.9506197357511712,Across five GCM absolute deltas,,,ssp585cal,5.0
+2100 SSP2-4.5,total_damage_usd,Total loss,64903028045.044586,28305273145.919594,77542430432.34416,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,wind_insured_private_usd,"Insured wind, private",18531311516.297966,8131140231.789023,22145850775.3809,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,wind_insured_citizens_usd,Citizens wind,3408506325.2922835,1521476144.9019125,4080982327.3132186,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,flood_insured_capped_usd,"Insured flood, NFIP",1905633901.3506045,857840590.4904196,2329216836.2865286,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,wind_un_underinsured_usd,Un/underinsured wind,32881415191.111877,14294992625.543644,39369230832.4949,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,flood_un_derinsured_usd,Un/underinsured flood,8176161110.991869,3499823553.1945944,9620125229.024632,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,residual_financing_requirement_usd,Residual financing requirement,7196277203.254136,3130126958.7047453,9502630682.881289,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,figa_residual_deficit_usd,FIGA residual deficit,4519128238.619827,1923729232.665095,5875507275.458134,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,citizens_residual_deficit_usd,Citizens residual deficit,1690022920.571277,760697453.243828,2275175036.3318605,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,nfip_borrowed_usd,NFIP financing requirement,987126044.0630319,445700272.79582256,1352291924.153854,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,defaults_post,Private defaults,6.774699999999999,3.03102,7.45016,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,largest_entity_deficit_usd,Largest single-entity deficit,1113954451.445016,476812929.411323,1417859802.7495708,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,fhcf_reimbursement_usd,FHCF reimbursements,4160993945.647042,1812541640.840345,4527437227.52048,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,fhcf_utilization,FHCF utilization factor,0.24476434974394368,0.10662009652002032,0.26631983691296945,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,citizens_assessment_stress,Citizens assessment stress factor,1.878020682835528,0.8453172635607277,2.5282649858133093,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,figa_unfunded_share,FIGA unfunded share,0.7260513162512283,0.6164948332689699,0.7395457434994219,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP2-4.5,nfip_florida_stress,NFIP Florida stress factor,1.3652103153437694,0.6145633860879988,1.6686682837228273,Across five GCM absolute deltas,,,ssp245_2cal,5.0
+2100 SSP5-8.5,total_damage_usd,Total loss,91751012087.17644,34069253834.222095,161343989302.26422,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,wind_insured_private_usd,"Insured wind, private",26217324263.729034,9776993605.430954,45990910305.53071,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,wind_insured_citizens_usd,Citizens wind,4720968596.721655,1798464410.5458689,8648991129.894547,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,flood_insured_capped_usd,"Insured flood, NFIP",2749497116.0662923,1038828963.707532,4964793838.112646,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,wind_un_underinsured_usd,Un/underinsured wind,46552737781.55313,17145696712.310566,81665318468.4202,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,flood_un_derinsured_usd,Un/underinsured flood,11510484329.106327,4309270142.227178,20073975560.30614,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,residual_financing_requirement_usd,Residual financing requirement,11463185238.169676,3945595500.1814957,23256040217.23809,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,figa_residual_deficit_usd,FIGA residual deficit,7115897531.068979,2410049499.876568,14191215452.399878,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,citizens_residual_deficit_usd,Citizens residual deficit,2697127112.366522,954362164.165055,5671305815.091734,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,nfip_borrowed_usd,NFIP financing requirement,1650160594.7341735,581183836.1398723,3393518949.7464848,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,defaults_post,Private defaults,8.5213,3.52958,12.29854,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,largest_entity_deficit_usd,Largest single-entity deficit,1710456913.8374786,592167198.8801188,3287059664.7377205,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,fhcf_reimbursement_usd,FHCF reimbursements,5086734938.242479,2103354394.229942,7518415277.108,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,fhcf_utilization,FHCF utilization factor,0.2992197022495576,0.12372672907234955,0.4422597221828236,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,citizens_assessment_stress,Citizens assessment stress factor,2.9971549140579614,1.0605251925292203,6.302180573874931,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,figa_unfunded_share,FIGA unfunded share,0.7414587871073985,0.6505752717605375,0.8277847598016075,Across five GCM absolute deltas,,,ssp585_2cal,5.0
+2100 SSP5-8.5,nfip_florida_stress,NFIP Florida stress factor,1.9697602053580598,0.744224804211474,3.5568152710458807,Across five GCM absolute deltas,,,ssp585_2cal,5.0

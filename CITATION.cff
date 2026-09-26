@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "Please cite the archived software version used for your analysis and the accompanying paper."
+type: software
+title: Florida Systemic Insurance Risk Model
+version: 1.1.0
+date-released: 2026-09-26
+authors:
+  - family-names: Meiler
+    given-names: Simona
+    affiliation: Stanford University
+repository-code: https://github.com/simonameiler/systemic_insurance_risk_fl_pub
+url: https://github.com/simonameiler/systemic_insurance_risk_fl_pub
+license: GPL-3.0-or-later
+abstract: "A probabilistic framework connecting hurricane losses, insurance coverage, insurer capital, risk transfer, and institutional financing capacity."
+keywords:
+  - climate risk
+  - insurance
+  - tropical cyclones
+  - Florida
+  - stress testing

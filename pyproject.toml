@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "fl-risk-model"
-version = "1.0.0"
+version = "1.1.0"
 description = "Florida Systemic Insurance Risk Model - Stress testing financial stability under climate change"
 readme = "README.md"
 license = {text = "GPL-3.0-or-later"}
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 authors = [
     {name = "Simona Meiler", email = "simona@simonameiler.ch"}
 ]
@@ -27,25 +27,26 @@ classifiers = [
     "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
 ]
-dependencies = []  # Use with climada environment which provides all dependencies
+dependencies = [
+    "numpy>=1.26,<3",
+    "pandas>=2.0,<3",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+    "openpyxl>=3.1",
+    "tqdm>=4.60",
+]
 
 [project.optional-dependencies]
 all = [
-    "numpy>=1.20,<2.0",
-    "pandas>=1.3",
-    "scipy>=1.7",
-    "matplotlib>=3.4",
     "seaborn>=0.11",
     "h5py>=3.0",
-    "openpyxl>=3.0",
-    "tqdm>=4.60",
 ]
+notebooks = ["jupyterlab>=4", "seaborn>=0.11"]
 dev = [
     "pytest>=7.0",
     "pytest-cov>=3.0",
@@ -53,7 +54,7 @@ dev = [
     "flake8>=4.0",
 ]
 climada = [
-    "climada>=4.0",
+    "climada>=6.1",
 ]
 
 [project.urls]
@@ -64,14 +65,43 @@ Issues = "https://github.com/simonameiler/systemic_insurance_risk_fl_pub/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["fl_risk_model*"]
+include = ["fl_risk_model", "fl_risk_model.branches", "fl_risk_model.scenarios"]
+exclude = ["fl_risk_model.tests*"]
+namespaces = true
 
 [tool.setuptools.package-data]
-"fl_risk_model.data" = ["*.csv"]
+# Include only the public inputs; never package locally supplied licensed files.
+"fl_risk_model" = [
+    "data/24fin_fhcf.csv",
+    "data/FHCF_2024_Exposure_byCounty.xlsx",
+    "data/NfipResidentialPenetrationRates.csv",
+    "data/catbonds_2024.csv",
+    "data/catbonds_2024_reviewed.csv",
+    "data/citizens_capital_pml.csv",
+    "data/citizens_county_data.csv",
+    "data/citizens_county_data_all_harmonized.csv",
+    "data/company_keys.csv",
+    "data/county_region.csv",
+    "data/fhcf_terms_keyed.csv",
+    "data/fl_county_fips.csv",
+    "data/fl_per_event_impacts.csv",
+    "data/florida_coastal_counties.csv",
+    "data/florida_log_contribution_p95_present.csv",
+    "data/hazard/historical_events/1926255N15314.csv",
+    "data/hazard/historical_events/1928250N14343.csv",
+    "data/hazard/historical_events/1992230N11325.csv",
+    "data/hazard/historical_events/2017242N16333.csv",
+    "data/hazard/historical_events/andrew_then_great_miami.csv",
+    "data/hazard/historical_events/great_miami_then_andrew.csv",
+    "data/hazard/historical_events/great_miami_twice.csv",
+    "data/hazard/historical_events/irma_twice.csv",
+    "data/nfip_FL_claims_by_year.csv",
+    "data/nfip_FL_coverage_premium_by_year.csv",
+]
 
 [tool.black]
 line-length = 100
-target-version = ['py39', 'py310', 'py311']
+target-version = ['py311', 'py312']
 
 [tool.pytest.ini_options]
 testpaths = ["fl_risk_model/tests"]

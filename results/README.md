@@ -1,120 +1,50 @@
-# Archived Model Outputs — `results/`
+# Publication results — v1.1.0
 
-This directory contains pre-computed model outputs used to reproduce the figures and
-tables in the manuscript **"Stress testing insurance market stability under climate risk"**.
+The final campaign contains **106 analyses and 997,000 seasons/realizations**:
 
-These files are included so that reviewers and readers can:
+| Analysis | Runs | Rows per run |
+|---|---:|---:|
+| ERA5 baseline and three policies | 4 | 10,000 |
+| Five GCMs × five climate periods/pathways | 25 | 10,000 |
+| Five GCMs × thirteen wind/flood reduction pairs | 65 | 10,000 |
+| Historical and sequential scenarios | 7 | 1,000 |
+| Fixed insured fractions 0.1–0.5 | 5 | 10,000 |
 
-1. **Inspect the full analysis workflow** in the Jupyter notebooks without re-running
-   the upstream hazard preprocessing and Monte Carlo pipeline.
-2. **Regenerate all reported visualizations** by executing the notebooks in `notebooks/`.
+## Download and reproduce
 
----
+Download the [compressed results archive](https://github.com/simonameiler/systemic_insurance_risk_fl_pub/releases/download/v1.1.0/systemic_insurance_risk_fl_v1.1.0_results.tar.gz) and check it against [SHA256SUMS](SHA256SUMS). From the repository root:
 
-## Why archived outputs are provided
-
-Full end-to-end reproduction of the upstream inputs requires:
-
-- Proprietary synthetic tropical cyclone event sets from WindRiskTech L.L.C.
-  (10,000-year stochastic simulations per GCM × scenario).
-- Licensed company-level exposure and surplus data from S&P Capital IQ.
-- Significant high-performance computing resources (the production Monte Carlo
-  simulations were run on the Stanford Sherlock HPC cluster; a full baseline run
-  of 10,000 years takes roughly 4–8 hours on a single compute node).
-
-The archived outputs below represent the final, validated results of that pipeline.
-They are provided here to enable rapid and complete figure/table reproduction without
-any of the above dependencies.
-
----
-
-## Directory structure
-
-```
-results/
-├── mc_runs/                           ← per-run Monte Carlo output directories
-│   ├── emanuel_era5_baseline_*/       ← ERA5 baseline (ERA5 TC climatology, 10,000 years)
-│   │   ├── iterations.csv             ← one row per simulated year (all metrics)
-│   │   ├── return_period_summary.csv  ← pre-computed return-period summary
-│   │   └── run_config.json            ← run configuration metadata
-│   ├── emanuel_era5_market_exit_*/    ← market-exit policy scenario
-│   ├── emanuel_era5_penetration_*/    ← flood penetration policy scenario
-│   ├── emanuel_era5_building_codes_*/ ← building code policy scenario
-│   ├── emanuel_{canesm,cnrm6,ecearth6,ipsl6,miroc6}_{20thcal,ssp245cal,ssp245_2cal,ssp585cal,ssp585_2cal}_baseline_*/
-│   │                                  ← 5 GCMs × 5 period/pathway combinations (25 directories)
-│   ├── emanuel_{gcm}_ssp245cal_buildingcode_{params}_*/
-│   │                                  ← 11-level building-code sensitivity sweep × 5 GCMs (55 directories)
-│   ├── {historical_scenario}_*/       ← 8 historical hurricane scenarios (gitignored; run locally)
-│   │   (great_miami, andrew, irma, lake_okeechobee, and four composite scenarios)
-│   ├── scenario_report_with_uncertainty_*.xlsx  ← Excel summary of historical scenarios
-│   └── scenario_report_with_uncertainty_*.csv   ← CSV version of the same report
-│
-├── climate_deltas/                    ← GCM ensemble climate change scaling factors
-│   ├── climate_deltas_by_gcm.csv
-│   ├── climate_deltas_ensemble_absolute.csv
-│   ├── climate_deltas_ensemble_relative.csv
-│   ├── comparison_absolute_vs_relative.csv
-│   ├── era5_climate_scaled_absolute.csv   ← main input for Fig. 3 climate panel
-│   ├── era5_climate_scaled_relative.csv
-│   └── gcm_era5_alignment.csv
-│
-├── tables/                            ← summary tables (reproduced by notebooks)
-│   ├── baseline_metrics_return_periods.csv   ← Table 1 source data
-│   ├── baseline_return_periods.tex
-│   ├── era5_baseline_probabilities.csv
-│   ├── era5_climate_comparison.csv
-│   ├── era5_policy_comparison.csv
-│   ├── probabilistic_combined_table.csv
-│   ├── probabilistic_combined_table.tex
-│   ├── probabilistic_institutional_data.csv
-│   ├── probabilistic_loss_data.csv
-│   ├── scenario_report_with_uncertainty.xlsx
-│   ├── scenario_stress_test.tex
-│   ├── si_table2_scenario_summary.csv
-│   ├── si_table_insured_frac.tex
-│   ├── si_table_variance_decomp.tex
-│   ├── systemic_risk_all_scenarios.csv
-│   └── systemic_risk_all_scenarios.tex
-│
-└── figures/                           ← generated figures (written by notebooks)
+```bash
+shasum -a 256 -c results/SHA256SUMS
+tar -xzf systemic_insurance_risk_fl_v1.1.0_results.tar.gz -C results
+python scripts/analysis/publication/reproduce.py --archive results/campaign
 ```
 
----
+The archive expands to `campaign/manifest.json` and `campaign/outputs/<analysis>/iterations.csv`. The [manifest](manifest.json) records checksums, row counts, and execution provenance. Each retained numeric field and its row ordering are unchanged from the validated source CSV. Restricted event identifiers, event-level wind shares, and company default identities are omitted. No licensed insurer inputs, synthetic storm tracks, or event-level loss caches are distributed.
 
-## Notebook → figure / table mapping
+The simulations used model commit `014ed02c1b3cad1334411b82ce440a01f5b24f1b` and seed 42. The release preserves these financial calculations. The original execution logs were checked for that revision and successful completion; their checksums are retained in the manifest without publishing local paths or cluster logs.
 
-| Notebook | Figures / Tables produced |
+## Figures and tables
+
+Committed outputs in `publication/` can be inspected directly. Regeneration writes into the same directory unless `--out-dir` is supplied.
+
+| Manuscript display | Output |
 |---|---|
-| `notebooks/historical_scenario_analysis.ipynb` | Fig. 2, SI Fig. 2 |
-| `notebooks/probabilistic_risk_analysis_pub.ipynb` | Fig. 3, Fig. 4, Table 1, SI Tables 4–5, SI Fig. 1 |
+| Figure 1: model overview | `figures/fig1_systemic_risk_overview_florida.*` |
+| Figure 2: historical scenarios | `figures/fig_loss_institutional_stress.*` |
+| Figure 3: return-level scaling | `figures/fig_public_burden_scaling_linear.*` |
+| Figure 4: climate and policy stress | `figures/fig_combined_climate_policy_systemic_risk.*` |
+| Figure 5: financing requirement and loss reduction | `figures/fig_climate_buildingcode_sensitivity_public_burden.*` |
+| Figure S1: event and seasonal losses | `figures/fig_loss_return_period.*` |
+| Figure S2: loss-reduction sensitivity | `figures/fig_climate_buildingcode_sensitivity.*` |
+| Figure S3: SSP5–8.5 stress | `figures/fig_combined_climate_policy_systemic_risk_ssp585.*` |
+| Figure S4: common-season severity groups | `figures/fig_residual_financing_severity_decomposition.*` |
+| Table 1 | `tables/table1_return_levels.tex` and corresponding CSV |
+| Tables S3–S6 | Historical, climate/policy, probability, and insured-fraction files in `tables/` |
+| Table S8 | `tables/tableS_decomposition.tex`, `tables/severity_bin_decomposition.csv` |
 
-Each notebook reads directly from `results/mc_runs/` and `results/climate_deltas/`
-using relative paths (e.g., `../results/mc_runs/`) and writes output figures to
-`results/figures/` and tables to `results/tables/`.
+Figure S1 is copied from its published reference unless `--physical-data` is supplied. Recomputing its event curve requires authorized access to `all_events.csv`; see the [data-access terms](../README.md#data-availability-and-restrictions). The financial figures and all simulation-derived tables are regenerated from the public archive. The conceptual overview retains the original map artwork.
 
----
+Residual financing requirement sums FIGA residual deficit, Citizens residual deficit, and NFIP financing within each season before quantiles. FHCF shortfall is a separate upstream diagnostic. Values below USD 0.01 in FIGA residuals are treated as numerical zero during publication processing. Source CSVs are preserved. Return-level intervals resample whole seasons; climate intervals represent variation across five GCM changes, not sampling confidence intervals.
 
-## Data provenance
-
-The Monte Carlo output files (`iterations.csv`) were generated by running
-`scripts/run/run_*.py` on the Stanford Sherlock HPC cluster with:
-
-- Python 3.11, fl-risk-model 1.0.0
-- Proprietary Emanuel/WindRiskTech TC event sets (ERA5, 5 CMIP6 GCMs, SSP2-4.5 and SSP5-8.5)
-- Licensed S&P Capital IQ exposure and surplus data (2024 calendar year)
-- 10,000 simulated years per scenario (seed = 42)
-
-The climate delta files in `climate_deltas/` were generated by
-`scripts/analysis/compute_climate_deltas.py` from the GCM-specific MC run directories.
-
----
-
-## Important notes
-
-- These outputs **cannot legally be regenerated** without access to the proprietary TC
-  event sets and licensed S&P Capital IQ data.  They are archived here solely to support
-  scientific reproducibility at the figure/table level.
-- The raw proprietary input data themselves are **not included** in this repository.
-- Archived numeric values are the definitive source for all manuscript figures and tables.
-  Minor numerical differences may arise if the pipeline is rerun with different random
-  seeds or software versions.
+The original preprint release and subsequent published snapshots remain available in Git history. Use the results matching the code version; do not mix campaigns.
