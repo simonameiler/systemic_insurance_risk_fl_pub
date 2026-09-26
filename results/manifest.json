@@ -1,0 +1,1078 @@
+{
+  "schema_version": 1,
+  "software_version": "1.1.0",
+  "date": "2026-09-26",
+  "simulation_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+  "seed": 42,
+  "n_runs": 106,
+  "total_rows": 997000,
+  "description": "System-level seasonal and historical-scenario financial outcomes. Restricted event identifiers, event-level wind shares, and company default identities are omitted. All retained CSV values are unchanged.",
+  "omitted_columns": [
+    "default_companies_post",
+    "default_companies_pre",
+    "events",
+    "wind_shares"
+  ],
+  "runs": [
+    {
+      "name": "era5_baseline",
+      "path": "outputs/era5_baseline/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "126c2983348d44f3324cbe6c2af51d20115d0104a052af657649d98f649e94b6",
+      "source_iterations_sha256": "53cd54e79b6c03601fa8a1d5dc3f88780c37ebf48b6cb76877929046ab629bb5",
+      "execution_log_sha256": "4b6902ea383b7d14b43889c69c858364e26481e2033b972842f498ecda707606",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "era5_policy_market_exit_moderate",
+      "path": "outputs/era5_policy_market_exit_moderate/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "681a67d5bf36b9053f5c30768ee77ab531d5451e506964fc7bfd7e0dd287f09e",
+      "source_iterations_sha256": "0b2719d813e6a1311fd3a280fa06a4f26bb77e47ddcf0676770dd7aff01a51d2",
+      "execution_log_sha256": "8cf6d3e1f29f563445647cd21b0ec1b5529843eaae906bee9e56d99d163db262",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "era5_policy_penetration_major",
+      "path": "outputs/era5_policy_penetration_major/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "65724e9d8792fa958fdda7b66075e709a78fdb566e7a46891ff8d80b7963c050",
+      "source_iterations_sha256": "8e376cdf4aaca7b91a36614ff7e0cb591d6c928241c2fdd37b4702c5233e0fb9",
+      "execution_log_sha256": "ef37baaa79456a41d36402d1d00f2c061247858abad28a31cc5aabffaa8c440b",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "era5_policy_building_codes_major",
+      "path": "outputs/era5_policy_building_codes_major/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "0a843bb42e8cda08ed2d129029652bf5d766ac69eb03ba2d4a1bf84d33bc173e",
+      "source_iterations_sha256": "e3038ab5e274f35d32e9d82ef3bba3e8b08cf1d7809d5de0156833764ef7974e",
+      "execution_log_sha256": "0bd07518a2d5b4ad3a5ebb7c3c1076ecd0124bcb001f5831f50a3a9a8ab849c3",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_canesm_20thcal",
+      "path": "outputs/gcm_baseline_canesm_20thcal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "9dc6e450bf8b618752c264fd931ef8ab7cbaed64d17648b6f6e9ba7ec715c883",
+      "source_iterations_sha256": "690404c2bf67a0dd119bdc47fc161e955f7a6bbab3a651cd2ec938a798914f97",
+      "execution_log_sha256": "0408b73751b8b3d0934e3353806daa9cc431e135e939f70514983eee7b6b08a8",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_canesm_ssp245cal",
+      "path": "outputs/gcm_baseline_canesm_ssp245cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "5bcc96df148e4f7f6883bcd09955bdf69cc5eaa61dfe9d0f3bf0ca5d18eaceb7",
+      "source_iterations_sha256": "0e7311320a97b2ffdbbfd9e397a394087b10eaab65d24f15ff3251af12f76a47",
+      "execution_log_sha256": "f53da5ac82e81462b9344c81d680c2f2d0f2cd9065b24c786c06c1817fc7d797",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_canesm_ssp245_2cal",
+      "path": "outputs/gcm_baseline_canesm_ssp245_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "1dcff107669f48c6fbf65aa0373b750d050ac74db32da0bd6b73b2253b646e92",
+      "source_iterations_sha256": "32035f84f9d2a35439ee05c93d6dccdf9a6d4e3a36211ef5db535f6765f4c274",
+      "execution_log_sha256": "c438ee2b45e399a633357f5b35da332e7c05de22d6a7181f9203a0b83d041e25",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_canesm_ssp585cal",
+      "path": "outputs/gcm_baseline_canesm_ssp585cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "b1f34765cfd88700a7b694b6fa85cff61b7e41c70043721710d6e3e86571a526",
+      "source_iterations_sha256": "2c6578c47b134c7d0bd77abc95809c5b8e48f2856d9a31c1a4da42124699d7fd",
+      "execution_log_sha256": "ab4454feab20bb1411205d240c482421090cd4771d4a7cbc9662da03a3afe5f5",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_canesm_ssp585_2cal",
+      "path": "outputs/gcm_baseline_canesm_ssp585_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "66e02f2076d08605f59efbd27ea8f9f2390e461bef69e996b54851f166e49d16",
+      "source_iterations_sha256": "3b4bfc68c2e5ed2ce6288a6ea9bf3d635e80424159fb4048332e2710db049e89",
+      "execution_log_sha256": "c4a49fcdea2cfd544d776f401886924b5fd730ae92aa95d68730dbc9d5703ddb",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_cnrm6_20thcal",
+      "path": "outputs/gcm_baseline_cnrm6_20thcal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "43dc0edfbcfd66cc6f4b22c30eebd5057baffcd1d3d9292b5dd747e07362ff30",
+      "source_iterations_sha256": "c79a092dece2c95fd52660b4970a56869259f5417f67ca2a3cfb4836bc4fa00d",
+      "execution_log_sha256": "d6a1b4bb5af88422d59008d0436b5fb22e0447c7d434505293cc9081b3e2b624",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_cnrm6_ssp245cal",
+      "path": "outputs/gcm_baseline_cnrm6_ssp245cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "47e057ead84ced761140021b8ed1d4138d5502912294202aa1892fbf799464f9",
+      "source_iterations_sha256": "c7b1db19e9ca3f9d0719f5f0477edb920c3776fab31ca295675b38871b742034",
+      "execution_log_sha256": "3a26fb0779c5f96074046ed064574ca679a6224d85710428b27ebc6b24d828ab",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_cnrm6_ssp245_2cal",
+      "path": "outputs/gcm_baseline_cnrm6_ssp245_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "f45b02b7bdd2f29981dddd9d78bfe81d994a6c328ef8d1d22c5045d7b50bde0b",
+      "source_iterations_sha256": "e0cce8289dc53239399b81cac916dc3f35a28b7948d94b15c7017e65685a3bb7",
+      "execution_log_sha256": "11419c76932023fc9f1e60fbbe14295cff52b5d06a7e2c1aef6c2183aac0483d",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_cnrm6_ssp585cal",
+      "path": "outputs/gcm_baseline_cnrm6_ssp585cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "489fd4ca9c169a6d00d72fa897728fa9b8be86ebd01f077e2903a1649dedc8f1",
+      "source_iterations_sha256": "3615cc5c8334a850603b9d7494b52aee4eac00bd03c13e0a57da0c13cca245d6",
+      "execution_log_sha256": "6d538dd608d231ebefd7e7a636edda4c639746b70aea8ef5a5329349112d73d0",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_cnrm6_ssp585_2cal",
+      "path": "outputs/gcm_baseline_cnrm6_ssp585_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "f7700d1c533973e85eedcfa58356b214f03cf94cd9286f85a3b4017097a4bd7f",
+      "source_iterations_sha256": "a9ebe370ee598103eb4859672448b10072d85c1e1c6cd9b482d75fe50991d08d",
+      "execution_log_sha256": "00c875c27afe607defc0abc99f168be482bf45519d1e8f13c138ca0d5bd320d8",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ecearth6_20thcal",
+      "path": "outputs/gcm_baseline_ecearth6_20thcal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "9d8a20797251d96001d9f71f0060376ebc9353a494f6a8493f52ee57ac06f9c0",
+      "source_iterations_sha256": "6881c92e760fc0d016189c4cba20dbe141d8ccd46931650e28b3b207576d737f",
+      "execution_log_sha256": "43104cc55912eecef599c6df1fd09c131db32dcf64720cd78aa0c80a29f88dea",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ecearth6_ssp245cal",
+      "path": "outputs/gcm_baseline_ecearth6_ssp245cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "11daa3e86e24ee95f1418cbe628ce681d16e41775479ec8fd8f260479ecb9bdd",
+      "source_iterations_sha256": "b64edd950c4b5b3bb06087861d7b88f92dcb3b0310087681c7c3625965770a89",
+      "execution_log_sha256": "12db2c0e9989c667c449bb5f059ac773a3cf703cbf3a438a19e5a9f324e30449",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ecearth6_ssp245_2cal",
+      "path": "outputs/gcm_baseline_ecearth6_ssp245_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "b7eec44dbb6858ba98fdc37d7b723583a15a74fcea05d4fd4c435e80f8721d12",
+      "source_iterations_sha256": "07b698dd937f5888d407e42405f7dabb106a8cc2bdd737d914a5f42c2d1714ec",
+      "execution_log_sha256": "f431c718a790579e2bd862163a8cd0b2d95bbb7c1332727b10c8c147cf7ff1c9",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ecearth6_ssp585cal",
+      "path": "outputs/gcm_baseline_ecearth6_ssp585cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "4680ddc1b247c93cb37bdd105c7dfcef4fbe0579dea5a6dcb574663ab3eb2537",
+      "source_iterations_sha256": "dfc7cda3c4cf281fa763ceb8343071c10dbd585362ceac88d74e737183ee3bfa",
+      "execution_log_sha256": "c217253e556f5cbe5be69e96fbe518a113d536f02de6f00a6cd9f56a86d0a6d6",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ecearth6_ssp585_2cal",
+      "path": "outputs/gcm_baseline_ecearth6_ssp585_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "61b5b4188644b4fecc7ff3a5ac498b23ae209fcb06cfec961a28c440f2d0fb32",
+      "source_iterations_sha256": "d7370ae34005918496914f987a6d7d6acfeab14cdc733c95c8a9c5e4a485dae1",
+      "execution_log_sha256": "6739098417e268959d750948205c0079ab50a3769f4e0862a69dd39c98a8e600",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ipsl6_20thcal",
+      "path": "outputs/gcm_baseline_ipsl6_20thcal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "846a1d43412cc2dc102064db19faa81f8bedbeaddba2987812dcbd5903d7c56a",
+      "source_iterations_sha256": "21502be0db9e9183ddbd9ff2239b23fe0f00d4b444d59c6d925497261d3aa01a",
+      "execution_log_sha256": "62b8933f21b96857a149b950a38939d5e647e74fc3d486daa3c6f2b45f69bb3e",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ipsl6_ssp245cal",
+      "path": "outputs/gcm_baseline_ipsl6_ssp245cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "1ddc8dad8e0451b90c45ae6a99b396ab6c1fde26f82e750300818a0aab4d3699",
+      "source_iterations_sha256": "801adb1af66340ef1b4aff0819d440addc4a76ae61b103fe2f2b908ca638041a",
+      "execution_log_sha256": "732b9994c49e31664c0cb349ec8ce9c30b0a9ed5dc22621c442ab6ad918ee07a",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ipsl6_ssp245_2cal",
+      "path": "outputs/gcm_baseline_ipsl6_ssp245_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "5b05cd490183d1107cb3ac04044ec748e0335ec525aa7489f100dd56c494306f",
+      "source_iterations_sha256": "e2e4d4a164ad10177218aa32b37b797b1e8ef161618d1721603468ee0f85de9d",
+      "execution_log_sha256": "46e3e2c2d92b6f20ee72b41ffc5f0b21bfcf3096910c0011995bc400bad2fb68",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ipsl6_ssp585cal",
+      "path": "outputs/gcm_baseline_ipsl6_ssp585cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "2b7b7ad8bc8f1e8186495bdbe6c1b05454e1b19b6bddd1d1aeabd20b45df3ad5",
+      "source_iterations_sha256": "f2306f9bf0458bbf4f0ada6c8adddc47a7edc2df75759de475561b12850686dc",
+      "execution_log_sha256": "30827251bb84319ca32136ab85d7d0841c00c3a35a85733fbcea6a608b97e590",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_ipsl6_ssp585_2cal",
+      "path": "outputs/gcm_baseline_ipsl6_ssp585_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "23ec25095b52ab01ea62a289dbf42846eba20534ffdf7db9188c04fac87c1e9f",
+      "source_iterations_sha256": "198f16f073bb9582e0987ac771706cc8432be35cf8b66a2e6304cac03943220b",
+      "execution_log_sha256": "887bda735afe3b35e60b90e916259e31926b1de4f5d9fb110eab5d9413c647bc",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_miroc6_20thcal",
+      "path": "outputs/gcm_baseline_miroc6_20thcal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "081e71f8d77658d4439f13705515f2d0248738d523e2b8dfd2bf697d463c8733",
+      "source_iterations_sha256": "e82465b4d09cb061153fb21704794732ea4cb3097be8a1eca9c385a14ae925a7",
+      "execution_log_sha256": "588b1f416b4aa82d2c01fca090c1e583b35fe95e79ae0d7a59ed4af85e716553",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_miroc6_ssp245cal",
+      "path": "outputs/gcm_baseline_miroc6_ssp245cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "a6e5492b52dc87090a3157b5fb0b00f5318ac37be149f7fb91bd04cca916f982",
+      "source_iterations_sha256": "1b82a8fd3cfd488422a0dc195f4dfe0228642b43f5d784f56151695aee29d2b0",
+      "execution_log_sha256": "7447bb293993b15fca7db6405254cb03c84e70646a5e9a393daefd036665e6f9",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_miroc6_ssp245_2cal",
+      "path": "outputs/gcm_baseline_miroc6_ssp245_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "0a73c3bfe9d570e2ca7061a4264711207cb8b7fabda333efe9e55e3c61b35c22",
+      "source_iterations_sha256": "6b609615b6dcbb18a9d4b470867fe2ed7de33fedc274f32ff19ce9f1e5cc5d4a",
+      "execution_log_sha256": "54525cd44a17770919a8dd119b215d57df1c7355b838ee419da9c7ce48a890ba",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_miroc6_ssp585cal",
+      "path": "outputs/gcm_baseline_miroc6_ssp585cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "b64b67b8b3d5d32b6c3d0b8a3501cf026461819f72fce8c1a4151d51413fe89b",
+      "source_iterations_sha256": "633198e7e85516153af33506cfde0a72e0d411103656bbf9cc047378e748d352",
+      "execution_log_sha256": "135440c86a50c2ae979f48d5889a97346b9ef30a4a2cdc739ab0fa93f3b3ab1d",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "gcm_baseline_miroc6_ssp585_2cal",
+      "path": "outputs/gcm_baseline_miroc6_ssp585_2cal/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "76f7951b0bfc4f8cceaf1fa339d3bb8fa9aa8840ff7ef90d46bfdfbb9c9351da",
+      "source_iterations_sha256": "3740cd7bbc97316a9e30b892b59d2d9b5684179591b8208008198ada13c3965b",
+      "execution_log_sha256": "18238089becd1d704e0e141ba4f16db2b8154ebe1f60d807aa71029dc2332bdf",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L00",
+      "path": "outputs/buildingcode_canesm_L00/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "99885caf9bae5b69a8d9c178ceff42891064affbbc8215b755c21720ac202206",
+      "source_iterations_sha256": "c96ebf6655f81daf4969f90d6105a51da0af124a5339de781fbe27f325a850a0",
+      "execution_log_sha256": "f6e006e9318eeb4610bbb59c307482a6fcbaf9347774cbed5ca225a33fc544c0",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L01",
+      "path": "outputs/buildingcode_canesm_L01/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "5251f18881b9d322166936618ec05c1cdac3466382916f217028ec7783b5bade",
+      "source_iterations_sha256": "323c7f716958dc9ea4c15a2b1341fb5d1627b5080269812edb300e3bb84de756",
+      "execution_log_sha256": "57f695e64f64892a7903a6acf1d9f167a898ee9c6f89a462d12a79b6e28c6380",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L02",
+      "path": "outputs/buildingcode_canesm_L02/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "35cde2f9cf21fbcac6c5fe9bc27bcc1324677daeae011f511cf217f86f04331a",
+      "source_iterations_sha256": "439a4248335c0e8f255922e9afe4d67d915051761ba13acb9cd2b6ee8929a90a",
+      "execution_log_sha256": "86672b60f98dd8d496e13315b1ee85b02af064fd0bb77d8fe748d965122ce67b",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L03",
+      "path": "outputs/buildingcode_canesm_L03/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "fadb45753ec16962cea82e673ceae1e8ab65ce0d6a1888a7ef465e7414ac3d4f",
+      "source_iterations_sha256": "1b7cd9e7ce4b098bc86140715bfacf7ffc162b4fe4fe0303c18f7a20d4a67b3f",
+      "execution_log_sha256": "8dab131f6ab3f1d0237649a9dd38b159d96ce4c1dc9685526898d6d39dd5a8f6",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L04",
+      "path": "outputs/buildingcode_canesm_L04/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "8eeb778d67aa5e453a07c25e01e5419c5bf20adc1cd680f5d6b20532f27b014c",
+      "source_iterations_sha256": "b594393bf94fd9cfe8dddf1c99b1c34d408d49a19c08b53e5e52a50e65c259dd",
+      "execution_log_sha256": "1b11053567e0cc01ec278ac8f0f9467ba1d9899f42b875dcb697140c9196ce6b",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L05",
+      "path": "outputs/buildingcode_canesm_L05/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "562c687227aa1b0fe7b99652e9bdf36e90a7f64dbf3ccf54189612abc701c986",
+      "source_iterations_sha256": "28f2d430860c93cb73690827f8d456b4e3146ab267340797438e7e1a83cdfa9c",
+      "execution_log_sha256": "cd89c967b86b2509139344d50a99a9c139509d3768dc2c290923ad93f2b5517a",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L06",
+      "path": "outputs/buildingcode_canesm_L06/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "cf5fc7d40313bcf3eb474778b30d6d07c34708c313367b0357c13375020d5ee1",
+      "source_iterations_sha256": "6b2fb3b8989274938fa114369f978d715eace780d2ed8a7784284c6e733eb558",
+      "execution_log_sha256": "7ba78252f320b968344c30c6599e59692a958c6378ad3e8f5ef4350e04149d3c",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L07",
+      "path": "outputs/buildingcode_canesm_L07/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "b1d2c398ee04e5ee576fd9bb43cafd5cf3bc127435743b48d16bfd05b511e387",
+      "source_iterations_sha256": "4a3f5514177ffccf032e9f3c25677e2de370d6932cffc372b4364a619c8d7721",
+      "execution_log_sha256": "90c33fb299cdf989e92433cb9704c3d97da1e20829b8a82fd2b6b3562faab95a",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L08",
+      "path": "outputs/buildingcode_canesm_L08/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "ada265682fae9a8d00eb66badf1c11e38c5fd8c18caf1b5da88b398032038ea2",
+      "source_iterations_sha256": "76e46802973028b2325d342459500a20edf24399b2aa0328e4014a8118027292",
+      "execution_log_sha256": "caaa420b9eb69c5d5072998559fd9916ddb37a26071dff049e6bf95ad782fea8",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L09",
+      "path": "outputs/buildingcode_canesm_L09/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "ba20f8686cf428fd108c14b38c239d7bfefcb28712a4d23cbf144adc2af12b6a",
+      "source_iterations_sha256": "c673e5e31d5fd1bed7cc15c9f5c9ad97096c9b5ece76f860998d82616ddb7836",
+      "execution_log_sha256": "acab6eb14dd1fb45b8acdde34941360dadea1a9bcf05fc03cbd43fe2f3d1d6ab",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L10",
+      "path": "outputs/buildingcode_canesm_L10/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "75bb509b5fb92e9626498facb673931923a47b0531d76ba5cc127145f6f7503e",
+      "source_iterations_sha256": "2d78c071f1317ae2c6d166f0b72dc3b22631d4b57744e63ff933f680ecf64999",
+      "execution_log_sha256": "f8bfae237d6338a06bedc36ae293aae4ffeea9f32459148fa69626e626bcd75b",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L11",
+      "path": "outputs/buildingcode_canesm_L11/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "5d004ff9b24388731b862d84c6cad3526f7bf1afc36fc3701ef3687876397157",
+      "source_iterations_sha256": "4194a6e9cffc8cca927e160915917d25a1401107fd13daaf3377852e7759a251",
+      "execution_log_sha256": "00f7b4b25bebbf88a2a9ed570b9c85a6ad662e51c29f22d7f82d55b7f7b982e1",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_canesm_L12",
+      "path": "outputs/buildingcode_canesm_L12/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "523723e62ba8647ff90dc305573476a04b60431d6713b19b262b66bb71dd452a",
+      "source_iterations_sha256": "e95ae471aeb656c7099597194fea57768f0a38c7467ae2cd66e7a8fb1d2ea564",
+      "execution_log_sha256": "6f1c6ee53c8a6484480b49ce17f0c38f9a61839ad173c9adb3216869f604623a",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L00",
+      "path": "outputs/buildingcode_cnrm6_L00/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "1117bccb4e08cac61a996e97eb0ac191507e9ee83deab14966cab14b036a59c7",
+      "source_iterations_sha256": "1b0deaece58c01abe2aa6b91680f6bcb068adc2369b74c54e3817625258a684a",
+      "execution_log_sha256": "4e1fca66d8f3ee4565e1d60aea689d724681ed3a85915be3d502a66b326c15c8",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L01",
+      "path": "outputs/buildingcode_cnrm6_L01/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "713ccdd755ce785790e3c02d37e50d16bb6cdeadacebbb527fcc39cfedc624fb",
+      "source_iterations_sha256": "a25c9ff8ba4b418d5279e44804b08d5058fee671c7e0c616527c254376684c33",
+      "execution_log_sha256": "99b85faadb69c6adf4ff3c5882fcb2eecb4faa9e86af31699a7e84cc330620e2",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L02",
+      "path": "outputs/buildingcode_cnrm6_L02/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "ba916442c0fceec1c6193d81b30594afcc8139f0db652a536b3eef77d60a10b0",
+      "source_iterations_sha256": "7118e58958f5d01b26c88f72a019c1bf77592f40a1a52e81e9fae16a5acb47e6",
+      "execution_log_sha256": "610aca25fdb0d53bf2e050d904dbcac98cf9082481b667fc95df36678822c547",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L03",
+      "path": "outputs/buildingcode_cnrm6_L03/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "a9f1f2a6f6beb7a8c4bdd42ea70bd25060f62c9843f8ccec6bf004a747f840b0",
+      "source_iterations_sha256": "0bd9c55ea61636d6f3729e95e1688b85aa29c71261324d7f17d323d39eea8941",
+      "execution_log_sha256": "18afb428eec67c9e2c689760fa8f7949d95cecbe2071341f888647fdc83d06fe",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L04",
+      "path": "outputs/buildingcode_cnrm6_L04/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "e71ec8765be651e28740418442f3a8c2ab572738d8e5040b35ca48db4d32912e",
+      "source_iterations_sha256": "ddaeefa50d0d028ca225f51ee627c18634e60cccccfd23ef1c74bc9b71760c3c",
+      "execution_log_sha256": "01d5bec886ec18dcec4fb3a89020238b57ea2f307a77cd6553b33191ab2cf1f4",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L05",
+      "path": "outputs/buildingcode_cnrm6_L05/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "fafaee0dc9ea520ed1bed2fb09ad7b9c7ad61899c477bd15df8a2b5c019b848b",
+      "source_iterations_sha256": "d87b00600880fd3c25a24129a8ff035f55af6ef1f2eece64de0a7f564d3fdfee",
+      "execution_log_sha256": "ec58b70d023cfcd83a3d02217e1abf3b8a9a0d762e9aa02886098953c0703279",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L06",
+      "path": "outputs/buildingcode_cnrm6_L06/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "9e1fb47927218a9860602cf3f1f95420ee701108bbd4dd13f02b7d90b5269dd8",
+      "source_iterations_sha256": "f473d5eae3051296bae94aa75ea8f3a4f09815891ccc87a4eeb2e009588e3e72",
+      "execution_log_sha256": "3b212b385661968b6a01eb8e86acac1ef4715cbd5c295e78dc7a6654c8f1e506",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L07",
+      "path": "outputs/buildingcode_cnrm6_L07/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "74a5387203c7181bfdd620b9ffae1aeb82aa5b0203dd3223dab5f8724fed7048",
+      "source_iterations_sha256": "8e1e969c477f957e524c891271342b0826842c05b1f1ae4a028312c064c16673",
+      "execution_log_sha256": "78a0975a45dbe5163e072c2434b53ad7179e6c38503487436784bfc96c6f131b",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L08",
+      "path": "outputs/buildingcode_cnrm6_L08/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "24980eea4bb89e18caabed3e2be603060994772121ec254e6b5c1d758c665de4",
+      "source_iterations_sha256": "7a1c8773a6c725da0e17f21acf5b42cde59e23eb40c5e9998b8a81ca248b79aa",
+      "execution_log_sha256": "ae1d1ada6290e30ea62986f4d6abbe10ce2ac3a150d167e579e8807032e58d05",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L09",
+      "path": "outputs/buildingcode_cnrm6_L09/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "abce28442945dcb4f4e35fec77f24ebe004586fdb7e4f4a5e628acdb045da7da",
+      "source_iterations_sha256": "86afe2ed1a30cced4e9ad1a545f2f0e37477090e8c46bb72139242db66fcbbe3",
+      "execution_log_sha256": "ec5a63cb6f8875febc5fa8288b81be4749a144de171ce74e889e578456966a64",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L10",
+      "path": "outputs/buildingcode_cnrm6_L10/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "0e663f4ab17733fbf83d62a6f65819756f6d6ef15b154a1c599526aa408f847b",
+      "source_iterations_sha256": "d9f06274626816743e007c57d76381371edeb38bd9eb98f37bd369310e579873",
+      "execution_log_sha256": "f0066387c3e39b6a94a72c0438370ed0a57c54989ccb50317dc24ece67ad102f",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L11",
+      "path": "outputs/buildingcode_cnrm6_L11/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "5a162d8ffabcfbdc1ac00e74ecce35ec2b574257f9d3575a4b296a023952f04e",
+      "source_iterations_sha256": "77c049e795f14876955baa65c988dd477d46a921be380101a0d482f9f1b5fa12",
+      "execution_log_sha256": "2ef135c27596395404993931756d269d65aafe0557165837a08b23b325753d90",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_cnrm6_L12",
+      "path": "outputs/buildingcode_cnrm6_L12/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "8990fd44bed68466cbd4f9b74b6a364b133b57cb3e7e35e82eb8d96dbaabdc77",
+      "source_iterations_sha256": "adb7e1655875d44c45e976c1d79ae33ff3d0e3dfac53595bffb7d98d9bdaec34",
+      "execution_log_sha256": "ee4370242497390f5df8b478f7788338ce2984f2c172389ab35e743bd0e86670",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L00",
+      "path": "outputs/buildingcode_ecearth6_L00/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "f7931641cd44566d21704dec5ba3fb1f3c7bd5bada2bc9502b35e232e9af7272",
+      "source_iterations_sha256": "311b5465de8c6982eaac6b6e463f4a206af52d923617c36eb2b6f3bb5483322e",
+      "execution_log_sha256": "e389a93783156406dcd8d7cd5e482e895146e510638f28f9e455556d0e68d0cc",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L01",
+      "path": "outputs/buildingcode_ecearth6_L01/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "ebdef17bc56717c8c9155a831c240f7ce29ad430bc8577adf6966df9a0ff792b",
+      "source_iterations_sha256": "84468d3386b12414519dde3023f2ee37ec204e15058c83a30258f11751462254",
+      "execution_log_sha256": "7b786933f29276a282012e229d4e955e55b592a7c075fc92e87b0394b3c2e71c",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L02",
+      "path": "outputs/buildingcode_ecearth6_L02/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "8af045b9fc64a07cfe04b0d9db57e6aa326434acd18981d98fe89d8f3a2b4e4f",
+      "source_iterations_sha256": "7050789f223c952abb8374c83fb9cfe4c721fce240284daf4d3ac6aaa2438dd0",
+      "execution_log_sha256": "62229c0bb12728560b44579d2301fcadfe18ad752628ef3345e1676b745ea1d1",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L03",
+      "path": "outputs/buildingcode_ecearth6_L03/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "ab84ecd2f916cbaf0e1d9db8e58af4efe829b5f20e8c0343ff18bd4c91a31432",
+      "source_iterations_sha256": "199934189f768eff4b05f245a21fc8d413fe8436dff7e274122a521b6b775d63",
+      "execution_log_sha256": "25997dc2c04937a5a30a9ba3210efe26f0dd4da897d679cc8df620dd004af4d5",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L04",
+      "path": "outputs/buildingcode_ecearth6_L04/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "a06dff5ae5b89ed9dc977c9064fe66dae344d8abf0d19e755e980e2d50eb11f8",
+      "source_iterations_sha256": "74985a8f50e26c39841f1bd9e7afdff030d868b1452266d900755af3afde7705",
+      "execution_log_sha256": "a5122013dc74c7caa621a7a42099fda2b81423210b8288bd0c2d686455012946",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L05",
+      "path": "outputs/buildingcode_ecearth6_L05/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "4a20c64dc6e667416667513b0775d8d8da5244e192127f829df3be7f87ddac3f",
+      "source_iterations_sha256": "36ea67a48b66a7dc3863bcd85dd4ac4bd64f9740d4881a627f01666788830c63",
+      "execution_log_sha256": "3ca74b94996915f46110721db4ce211ded447d17b13a8180b56ac3e404a1faf0",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L06",
+      "path": "outputs/buildingcode_ecearth6_L06/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "51f9798c58e6d595f4b8721333550016ba13c6efb8950855d6a6f9fa07bafa1c",
+      "source_iterations_sha256": "580556032cec99827aa9451878eaecde1930a961a1f24aa995fd0215633e78a5",
+      "execution_log_sha256": "ec78f90406cacea6c9e5ee36c8570d90b6014e815a0a0992aab8eaf85cb5320d",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L07",
+      "path": "outputs/buildingcode_ecearth6_L07/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "01b4009f98ef28c88070c3230a8bcb716a8b3726bc8cc17689bd54373ca46bbc",
+      "source_iterations_sha256": "2bf3342d8d031da5d0df0ceec36f14ce0e0d9d3e80791756a20a351bc745219f",
+      "execution_log_sha256": "e5ac8f0ba2ce0e6c45187b9c4f83edf463039df258ced6af049a2647ead14938",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L08",
+      "path": "outputs/buildingcode_ecearth6_L08/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "f1cff7f1a13e2fb752cf1b774d0d99d79859d0d6e4875676a8d5efff35b8ce23",
+      "source_iterations_sha256": "7fee5a2837554a712015435ac60c0f4095c6aba73eee1e6cc70cd6d8b7989082",
+      "execution_log_sha256": "02c14cd04c03aaf50cc32d3d99d736fc7f11898a92c10799e747b635c9aeac57",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L09",
+      "path": "outputs/buildingcode_ecearth6_L09/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "5cb81f4b4d746d57260ccf3d89e724b9a5d7d5c81fcfe4de27176d54df3bf328",
+      "source_iterations_sha256": "69f106dc98584708cc6d15b48938b7515612e914b396a39ded9a655cc3624add",
+      "execution_log_sha256": "a6d108e49ec570afb380fd733ff8db061a8d5a5e29a7479d609523dc46d2a5b8",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L10",
+      "path": "outputs/buildingcode_ecearth6_L10/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "5e5930af03abd05ae4da9b8d6dad3d8b10ea6b523acd9de7b88ebcc0ab101b7f",
+      "source_iterations_sha256": "2c6fb6af49ebf258d7651dc9f876a59e664b94a4bbdb208d2833058b36993431",
+      "execution_log_sha256": "6352150ebd08853f8630c0abe319812104db54493f1c969bdd2f61a2df431782",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L11",
+      "path": "outputs/buildingcode_ecearth6_L11/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "3cfc9ebc722aed8b4db825197b037facd2faf072d47b902578a003b3d44ea88e",
+      "source_iterations_sha256": "90ad5df7782e457c06d04c0b0cdfc39cf894986e7571b3c52f64afcedc10f0f1",
+      "execution_log_sha256": "5c9fa8046c7b5a9b523c8ba1b37db763b012d315b4342fad5dc802338154a36b",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ecearth6_L12",
+      "path": "outputs/buildingcode_ecearth6_L12/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "a56f99591575120d18962c02e0d7a14cc24a9f9a994d5d65662e75a90cbf7831",
+      "source_iterations_sha256": "8357f0f9ce10cad3eb556db16aba794838fed9135393debe3a6d621113ad840b",
+      "execution_log_sha256": "8ee6fa8f95f5ccf44dcb1d719c43a4db990f1d035ed4a9ddef3c84c838973008",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L00",
+      "path": "outputs/buildingcode_ipsl6_L00/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "352fa7611fa2e62d1d708ab2674013da38da6e573f2370055fbef6c74f4244ea",
+      "source_iterations_sha256": "01742d1b15c262e959fbebf6a70c855cdd59a47b99d6aafad99ec5004eebbdd5",
+      "execution_log_sha256": "cc39091739d342b8df75ef302442d7dec6e568069490724db501dce2c70dea36",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L01",
+      "path": "outputs/buildingcode_ipsl6_L01/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "fcf411189da2b7b038f451005c33bddc0c0ab11d9bbda6df8a27794722253ee1",
+      "source_iterations_sha256": "e5f8b97eda5afc228c30e05736129c8353cabc2d93b6311de913172ab9d8eb54",
+      "execution_log_sha256": "b148c0b820d30f41f3d4d442ce758d441954588edef5cf1d19b3be402ba27bab",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L02",
+      "path": "outputs/buildingcode_ipsl6_L02/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "ff062a38a89543c23e69a1d26849f49b65da216faefabc0a4ee4d3394b66d356",
+      "source_iterations_sha256": "4a6b4b33097d06cc9f1142319382adb6cbc962f285144a76bd09e43a5dcfd754",
+      "execution_log_sha256": "791b95db5dd05c5095428b35f1c028fe511b6e1dc9fae982332d0b4ddb85d01a",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L03",
+      "path": "outputs/buildingcode_ipsl6_L03/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "09591c73b88b3771fbf289b1091dc653b6513dd6fb29141a62781cc46dab940c",
+      "source_iterations_sha256": "5018f8c7f9825525c7e782b050d402b1371e3b43f9d02e36116661d564a629f6",
+      "execution_log_sha256": "c5c7c8e08ea0cc8886f026b63ccc701f0bc76c0625735132719cb54687ee9dc8",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L04",
+      "path": "outputs/buildingcode_ipsl6_L04/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "1fc86614448dd35e479cb5fdae1ab5daf66c714ef51ac6ac628e117b51d4537c",
+      "source_iterations_sha256": "e4927ef5edb750b327645443e5f9cb2880254def26a5a33a58d6f627ff9c4851",
+      "execution_log_sha256": "9f610192cbb4d8ad7e07980930507208c7b40b56ce366bed52d5d7a62bf649a8",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L05",
+      "path": "outputs/buildingcode_ipsl6_L05/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "50811f29dab1fcfccac79dda56f23f9d72bd25052afb455d2a87799ebcfc448a",
+      "source_iterations_sha256": "7c6810a664e0b9266449b58b55cc6ad0f039a474e32b4987ce14b741da34defe",
+      "execution_log_sha256": "7d29987ea54ea4cf46f59599d9681af9ab58e203a88d1b9547176bfd67080742",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L06",
+      "path": "outputs/buildingcode_ipsl6_L06/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "a2168f5b7586b1bef97adf5e01dc1b263942284a7ddadbbbd9ec647160a10d73",
+      "source_iterations_sha256": "dee6ee4a12981cf9bc1a7c4a4115e0d8a788d92b1e6c944a8a7693ecc69f8429",
+      "execution_log_sha256": "d13eb1e7e375d8b6ac3afcfb56ba65c948e863196dda78e775447d3cd8796a13",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L07",
+      "path": "outputs/buildingcode_ipsl6_L07/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "79a89d45f4c52f81e6ef9cddbdd4ee8cebbb5c9be42cac0bb1a027c3868adfc4",
+      "source_iterations_sha256": "640393ce4ff0f3adedc163af29e4ce94ed690b7d45163d4051dc7f507fe232bd",
+      "execution_log_sha256": "f58fdfb94692a1cdbfa962f72a4423f79d9197d65eea62b728ffc00d4c10eb5a",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L08",
+      "path": "outputs/buildingcode_ipsl6_L08/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "db07384435c47e6759b456d3a3d94232d4743b20890aa16710cfdc3cf1d2c6af",
+      "source_iterations_sha256": "eca013e217869347574d19e43293d2ebdf4ed820275b1a6b8b129d332b6563df",
+      "execution_log_sha256": "6b4ea9757f4df5b80b56acca3fda728b506511ba5d1d1096553a6d50b8eef57e",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L09",
+      "path": "outputs/buildingcode_ipsl6_L09/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "8f88e3a5e22e2b53a79ed894c10c284923be795081a286259c6fa21e71233833",
+      "source_iterations_sha256": "fb97d8e92b67ff79536c2969c5b363c6d104ce8b097fd6a9770e2ce4329e7491",
+      "execution_log_sha256": "187d9a90ce5ac73e849a3b063274cba51b2efe544b54e8bc9675e787c1f483e4",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L10",
+      "path": "outputs/buildingcode_ipsl6_L10/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "6cf63cae1c0f37dcf15de2dcacf421c9af85e9c2fdaacd876008b61bda5a3c8a",
+      "source_iterations_sha256": "5fec08832142e520325abf5e294fa5f95bb38b396068f45a28f7e94ff18bebb6",
+      "execution_log_sha256": "ba78f204610ae46552a355bd9f3a08c47fc86a2b2a07bd43e7b1b1764778efa3",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L11",
+      "path": "outputs/buildingcode_ipsl6_L11/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "ee27a818baaf945ca5e8134bee6a4f0c797ac1dac15f34f1c75ee7a25c99a449",
+      "source_iterations_sha256": "6aa65ad78965864296b203cd236505d669fff74b4f1cd3bb0f373f76a0bf0952",
+      "execution_log_sha256": "8a69d0b52e70e4e319f1d9b941bb34bd0dd016c1837bf3f39123edfb30bf121b",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_ipsl6_L12",
+      "path": "outputs/buildingcode_ipsl6_L12/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "3a5a9d568306a99c892de002f047f48f871af01d5320d6adf45035f179ca0e49",
+      "source_iterations_sha256": "85a417f99a33e871d75f87d8d1356887b18dfe0284e30154f3ab5c8e4c14d35f",
+      "execution_log_sha256": "8dbf21c802491b75ac2db070f58e7bb344e49a2b5bfb45fa2d94e832adde894d",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L00",
+      "path": "outputs/buildingcode_miroc6_L00/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "cd35720fc58a65ab4b5b49f38d32080eb2f92fd0d518bf1f031f0661c0dca73d",
+      "source_iterations_sha256": "f39c6783e7bf1196d5d06adff654b8cd137dd3b1184cef3a3c5d3d35d8c4ff11",
+      "execution_log_sha256": "ad0a71dfd3f07475518bc26e287fc7af081dda6884e3748df93ecb859fcf2d17",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L01",
+      "path": "outputs/buildingcode_miroc6_L01/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "207dbe370634363385008729bb7fa7cffed4ea670f38931ef4a927ac33d4d67c",
+      "source_iterations_sha256": "24f958d19f3b6748806d93f3ff317dfc7aba2874df58dd98257273ab7df2b513",
+      "execution_log_sha256": "5369a847081de11c0271f54827417be43fddfb8d5a87aaf30a176602997fe1f5",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L02",
+      "path": "outputs/buildingcode_miroc6_L02/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "fcee24fadbf950f5b104a9b19bc14376824360af84133c9b29023ee51275d550",
+      "source_iterations_sha256": "d857b6635723fbf518585ed5022aa9e55ae74556f32f323f465f59947cf88d8c",
+      "execution_log_sha256": "a94dcbf6c735b3466cf0bb69efce19dbf03bbf68c621e72e935e1472fa331bb2",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L03",
+      "path": "outputs/buildingcode_miroc6_L03/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "4760436ad26bcb51a9adbbce4407ac817dd6ef5e7d4b213bc36a175ecbebdc19",
+      "source_iterations_sha256": "c578f90c35742f65eab18bcb61dbf17cbd1adf7b204127a06856b77cc326f8a6",
+      "execution_log_sha256": "b98fab2ee679f17a9a165f00b4b19466274f2cf80a04461df18f73429225f556",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L04",
+      "path": "outputs/buildingcode_miroc6_L04/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "6a55d8cf4bba01a9639ce6b04ab1aee07e40f9ae2e7663ea8d780c539953cd56",
+      "source_iterations_sha256": "842762cbbebda85a90b9a8e805d8524ea3601f31bfd1d6f544b825a06d20ff4d",
+      "execution_log_sha256": "0723e770734af37d02d21e61ba949ffaa9208912e1bb29e02729c832f676cf01",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L05",
+      "path": "outputs/buildingcode_miroc6_L05/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "47777a20d374b15d28d24ea41034b77a0adfd18101a68e544556edc9d448c2cf",
+      "source_iterations_sha256": "c87882c97044b5f02b48c2300625ca5884b74345e5c321dc98251d3e54496f47",
+      "execution_log_sha256": "1c5d13b5e8d11fe0789738ed6f6a92cb8f11afc7eab8536b99b35875250564f4",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L06",
+      "path": "outputs/buildingcode_miroc6_L06/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "6a4bf765f4db63b94586f5d593ae2ed0cd069d47f650a1e674d2e713f1d2924e",
+      "source_iterations_sha256": "c0c9880c6b9ae22682c5752afdb15372c72307c9e8b6a57973bda0095dbdeb67",
+      "execution_log_sha256": "08005cb310876410ca62508bb1378138418938ee7e3c82417d42d59f34464e03",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L07",
+      "path": "outputs/buildingcode_miroc6_L07/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "ee7ca8768a01f67e524b52399baf802be41df95eb350f60b594236501fe6a26b",
+      "source_iterations_sha256": "34eaffdc8f2dbe7751d4a242ef19bb64903da7c3fc773dda9fcbe35918bfe339",
+      "execution_log_sha256": "e9535f02af6597e7c3691899d82a9474966ca5ec243c7b9a246e29aa7ea0d941",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L08",
+      "path": "outputs/buildingcode_miroc6_L08/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "0e0e2d512638f7db35240c1952c219d393685fa5ec445074d5ffcc2e639dc569",
+      "source_iterations_sha256": "328ea16c20a359f0e3d9c3a4d00c9591d2e9f7d4fe6b00ef1ebf696602b0a3db",
+      "execution_log_sha256": "0d43b2c563ddb31462796e986898d3a7c29558a59f3547b3cd388f8e9f67ee25",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L09",
+      "path": "outputs/buildingcode_miroc6_L09/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "cedd12badb07aba061d9cad3b16fc2bd5518c87f310f768f7ebf279525cf6e36",
+      "source_iterations_sha256": "ca4870446e95967d396857de2799cd8c4889bb5d93c966738d7a2157c63d8cfe",
+      "execution_log_sha256": "d3c3cb7372e926937ae5281578ad4bb3eda11fbc1945d778e6da36f5631efc8e",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L10",
+      "path": "outputs/buildingcode_miroc6_L10/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "62bb4549874df25d3f4e3c41fdc79152ee899bd005e7ad189c7c0ede2547b31e",
+      "source_iterations_sha256": "df8777c5a1fa6e45f8036fdbf94edd882c0db2e550e4dd5fc8c4526f995b367a",
+      "execution_log_sha256": "6cc590443210b17b91428bb2d5644be0389327a8a0950b66f24e5e7563774748",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L11",
+      "path": "outputs/buildingcode_miroc6_L11/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "929717add21119bb019a374fa7757b8d8a88d68332062183dd97c810d99fbd65",
+      "source_iterations_sha256": "499069943e722358ec530f9222c1d88f2173f185e36144842e9cb474d98abda2",
+      "execution_log_sha256": "d4686b72baf31759d592acd3f7a217a6f15e349841cf985b33eda0e6dc4869c5",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "buildingcode_miroc6_L12",
+      "path": "outputs/buildingcode_miroc6_L12/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "61ccf35d89b159902aa1cde1dfef0096a50afe44441e61222dcc00f1db2f7cf1",
+      "source_iterations_sha256": "4384085e9c9d4be68617296c3916f9a001383e95c764a0b3901adc1a37ab6568",
+      "execution_log_sha256": "3435ead10c9ce0cb5ddb69c4a54c8387f871b261c38a586390b980ef97ce8258",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "historical_great_miami",
+      "path": "outputs/historical_great_miami/iterations.csv",
+      "expected_rows": 1000,
+      "sha256": "eea75abe4a72c6ce28ccbb0ab054acd735605710231eca33e1f18d27b7312075",
+      "source_iterations_sha256": "0e3a521c4084bfe85de9938b6fd8a2167c6f92051c4ffe13ec8e132b3bd8b5de",
+      "execution_log_sha256": "092cb407f4155a69de71aa7e521fbeef7271cccdb5829fe5c18263ce2a85147b",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "historical_andrew",
+      "path": "outputs/historical_andrew/iterations.csv",
+      "expected_rows": 1000,
+      "sha256": "c8d9c319935ccf1905c04797f8e18ffed341f5d2297a820f94e210d63629c560",
+      "source_iterations_sha256": "61b169ed61b5aa2bbb84598391eceb0d46f9c7edfee9eda13b3e579f60ff73ef",
+      "execution_log_sha256": "32fd2c79ba12e45792e572bbfc118cd25902ab2b5aa2a851a5bdea6f40275c2a",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "historical_gm_then_andrew",
+      "path": "outputs/historical_gm_then_andrew/iterations.csv",
+      "expected_rows": 1000,
+      "sha256": "b8ef5851fdd5b828a44f21d39aa90abf9f7f94e3eef15334331e86de76c147c9",
+      "source_iterations_sha256": "a75994e7b678bcad3e8ba9157c281d1c062b0d5f649ba1bf3a07a4a7943e6df4",
+      "execution_log_sha256": "3b2a3ce6cfd197331ef56b99b2e4be2cc2c8cc8f1178b66f33e05cc14ab34de7",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "historical_double_gm",
+      "path": "outputs/historical_double_gm/iterations.csv",
+      "expected_rows": 1000,
+      "sha256": "58d36e35a9bb3a34c2c6ac98428fe0222420ab907a113532056d3ec93db683c7",
+      "source_iterations_sha256": "3910ed541f6c8fc1f8d0ccd507826348a9c787e91f889746ef965fdb402638d6",
+      "execution_log_sha256": "94d8ec3338d10de2f92856e2c87bd48ff467586bbcbd3a146ef74893b1dadccd",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "historical_lake_okeechobee",
+      "path": "outputs/historical_lake_okeechobee/iterations.csv",
+      "expected_rows": 1000,
+      "sha256": "03a7a95f9d7448d530c5adf3abe1964a1343333ef473f530c6b1627c55b8ea86",
+      "source_iterations_sha256": "ef9cb86e661f3e9d31bd2dc45b7271a1539b2966ca9635986ea8dc705df5ba2c",
+      "execution_log_sha256": "a6c1a07c6b039c61058f2313b845b730e4fba6b6b71753105684e9a21d106c97",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "historical_irma",
+      "path": "outputs/historical_irma/iterations.csv",
+      "expected_rows": 1000,
+      "sha256": "6b3afe5bb40f93f0f1d282f2da93e9614c8164687a6ff94193370f82ef51437d",
+      "source_iterations_sha256": "346f2de98866724cbd8f722b98e18ad1be1c8161a035b6648ec5d4b52c4cd2c5",
+      "execution_log_sha256": "247f0882c7d8968366e39e51452b19ad25520648791f54b13008cbeefc88e44a",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "historical_double_irma",
+      "path": "outputs/historical_double_irma/iterations.csv",
+      "expected_rows": 1000,
+      "sha256": "41d1607d0c5e0044ae9c1af9b2640a0e361448b41deffbaddb5b523212895eb8",
+      "source_iterations_sha256": "5ae1a10dc4dbfc5408843bbc91e71c0793bab7b3bbabe9f4e93026ac3564d0b1",
+      "execution_log_sha256": "4c7129cf114a4d1568e6686f0ccb45ffb615e508a0a0c2981190df86d1b1dbec",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "insured_fraction_0.1",
+      "path": "outputs/insured_fraction_0.1/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "22f1c24313fb46894c38185a73acee1fe04fe7c8a75774af3b1ffa92f0467ab8",
+      "source_iterations_sha256": "0e17e96aa6418377ef31e4509d9b9a344c570d6e539851c3581610ec83a075e4",
+      "execution_log_sha256": "6d28182f0294619506ff226130cff0bbba115f9d18475d70bc57cb91a15fc4d3",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "insured_fraction_0.2",
+      "path": "outputs/insured_fraction_0.2/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "12edc50bbceccec152277536b0a4290c477559112c0d8855c97e3f36f7066291",
+      "source_iterations_sha256": "7fc17af542858b4b62360a59401237335297d4aeeb15718db8d58902b752dee6",
+      "execution_log_sha256": "1809695eb121c8cddff9a6da8f80793a03f4e4c1d479f891ae31d49538637fb4",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "insured_fraction_0.3",
+      "path": "outputs/insured_fraction_0.3/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "c38d9fc861b550e980b854724b7f7d09cc0c8aedfda261bea2e31832b766adb7",
+      "source_iterations_sha256": "4dfef64ec5450e8498bf53d694262c0c028cccc537f985234f2023ba680833fb",
+      "execution_log_sha256": "f24c5f35e4e8d34bbff63e8b6cfff220e46d5b693ea5405f1cccb92b23f00965",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "insured_fraction_0.4",
+      "path": "outputs/insured_fraction_0.4/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "2dcf5c9e37aa5190e272015782a520f7bba0100c51ee8b6a70f37d00805d9572",
+      "source_iterations_sha256": "2bba9352d1466f19230c19b290894120a8d62a98923ccfd9b9baa536242078cd",
+      "execution_log_sha256": "f35599989a222733384047f87575d35f0afb4fc8df5320c088994ce6fdc41c37",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    },
+    {
+      "name": "insured_fraction_0.5",
+      "path": "outputs/insured_fraction_0.5/iterations.csv",
+      "expected_rows": 10000,
+      "sha256": "f7455f4b0f946fe46e35f538a93bb4bc0d2f935d1e2ef13dcb29c9440d50b890",
+      "source_iterations_sha256": "ecd26d700de43c5423c867cddd968806ef109d44c73dfabb92ab76964aede5ed",
+      "execution_log_sha256": "efb03a55c8ad8882d89cc2675dfa0c8488a87a4904ce90f46b3a1b5b7a8039de",
+      "execution_commit": "014ed02c1b3cad1334411b82ce440a01f5b24f1b",
+      "execution_exit_code": 0
+    }
+  ]
+}

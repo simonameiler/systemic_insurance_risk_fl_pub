@@ -1,0 +1,127 @@
+scenario,metric,label,point,p10,p90,interval,n_rows,n_ratio_defined
+Great Miami,total_damage_usd,Total loss,170354720952.1598,170354720952.1598,170354720952.15985,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,wind_insured_private_usd,"Insured wind, private",36948437203.389755,20179094864.67438,56053849701.55954,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,wind_insured_citizens_usd,Citizens wind,10340338244.643274,4908648258.091446,17088490412.761587,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,flood_insured_capped_usd,"Insured flood, NFIP",14974528413.62863,4866812539.252733,27721048593.893906,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,wind_un_underinsured_usd,Un/underinsured wind,72175962978.56175,42533929369.95979,101262058305.47679,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,flood_un_derinsured_usd,Un/underinsured flood,35915454111.936424,11432486884.868675,66790148227.916565,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,residual_financing_requirement_usd,Residual financing requirement,22375082019.406788,11841054251.665405,32291553112.651627,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,figa_residual_deficit_usd,FIGA residual deficit,6774673140.150402,1012804271.2470937,14521904232.028383,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,citizens_residual_deficit_usd,Citizens residual deficit,4051753218.0694547,493516086.0997421,10520354805.838787,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,nfip_borrowed_usd,NFIP financing requirement,11548655661.186935,1425812539.2527332,24280048593.893906,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,defaults_post,Private defaults,17.601,13.0,22.0,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,largest_entity_deficit_usd,Largest single-entity deficit,1862796532.9549642,287503578.2780587,3768485580.8400984,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,fhcf_reimbursement_usd,FHCF reimbursements,14572116901.92486,11656938083.372862,15171950380.575298,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,fhcf_utilization,FHCF utilization factor,0.8571833471720505,0.6857022401984036,0.8924676694456057,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,citizens_assessment_stress,Citizens assessment stress factor,4.5024693172254056,0.5484147023840706,11.690636662758866,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,figa_unfunded_share,FIGA unfunded share,0.9192414544631591,0.726747204273218,0.9794786392793066,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami,nfip_florida_stress,NFIP Florida stress factor,10.727863648524028,3.4866207390219017,19.859565610009053,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,total_damage_usd,Total loss,114169083378.4201,114169083378.42007,114169083378.4201,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,wind_insured_private_usd,"Insured wind, private",29025414240.251156,14009097096.180805,46359995099.782455,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,wind_insured_citizens_usd,Citizens wind,10307034345.27361,4554374057.0428505,17658572695.348095,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,flood_insured_capped_usd,"Insured flood, NFIP",4935111183.334154,493088456.1798013,12880096809.272614,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,wind_un_underinsured_usd,Un/underinsured wind,60511459938.610596,37825172141.76076,84531060255.62811,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,flood_un_derinsured_usd,Un/underinsured flood,9390063670.950575,856370531.4596994,24698831132.481133,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,residual_financing_requirement_usd,Residual financing requirement,10417852555.519867,1501880307.8436277,21721757162.33845,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,figa_residual_deficit_usd,FIGA residual deficit,4079269178.447122,474132089.4802146,10414269509.125729,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,citizens_residual_deficit_usd,Citizens residual deficit,4095403015.554199,489973344.08925647,11090437088.4253,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,nfip_borrowed_usd,NFIP financing requirement,2243180361.518546,0.0,9439096809.272614,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,defaults_post,Private defaults,15.612,10.0,20.0,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,largest_entity_deficit_usd,Largest single-entity deficit,1198015228.2404082,266302960.1398503,2891436191.2215867,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,fhcf_reimbursement_usd,FHCF reimbursements,13831670063.891281,8484730993.561382,15160137035.887688,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,fhcf_utilization,FHCF utilization factor,0.8136276508171343,0.49910182315066953,0.8917727668169229,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,citizens_assessment_stress,Citizens assessment stress factor,4.550974708176094,0.5444778665644752,12.324134767774895,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,figa_unfunded_share,FIGA unfunded share,0.8463059549645948,0.5446841759860948,0.9713984466115689,"Across realizations, percentiles 5 and 95",1000,1000
+Andrew,nfip_florida_stress,NFIP Florida stress factor,3.535550396160067,0.35325224130222227,9.227397253052006,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,total_damage_usd,Total loss,156882125783.81442,156882125783.8144,156882125783.81442,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,wind_insured_private_usd,"Insured wind, private",16321449541.649845,4282295913.6592436,31588123468.627457,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,wind_insured_citizens_usd,Citizens wind,2578458925.9183154,659406452.3177714,5084261317.104083,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,flood_insured_capped_usd,"Insured flood, NFIP",17013745520.987175,10547815371.115107,22360856969.779953,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,wind_un_underinsured_usd,Un/underinsured wind,28344225587.18077,7633504978.354741,55401326921.22681,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,flood_un_derinsured_usd,Un/underinsured flood,92624246208.07831,57267312593.94222,121863266757.36363,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,residual_financing_requirement_usd,Residual financing requirement,15038492747.275621,11400120353.581312,18919856969.779953,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,figa_residual_deficit_usd,FIGA residual deficit,1135012647.6806245,0.0,4351762299.541348,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,citizens_residual_deficit_usd,Citizens residual deficit,330734578.60781837,0.0,495272216.68986857,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,nfip_borrowed_usd,NFIP financing requirement,13572745520.987177,7106815371.115108,18919856969.779953,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,defaults_post,Private defaults,11.047,3.0,17.0,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,largest_entity_deficit_usd,Largest single-entity deficit,431948099.1788606,46217723.207089566,1319757921.0778935,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,fhcf_reimbursement_usd,FHCF reimbursements,6881089616.125428,103858673.06326978,13029077125.275135,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,fhcf_utilization,FHCF utilization factor,0.40476997741914283,0.006109333709604104,0.7664163014867726,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,citizens_assessment_stress,Citizens assessment stress factor,0.3675254173147052,0.0,0.5503661845384682,"Across realizations, percentiles 5 and 95",1000,1000
+Lake Okeechobee,figa_unfunded_share,FIGA unfunded share,0.5905413813058694,0.0,0.9293606062336747,"Across realizations, percentiles 5 and 95",1000,967
+Lake Okeechobee,nfip_florida_stress,NFIP Florida stress factor,12.18877396724698,7.5565334657312855,16.019484421133686,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,total_damage_usd,Total loss,32020681848.66375,32020681848.66374,32020681848.663746,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,wind_insured_private_usd,"Insured wind, private",5965637182.209305,2798894715.262959,9502450893.530224,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,wind_insured_citizens_usd,Citizens wind,468370675.1284497,215889733.9193893,730079046.709978,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,flood_insured_capped_usd,"Insured flood, NFIP",2645719520.146584,1322293994.900773,3982100731.010406,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,wind_un_underinsured_usd,Un/underinsured wind,9661901874.29612,4743172570.0129,14888443488.971447,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,flood_un_derinsured_usd,Un/underinsured flood,13279052596.883286,6510572558.63298,20113792728.969296,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,residual_financing_requirement_usd,Residual financing requirement,155748949.14909038,0.0,541100731.0104058,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,figa_residual_deficit_usd,FIGA residual deficit,86081000.16548593,0.0,338004389.07874763,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,citizens_residual_deficit_usd,Citizens residual deficit,130768.42351996052,0.0,0.0,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,nfip_borrowed_usd,NFIP financing requirement,69537180.56008454,0.0,541100731.0104058,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,defaults_post,Private defaults,5.182,0.0,9.0,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,largest_entity_deficit_usd,Largest single-entity deficit,151025596.62346935,0.0,262972824.2299827,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,fhcf_reimbursement_usd,FHCF reimbursements,815746524.7407022,16004687.887391673,2868952222.5657234,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,fhcf_utilization,FHCF utilization factor,0.047985089690629534,0.0009414522286700985,0.16876189544504255,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,citizens_assessment_stress,Citizens assessment stress factor,0.00014531507297502606,0.0,0.0,"Across realizations, percentiles 5 and 95",1000,1000
+Irma,figa_unfunded_share,FIGA unfunded share,0.14581311476783548,0.0,0.46055705449874157,"Across realizations, percentiles 5 and 95",1000,892
+Irma,nfip_florida_stress,NFIP Florida stress factor,1.8954131629640565,0.9473012631000255,2.852806612466517,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,total_damage_usd,Total loss,266548625724.76178,266548625724.76184,266548625724.7619,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,wind_insured_private_usd,"Insured wind, private",61410967832.85043,35608227142.86411,90593898811.56732,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,wind_insured_citizens_usd,Citizens wind,18781891368.92557,9669330377.986744,29994931712.013573,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,flood_insured_capped_usd,"Insured flood, NFIP",19814421820.440033,9410677959.50387,31947055546.0716,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,wind_un_underinsured_usd,Un/underinsured wind,122854055557.17863,84350282705.4368,164963342457.03525,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,flood_un_derinsured_usd,Un/underinsured flood,43687289145.367195,20489670888.3897,70739878038.45883,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,residual_financing_requirement_usd,Residual financing requirement,45396771119.149765,26209664111.40444,65867756716.7537,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,figa_residual_deficit_usd,FIGA residual deficit,16787844250.187544,5998696718.187627,29027544365.38901,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,citizens_residual_deficit_usd,Citizens residual deficit,12235505048.522192,3101194771.0639462,23426796105.09077,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,nfip_borrowed_usd,NFIP financing requirement,16373421820.440033,5969677959.50387,28506055546.0716,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,defaults_post,Private defaults,21.277,18.0,23.0,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,largest_entity_deficit_usd,Largest single-entity deficit,4099262046.141562,1600137795.930402,7142719686.552255,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,fhcf_reimbursement_usd,FHCF reimbursements,15135323830.429869,15116509900.454342,15209268729.657597,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,fhcf_utilization,FHCF utilization factor,0.8903131664958747,0.8892064647326083,0.8946628664504469,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,citizens_assessment_stress,Citizens assessment stress factor,13.596579825258097,3.446170966480598,26.03278753347281,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,figa_unfunded_share,FIGA unfunded share,0.9760611967839009,0.9505702849110288,0.9897641398447917,"Across realizations, percentiles 5 and 95",1000,1000
+Great Miami then Andrew,nfip_florida_stress,NFIP Florida stress factor,14.195199320638293,6.741879757485069,22.887108455326022,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,total_damage_usd,Total loss,321140213590.4479,321140213590.4479,321140213590.44794,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,wind_insured_private_usd,"Insured wind, private",69336908246.05609,42735625644.17822,98133856785.56136,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,wind_insured_citizens_usd,Citizens wind,19350057107.91878,10462305419.522823,30527991157.337322,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,flood_insured_capped_usd,"Insured flood, NFIP",28101163096.63585,16104516062.998053,41433909289.88015,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,wind_un_underinsured_usd,Un/underinsured wind,136700314334.44673,95952456147.88354,180522449121.7161,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,flood_un_derinsured_usd,Un/underinsured flood,67651770805.39045,38484302991.75669,100067698719.94864,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,residual_financing_requirement_usd,Residual financing requirement,57574920245.883545,39030254863.8706,76980688948.60097,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,figa_residual_deficit_usd,FIGA residual deficit,20120450036.91504,8804720788.80974,32361942468.603596,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,citizens_residual_deficit_usd,Citizens residual deficit,12794307112.332663,3894169812.600025,23959855550.41452,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,nfip_borrowed_usd,NFIP financing requirement,24660163096.63585,12663516062.998053,37992909289.88015,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,defaults_post,Private defaults,22.035,19.0,23.0,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,largest_entity_deficit_usd,Largest single-entity deficit,4828820822.225252,2251482640.364492,7805950506.60667,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,fhcf_reimbursement_usd,FHCF reimbursements,15165990591.884426,15151489127.5515,15209268729.6576,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,fhcf_utilization,FHCF utilization factor,0.8921170936402605,0.8912640663265587,0.8946628664504471,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,citizens_assessment_stress,Citizens assessment stress factor,14.21754290254731,4.327356369855907,26.625144389296068,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,figa_unfunded_share,FIGA unfunded share,0.9821502495415982,0.9660712123773421,0.9908090956027643,"Across realizations, percentiles 5 and 95",1000,1000
+Double Great Miami,nfip_florida_stress,NFIP Florida stress factor,20.1318824699197,11.537395213866583,29.68356111185452,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,total_damage_usd,Total loss,62383714581.577034,62383714581.57703,62383714581.57704,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,wind_insured_private_usd,"Insured wind, private",11491113220.356234,7425624585.626068,15878054991.105766,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,wind_insured_citizens_usd,Citizens wind,905377682.4635159,584896202.399284,1242648979.3576727,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,flood_insured_capped_usd,"Insured flood, NFIP",5184585563.048651,3602071289.341378,6691805606.024895,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,wind_un_underinsured_usd,Un/underinsured wind,18745857245.69929,12801614348.254684,25542724137.238827,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,flood_un_derinsured_usd,Un/underinsured flood,26056780870.009342,17954228867.876366,33773822655.83979,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,residual_financing_requirement_usd,Residual financing requirement,2220341989.738243,955795378.7159183,3483727508.4050117,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,fhcf_shortfall_usd,FHCF shortfall,0.0,0.0,0.0,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,figa_residual_deficit_usd,FIGA residual deficit,402288897.13675374,176563339.31560212,584825481.5504582,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,citizens_residual_deficit_usd,Citizens residual deficit,63415637.07022616,0.0,200104202.25,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,nfip_borrowed_usd,NFIP financing requirement,1754637455.5312634,161071289.34137842,3250805606.0248947,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,defaults_post,Private defaults,9.638,7.0,12.0,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,largest_entity_deficit_usd,Largest single-entity deficit,262589307.6559143,260858645.00188795,269009881.0567191,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,fhcf_reimbursement_usd,FHCF reimbursements,4355520017.295772,1293102792.3838801,7487738270.926593,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,fhcf_utilization,FHCF utilization factor,0.25620705984092773,0.07606487014022824,0.4404551924074466,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,citizens_assessment_stress,Citizens assessment stress factor,0.07046997800054587,0.0,0.2223637478364922,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,figa_unfunded_share,FIGA unfunded share,0.4870935517393675,0.29911250635005365,0.6021991562696727,"Across realizations, percentiles 5 and 95",1000,1000
+Double Irma,nfip_florida_stress,NFIP Florida stress factor,3.7142756992515107,2.580550690941832,4.794059360061538,"Across realizations, percentiles 5 and 95",1000,1000

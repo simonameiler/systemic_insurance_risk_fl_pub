@@ -1,0 +1,30 @@
+{
+  "input_index": "validated_runs.json",
+  "index_sha256": "76666dc8629c49b7f68ffe792c14d3fc29aca9e4d6bb094f051d4c71bb8e734d",
+  "n_boot": 1000,
+  "bootstrap_seed": 42,
+  "return_periods": [
+    10,
+    25,
+    50,
+    100,
+    250,
+    500,
+    1000
+  ],
+  "rfr_components": [
+    "figa_residual_deficit_usd",
+    "citizens_residual_deficit_usd",
+    "nfip_borrowed_usd"
+  ],
+  "RP_method": "Linear empirical quantiles of complete season rows, including zero-loss seasons; RFR summed before quantiles.",
+  "RP_intervals": "1,000 whole-season row resamples, 10th and 90th percentiles.",
+  "historical_intervals": "5th and 95th percentiles across realization values, not a confidence interval on the mean.",
+  "means_intervals": "ERA5/policy 10th\u201390th percentiles of seasonal values. Climate median and 10th\u201390th of five within-GCM future-minus-historical mean deltas, added to the ERA5 mean.",
+  "probability_method": "Threshold indicators evaluated separately on every run. Climate probability deltas computed directly, added to ERA5; bounded to [0,1], with unbounded values retained.",
+  "policy_intervals": "Paired season bootstrap of indicator differences, 10th\u201390th percentile.",
+  "FIGA_unfunded_share": "residual / (residual + collected). Undefined zero-deficit rows omitted from ratio means, consistently with prior historical report.",
+  "decomposition": "Fixed reviewed dollar edges with a zero or negligible loss bin up to USD 1, and minimum 50 seasons per merged nonzero bin; three non-overlapping component ratios of means; FHCF diagnostics retained in CSV outputs.",
+  "FHCF_display": "Structurally zero shortfall rows omitted from LaTeX tables; full numerical CSV diagnostics retained. Nonzero utilization retained.",
+  "changes_no_model_rerun": true
+}

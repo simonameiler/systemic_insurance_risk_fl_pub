@@ -1,0 +1,19 @@
+{
+  "source": "original_overview_reference.png",
+  "sha256": "7d6258a259f3a47d0ef480ada1d1d11132d11ccc7965721dcb1b829b8a5884a8",
+  "unchanged_reference_panels": [
+    "a. Data input",
+    "b. Scenario development"
+  ],
+  "source_display_clip_pixels": [
+    0,
+    0,
+    1320,
+    1212
+  ],
+  "redrawn_panels": [
+    "c. Risk propagation model",
+    "d. Output metrics"
+  ],
+  "accounting": "FIGA residual deficit + Citizens residual deficit + NFIP financing requirement; FHCF shortfall is an upstream diagnostic reported separately."
+}

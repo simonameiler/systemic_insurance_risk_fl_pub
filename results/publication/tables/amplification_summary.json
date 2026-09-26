@@ -1,0 +1,8 @@
+{
+  "loss_RP100_over_RP10": 9.03857160905646,
+  "rfr_RP100_over_RP10": 87.91737689496865,
+  "marginal_quantile_slope": 1.8587991716849266,
+  "rfr_to_loss_marginal_quantile_ratio_RP10": 0.016493644205593593,
+  "rfr_to_loss_marginal_quantile_ratio_RP100": 0.16043220065233982,
+  "interpretation": "Matched return periods of marginal distributions, not same-season component shares or causal effects."
+}

@@ -1,0 +1,78 @@
+{
+  "method": "First crossing of ERA5 mean using linear interpolation between tested wind/flood pairs. The x coordinate is their unweighted arithmetic mean, not realized total loss reduction. P10/P90 are ensemble curves, not percentiles of individual GCM crossing locations.",
+  "offsets": [
+    {
+      "metric": "total_loss_billion",
+      "ensemble_statistic": "median",
+      "baseline": 19.343788695230298,
+      "mean_prescribed_reduction_pct": 78.0121775396929,
+      "wind_reduction_pct": 93.54373828199165,
+      "flood_reduction_pct": 62.480616797394156
+    },
+    {
+      "metric": "total_loss_billion",
+      "ensemble_statistic": "p10",
+      "baseline": 19.343788695230298,
+      "mean_prescribed_reduction_pct": 36.501244081271004,
+      "wind_reduction_pct": 43.75155510158876,
+      "flood_reduction_pct": 29.25093306095325
+    },
+    {
+      "metric": "total_loss_billion",
+      "ensemble_statistic": "p90",
+      "baseline": 19.343788695230298,
+      "mean_prescribed_reduction_pct": 81.69640527529609,
+      "wind_reduction_pct": 97.87812385328951,
+      "flood_reduction_pct": 65.51468669730266
+    },
+    {
+      "metric": "defaults",
+      "ensemble_statistic": "median",
+      "baseline": 2.1399,
+      "mean_prescribed_reduction_pct": 76.27381823503586,
+      "wind_reduction_pct": 91.49860968827748,
+      "flood_reduction_pct": 61.04902678179424
+    },
+    {
+      "metric": "defaults",
+      "ensemble_statistic": "p10",
+      "baseline": 2.1399,
+      "mean_prescribed_reduction_pct": 42.76139670223084,
+      "wind_reduction_pct": 51.48399612027158,
+      "flood_reduction_pct": 34.0387972841901
+    },
+    {
+      "metric": "defaults",
+      "ensemble_statistic": "p90",
+      "baseline": 2.1399,
+      "mean_prescribed_reduction_pct": 78.70643702978981,
+      "wind_reduction_pct": 94.3605141526939,
+      "flood_reduction_pct": 63.05235990688573
+    },
+    {
+      "metric": "rfr_billion",
+      "ensemble_statistic": "median",
+      "baseline": 2.1154360061673643,
+      "mean_prescribed_reduction_pct": 70.01875657349552,
+      "wind_reduction_pct": 84.13971361587708,
+      "flood_reduction_pct": 55.89779953111396
+    },
+    {
+      "metric": "rfr_billion",
+      "ensemble_statistic": "p10",
+      "baseline": 2.1154360061673643,
+      "mean_prescribed_reduction_pct": 27.859339892926258,
+      "wind_reduction_pct": 33.3639292857956,
+      "flood_reduction_pct": 22.35475050005692
+    },
+    {
+      "metric": "rfr_billion",
+      "ensemble_statistic": "p90",
+      "baseline": 2.1154360061673643,
+      "mean_prescribed_reduction_pct": 74.69760720517036,
+      "wind_reduction_pct": 89.64424377078865,
+      "flood_reduction_pct": 59.75097063955206
+    }
+  ],
+  "negative_delta_adjusted_values": 0
+}

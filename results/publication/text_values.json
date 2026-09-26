@@ -1,0 +1,922 @@
+{
+  "BaselineLoss": {
+    "value": 19.343788695230298,
+    "text": "19.3"
+  },
+  "BaselineRfr": {
+    "value": 2.1154360061673643,
+    "text": "2.1"
+  },
+  "BaselineUninsured": {
+    "value": 12.129860469118213,
+    "text": "12.1"
+  },
+  "BaselineDefaultProbability": {
+    "value": 8.709999999999999,
+    "text": "8.7"
+  },
+  "BaselineDeficitProbability": {
+    "value": 5.609999999999999,
+    "text": "5.6"
+  },
+  "BaselineFigaProbability": {
+    "value": 13.65,
+    "text": "13.7"
+  },
+  "BaselineCitizensProbability": {
+    "value": 13.639999999999999,
+    "text": "13.6"
+  },
+  "BaselineNfipProbability": {
+    "value": 5.04,
+    "text": "5.0"
+  },
+  "BaselineRfrOneGdpProbability": {
+    "value": 3.4099999999999997,
+    "text": "3.4"
+  },
+  "BaselineRfrTenGdpProbability": {
+    "value": 0.08,
+    "text": "0.08"
+  },
+  "ExitLoss": {
+    "value": 19.343788695230298,
+    "text": "19.3"
+  },
+  "ExitLossChange": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "ExitRfr": {
+    "value": 2.4411983400551356,
+    "text": "2.4"
+  },
+  "ExitRfrChange": {
+    "value": 0.3257623338877713,
+    "text": "0.3"
+  },
+  "ExitUninsured": {
+    "value": 12.129860469118213,
+    "text": "12.1"
+  },
+  "ExitUninsuredChange": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "ExitDefaultProbability": {
+    "value": 7.86,
+    "text": "7.9"
+  },
+  "ExitDefaultProbabilityChange": {
+    "value": -0.8499999999999988,
+    "text": "-0.9"
+  },
+  "ExitDeficitProbability": {
+    "value": 4.93,
+    "text": "4.9"
+  },
+  "ExitDeficitProbabilityChange": {
+    "value": -0.6799999999999997,
+    "text": "-0.7"
+  },
+  "ExitFigaProbability": {
+    "value": 12.61,
+    "text": "12.6"
+  },
+  "ExitFigaProbabilityChange": {
+    "value": -1.040000000000001,
+    "text": "-1.0"
+  },
+  "ExitCitizensProbability": {
+    "value": 17.9,
+    "text": "17.9"
+  },
+  "ExitCitizensProbabilityChange": {
+    "value": 4.26,
+    "text": "4.3"
+  },
+  "ExitNfipProbability": {
+    "value": 5.04,
+    "text": "5.0"
+  },
+  "ExitNfipProbabilityChange": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "ExitRfrOneGdpProbability": {
+    "value": 3.81,
+    "text": "3.8"
+  },
+  "ExitRfrOneGdpProbabilityChange": {
+    "value": 0.40000000000000036,
+    "text": "0.4"
+  },
+  "ExitRfrTenGdpProbability": {
+    "value": 0.12,
+    "text": "0.12"
+  },
+  "ExitRfrTenGdpProbabilityChange": {
+    "value": 0.039999999999999994,
+    "text": "0.0"
+  },
+  "PenetrationLoss": {
+    "value": 19.343788695230298,
+    "text": "19.3"
+  },
+  "PenetrationLossChange": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "PenetrationRfr": {
+    "value": 4.156498580615133,
+    "text": "4.2"
+  },
+  "PenetrationRfrChange": {
+    "value": 2.0410625744477686,
+    "text": "2.0"
+  },
+  "PenetrationUninsured": {
+    "value": 7.8644046960668,
+    "text": "7.9"
+  },
+  "PenetrationUninsuredChange": {
+    "value": -4.265455773051413,
+    "text": "-4.3"
+  },
+  "PenetrationDefaultProbability": {
+    "value": 7.829999999999999,
+    "text": "7.8"
+  },
+  "PenetrationDefaultProbabilityChange": {
+    "value": -0.8799999999999999,
+    "text": "-0.9"
+  },
+  "PenetrationDeficitProbability": {
+    "value": 7.000000000000001,
+    "text": "7.0"
+  },
+  "PenetrationDeficitProbabilityChange": {
+    "value": 1.3900000000000015,
+    "text": "1.4"
+  },
+  "PenetrationFigaProbability": {
+    "value": 9.02,
+    "text": "9.0"
+  },
+  "PenetrationFigaProbabilityChange": {
+    "value": -4.630000000000001,
+    "text": "-4.6"
+  },
+  "PenetrationCitizensProbability": {
+    "value": 15.93,
+    "text": "15.9"
+  },
+  "PenetrationCitizensProbabilityChange": {
+    "value": 2.290000000000001,
+    "text": "2.3"
+  },
+  "PenetrationNfipProbability": {
+    "value": 9.32,
+    "text": "9.3"
+  },
+  "PenetrationNfipProbabilityChange": {
+    "value": 4.28,
+    "text": "4.3"
+  },
+  "PenetrationRfrOneGdpProbability": {
+    "value": 5.17,
+    "text": "5.2"
+  },
+  "PenetrationRfrOneGdpProbabilityChange": {
+    "value": 1.7600000000000002,
+    "text": "1.8"
+  },
+  "PenetrationRfrTenGdpProbability": {
+    "value": 0.43,
+    "text": "0.43"
+  },
+  "PenetrationRfrTenGdpProbabilityChange": {
+    "value": 0.35,
+    "text": "0.4"
+  },
+  "MitigationLoss": {
+    "value": 13.692619701590148,
+    "text": "13.7"
+  },
+  "MitigationLossChange": {
+    "value": -5.65116899364015,
+    "text": "-5.7"
+  },
+  "MitigationRfr": {
+    "value": 1.2441837278897925,
+    "text": "1.2"
+  },
+  "MitigationRfrChange": {
+    "value": -0.8712522782775718,
+    "text": "-0.9"
+  },
+  "MitigationUninsured": {
+    "value": 8.610622219120815,
+    "text": "8.6"
+  },
+  "MitigationUninsuredChange": {
+    "value": -3.5192382499973984,
+    "text": "-3.5"
+  },
+  "MitigationDefaultProbability": {
+    "value": 6.83,
+    "text": "6.8"
+  },
+  "MitigationDefaultProbabilityChange": {
+    "value": -1.879999999999999,
+    "text": "-1.9"
+  },
+  "MitigationDeficitProbability": {
+    "value": 4.130000000000001,
+    "text": "4.1"
+  },
+  "MitigationDeficitProbabilityChange": {
+    "value": -1.4799999999999986,
+    "text": "-1.5"
+  },
+  "MitigationFigaProbability": {
+    "value": 11.540000000000001,
+    "text": "11.5"
+  },
+  "MitigationFigaProbabilityChange": {
+    "value": -2.1099999999999994,
+    "text": "-2.1"
+  },
+  "MitigationCitizensProbability": {
+    "value": 11.76,
+    "text": "11.8"
+  },
+  "MitigationCitizensProbabilityChange": {
+    "value": -1.879999999999999,
+    "text": "-1.9"
+  },
+  "MitigationNfipProbability": {
+    "value": 3.95,
+    "text": "4.0"
+  },
+  "MitigationNfipProbabilityChange": {
+    "value": -1.0899999999999999,
+    "text": "-1.1"
+  },
+  "MitigationRfrOneGdpProbability": {
+    "value": 2.08,
+    "text": "2.1"
+  },
+  "MitigationRfrOneGdpProbabilityChange": {
+    "value": -1.3299999999999996,
+    "text": "-1.3"
+  },
+  "MitigationRfrTenGdpProbability": {
+    "value": 0.01,
+    "text": "0.01"
+  },
+  "MitigationRfrTenGdpProbabilityChange": {
+    "value": -0.07,
+    "text": "-0.1"
+  },
+  "MidLoss": {
+    "value": 48.4719785668082,
+    "text": "48.5"
+  },
+  "MidLossLow": {
+    "value": 23.58195012895143,
+    "text": "23.6"
+  },
+  "MidLossHigh": {
+    "value": 70.2655149220662,
+    "text": "70.3"
+  },
+  "MidLossRatio": {
+    "value": 2.5058161733724993,
+    "text": "2.5"
+  },
+  "MidRfr": {
+    "value": 5.45254473968607,
+    "text": "5.5"
+  },
+  "MidRfrLow": {
+    "value": 2.553803487196312,
+    "text": "2.6"
+  },
+  "MidRfrHigh": {
+    "value": 8.606064913437052,
+    "text": "8.6"
+  },
+  "MidRfrRatio": {
+    "value": 2.577503986785544,
+    "text": "2.6"
+  },
+  "MidUninsured": {
+    "value": 30.460387342935256,
+    "text": "30.5"
+  },
+  "MidUninsuredLow": {
+    "value": 14.780146223450176,
+    "text": "14.8"
+  },
+  "MidUninsuredHigh": {
+    "value": 44.30670821806718,
+    "text": "44.3"
+  },
+  "MidDefaultProbability": {
+    "value": 21.09,
+    "text": "21.1"
+  },
+  "MidDefaultProbabilityLow": {
+    "value": 10.668,
+    "text": "10.7"
+  },
+  "MidDefaultProbabilityHigh": {
+    "value": 29.668,
+    "text": "29.7"
+  },
+  "MidDeficitProbability": {
+    "value": 14.44,
+    "text": "14.4"
+  },
+  "MidDeficitProbabilityLow": {
+    "value": 6.783999999999999,
+    "text": "6.8"
+  },
+  "MidDeficitProbabilityHigh": {
+    "value": 19.915999999999997,
+    "text": "19.9"
+  },
+  "MidFigaProbability": {
+    "value": 32.24,
+    "text": "32.2"
+  },
+  "MidFigaProbabilityLow": {
+    "value": 17.002000000000002,
+    "text": "17.0"
+  },
+  "MidFigaProbabilityHigh": {
+    "value": 42.214,
+    "text": "42.2"
+  },
+  "MidCitizensProbability": {
+    "value": 31.269999999999996,
+    "text": "31.3"
+  },
+  "MidCitizensProbabilityLow": {
+    "value": 16.49,
+    "text": "16.5"
+  },
+  "MidCitizensProbabilityHigh": {
+    "value": 39.928,
+    "text": "39.9"
+  },
+  "MidNfipProbability": {
+    "value": 12.76,
+    "text": "12.8"
+  },
+  "MidNfipProbabilityLow": {
+    "value": 5.888,
+    "text": "5.9"
+  },
+  "MidNfipProbabilityHigh": {
+    "value": 17.073999999999998,
+    "text": "17.1"
+  },
+  "MidRfrOneGdpProbability": {
+    "value": 8.65,
+    "text": "8.7"
+  },
+  "MidRfrOneGdpProbabilityLow": {
+    "value": 3.968,
+    "text": "4.0"
+  },
+  "MidRfrOneGdpProbabilityHigh": {
+    "value": 12.576,
+    "text": "12.6"
+  },
+  "MidRfrTenGdpProbability": {
+    "value": 0.14,
+    "text": "0.14"
+  },
+  "MidRfrTenGdpProbabilityLow": {
+    "value": 0.096,
+    "text": "0.10"
+  },
+  "MidRfrTenGdpProbabilityHigh": {
+    "value": 0.53,
+    "text": "0.53"
+  },
+  "EndLoss": {
+    "value": 64.90302804504459,
+    "text": "64.9"
+  },
+  "EndLossLow": {
+    "value": 28.305273145919596,
+    "text": "28.3"
+  },
+  "EndLossHigh": {
+    "value": 77.54243043234418,
+    "text": "77.5"
+  },
+  "EndLossRatio": {
+    "value": 3.3552386798480733,
+    "text": "3.4"
+  },
+  "EndRfr": {
+    "value": 7.196277203254136,
+    "text": "7.2"
+  },
+  "EndRfrLow": {
+    "value": 3.130126958704745,
+    "text": "3.1"
+  },
+  "EndRfrHigh": {
+    "value": 9.502630682881287,
+    "text": "9.5"
+  },
+  "EndRfrRatio": {
+    "value": 3.4017938535006653,
+    "text": "3.4"
+  },
+  "EndUninsured": {
+    "value": 41.05757630210374,
+    "text": "41.1"
+  },
+  "EndUninsuredLow": {
+    "value": 17.794816178738238,
+    "text": "17.8"
+  },
+  "EndUninsuredHigh": {
+    "value": 48.98935606151954,
+    "text": "49.0"
+  },
+  "EndDefaultProbability": {
+    "value": 28.619999999999997,
+    "text": "28.6"
+  },
+  "EndDefaultProbabilityLow": {
+    "value": 12.378,
+    "text": "12.4"
+  },
+  "EndDefaultProbabilityHigh": {
+    "value": 31.374000000000002,
+    "text": "31.4"
+  },
+  "EndDeficitProbability": {
+    "value": 19.53,
+    "text": "19.5"
+  },
+  "EndDeficitProbabilityLow": {
+    "value": 7.9719999999999995,
+    "text": "8.0"
+  },
+  "EndDeficitProbabilityHigh": {
+    "value": 21.436,
+    "text": "21.4"
+  },
+  "EndFigaProbability": {
+    "value": 41.230000000000004,
+    "text": "41.2"
+  },
+  "EndFigaProbabilityLow": {
+    "value": 19.032,
+    "text": "19.0"
+  },
+  "EndFigaProbabilityHigh": {
+    "value": 44.74,
+    "text": "44.7"
+  },
+  "EndCitizensProbability": {
+    "value": 40.64,
+    "text": "40.6"
+  },
+  "EndCitizensProbabilityLow": {
+    "value": 18.658,
+    "text": "18.7"
+  },
+  "EndCitizensProbabilityHigh": {
+    "value": 42.406,
+    "text": "42.4"
+  },
+  "EndNfipProbability": {
+    "value": 16.41,
+    "text": "16.4"
+  },
+  "EndNfipProbabilityLow": {
+    "value": 6.842,
+    "text": "6.8"
+  },
+  "EndNfipProbabilityHigh": {
+    "value": 18.2,
+    "text": "18.2"
+  },
+  "EndRfrOneGdpProbability": {
+    "value": 11.71,
+    "text": "11.7"
+  },
+  "EndRfrOneGdpProbabilityLow": {
+    "value": 4.922,
+    "text": "4.9"
+  },
+  "EndRfrOneGdpProbabilityHigh": {
+    "value": 13.784,
+    "text": "13.8"
+  },
+  "EndRfrTenGdpProbability": {
+    "value": 0.2,
+    "text": "0.20"
+  },
+  "EndRfrTenGdpProbabilityLow": {
+    "value": 0.126,
+    "text": "0.13"
+  },
+  "EndRfrTenGdpProbabilityHigh": {
+    "value": 0.602,
+    "text": "0.60"
+  },
+  "MiamiLoss": {
+    "value": 170.3547209521598,
+    "text": "170.4"
+  },
+  "MiamiRfr": {
+    "value": 22.375082019406786,
+    "text": "22.4"
+  },
+  "MiamiUninsured": {
+    "value": 108.09141709049815,
+    "text": "108.1"
+  },
+  "MiamiDefaultProbability": {
+    "value": 98.6,
+    "text": "98.6"
+  },
+  "MiamiDeficitProbability": {
+    "value": 78.5,
+    "text": "78.5"
+  },
+  "MiamiFigaProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "MiamiCitizensProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "MiamiNfipProbability": {
+    "value": 99.1,
+    "text": "99.1"
+  },
+  "MiamiRfrOneGdpProbability": {
+    "value": 81.2,
+    "text": "81.2"
+  },
+  "MiamiRfrTenGdpProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "MiamiUninsuredShare": {
+    "value": 63.45079049547041,
+    "text": "63.5"
+  },
+  "MiamiReturnPeriod": {
+    "value": 30.674846625766875,
+    "text": "31"
+  },
+  "AndrewLoss": {
+    "value": 114.16908337842011,
+    "text": "114.2"
+  },
+  "AndrewRfr": {
+    "value": 10.417852555519866,
+    "text": "10.4"
+  },
+  "AndrewUninsured": {
+    "value": 69.90152360956115,
+    "text": "69.9"
+  },
+  "AndrewDefaultProbability": {
+    "value": 93.7,
+    "text": "93.7"
+  },
+  "AndrewDeficitProbability": {
+    "value": 49.3,
+    "text": "49.3"
+  },
+  "AndrewFigaProbability": {
+    "value": 99.9,
+    "text": "99.9"
+  },
+  "AndrewCitizensProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "AndrewNfipProbability": {
+    "value": 63.1,
+    "text": "63.1"
+  },
+  "AndrewRfrOneGdpProbability": {
+    "value": 16.400000000000002,
+    "text": "16.4"
+  },
+  "AndrewRfrTenGdpProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "AndrewUninsuredShare": {
+    "value": 61.22631586510024,
+    "text": "61.2"
+  },
+  "AndrewReturnPeriod": {
+    "value": 19.76284584980237,
+    "text": "20"
+  },
+  "OkeechobeeLoss": {
+    "value": 156.88212578381442,
+    "text": "156.9"
+  },
+  "OkeechobeeRfr": {
+    "value": 15.03849274727562,
+    "text": "15.0"
+  },
+  "OkeechobeeUninsured": {
+    "value": 120.96847179525906,
+    "text": "121.0"
+  },
+  "OkeechobeeDefaultProbability": {
+    "value": 51.6,
+    "text": "51.6"
+  },
+  "OkeechobeeDeficitProbability": {
+    "value": 9.6,
+    "text": "9.6"
+  },
+  "OkeechobeeFigaProbability": {
+    "value": 90.2,
+    "text": "90.2"
+  },
+  "OkeechobeeCitizensProbability": {
+    "value": 91.4,
+    "text": "91.4"
+  },
+  "OkeechobeeNfipProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "OkeechobeeRfrOneGdpProbability": {
+    "value": 23.799999999999997,
+    "text": "23.8"
+  },
+  "OkeechobeeRfrTenGdpProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "OkeechobeeUninsuredShare": {
+    "value": 77.10787394731963,
+    "text": "77.1"
+  },
+  "OkeechobeeReturnPeriod": {
+    "value": 27.3224043715847,
+    "text": "27"
+  },
+  "IrmaLoss": {
+    "value": 32.02068184866375,
+    "text": "32.0"
+  },
+  "IrmaRfr": {
+    "value": 0.15574894914909038,
+    "text": "0.16"
+  },
+  "IrmaUninsured": {
+    "value": 22.940954471179406,
+    "text": "22.9"
+  },
+  "IrmaDefaultProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "IrmaDeficitProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "IrmaFigaProbability": {
+    "value": 44.1,
+    "text": "44.1"
+  },
+  "IrmaCitizensProbability": {
+    "value": 0.5,
+    "text": "0.5"
+  },
+  "IrmaNfipProbability": {
+    "value": 43.0,
+    "text": "43.0"
+  },
+  "IrmaRfrOneGdpProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "IrmaRfrTenGdpProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "IrmaUninsuredShare": {
+    "value": 71.64417853312125,
+    "text": "71.6"
+  },
+  "IrmaReturnPeriod": {
+    "value": 8.88888888888889,
+    "text": "9"
+  },
+  "MiamiAndrewLoss": {
+    "value": 266.5486257247618,
+    "text": "266.5"
+  },
+  "MiamiAndrewRfr": {
+    "value": 45.39677111914977,
+    "text": "45.4"
+  },
+  "MiamiAndrewUninsured": {
+    "value": 166.5413447025458,
+    "text": "166.5"
+  },
+  "MiamiAndrewDefaultProbability": {
+    "value": 99.9,
+    "text": "99.9"
+  },
+  "MiamiAndrewDeficitProbability": {
+    "value": 98.6,
+    "text": "98.6"
+  },
+  "MiamiAndrewFigaProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "MiamiAndrewCitizensProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "MiamiAndrewNfipProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "MiamiAndrewRfrOneGdpProbability": {
+    "value": 99.4,
+    "text": "99.4"
+  },
+  "MiamiAndrewRfrTenGdpProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "MiamiAndrewUninsuredShare": {
+    "value": 62.48066154897998,
+    "text": "62.5"
+  },
+  "MiamiAndrewReturnPeriod": {
+    "value": 55.24861878453038,
+    "text": "55"
+  },
+  "DoubleMiamiLoss": {
+    "value": 321.1402135904479,
+    "text": "321.1"
+  },
+  "DoubleMiamiRfr": {
+    "value": 57.57492024588355,
+    "text": "57.6"
+  },
+  "DoubleMiamiUninsured": {
+    "value": 204.3520851398372,
+    "text": "204.4"
+  },
+  "DoubleMiamiDefaultProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "DoubleMiamiDeficitProbability": {
+    "value": 99.4,
+    "text": "99.4"
+  },
+  "DoubleMiamiFigaProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "DoubleMiamiCitizensProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "DoubleMiamiNfipProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "DoubleMiamiRfrOneGdpProbability": {
+    "value": 100.0,
+    "text": "100.0"
+  },
+  "DoubleMiamiRfrTenGdpProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "DoubleMiamiUninsuredShare": {
+    "value": 63.633290535345,
+    "text": "63.6"
+  },
+  "DoubleMiamiReturnPeriod": {
+    "value": 78.74015748031496,
+    "text": "79"
+  },
+  "DoubleIrmaLoss": {
+    "value": 62.38371458157703,
+    "text": "62.4"
+  },
+  "DoubleIrmaRfr": {
+    "value": 2.2203419897382433,
+    "text": "2.2"
+  },
+  "DoubleIrmaUninsured": {
+    "value": 44.80263811570864,
+    "text": "44.8"
+  },
+  "DoubleIrmaDefaultProbability": {
+    "value": 11.1,
+    "text": "11.1"
+  },
+  "DoubleIrmaDeficitProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "DoubleIrmaFigaProbability": {
+    "value": 98.7,
+    "text": "98.7"
+  },
+  "DoubleIrmaCitizensProbability": {
+    "value": 48.1,
+    "text": "48.1"
+  },
+  "DoubleIrmaNfipProbability": {
+    "value": 99.3,
+    "text": "99.3"
+  },
+  "DoubleIrmaRfrOneGdpProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "DoubleIrmaRfrTenGdpProbability": {
+    "value": 0.0,
+    "text": "0.0"
+  },
+  "DoubleIrmaUninsuredShare": {
+    "value": 71.8178428716709,
+    "text": "71.8"
+  },
+  "DoubleIrmaReturnPeriod": {
+    "value": 12.987012987012987,
+    "text": "13"
+  },
+  "LossTen": {
+    "value": 39.516147299276604,
+    "text": "39.5"
+  },
+  "LossHundred": {
+    "value": 357.1695270785346,
+    "text": "357.2"
+  },
+  "RfrTen": {
+    "value": 0.6517652739300965,
+    "text": "0.65"
+  },
+  "RfrHundred": {
+    "value": 57.30149323516478,
+    "text": "57.3"
+  },
+  "LossAmplification": {
+    "value": 9.03857160905646,
+    "text": "9.0"
+  },
+  "RfrAmplification": {
+    "value": 87.91737689496864,
+    "text": "88"
+  },
+  "RfrBeta": {
+    "value": 1.8587991716849284,
+    "text": "1.86"
+  },
+  "ZeroRfrPercent": {
+    "value": 84.8,
+    "text": "84.8"
+  },
+  "RfrOnsetReturnPeriod": {
+    "value": 6.578947368421053,
+    "text": "6.6"
+  },
+  "FigaHundred": {
+    "value": 34.21079212460011,
+    "text": "34.2"
+  },
+  "CitizensHundred": {
+    "value": 15.531050747303846,
+    "text": "15.5"
+  },
+  "NfipHundred": {
+    "value": 10.295073531599666,
+    "text": "10.3"
+  }
+}

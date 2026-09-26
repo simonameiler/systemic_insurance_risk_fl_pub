@@ -884,9 +884,7 @@ def run_one_scenario(
             dbg(f"[CATBOND] series_in_force={len(catbonds)} payout_total=${cat_diag['catbond_payout_total']:,.0f} hits={cat_diag['catbond_attachment_hits']}")
 
     except Exception as e:
-        if DEBUG_PRINTS:
-            dbg(f"[CATBOND] skipped due to error: {e}")
-        cat_diag = {"bond_diag": pd.DataFrame(), "catbond_payout_total": 0.0, "catbond_attachment_hits": 0}
+        raise RuntimeError("Catastrophe-bond calculation failed; refusing a silent zero-recovery fallback") from e
 
             
     # --- 7) Flood -> NFIP recovery -----------------------------------

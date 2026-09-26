@@ -1,0 +1,26 @@
+{
+  "beta": 1.8587991716849284,
+  "fit_return_periods": [
+    10,
+    25,
+    50,
+    100,
+    250,
+    500,
+    1000
+  ],
+  "fit_return_period_range": [
+    10,
+    1000
+  ],
+  "bootstrap_resamples": 1000,
+  "loss_10": 39.516147299276604,
+  "loss_100": 357.1695270785346,
+  "rfr_10": 0.6517652739300965,
+  "rfr_100": 57.301493235164784,
+  "loss_amplification_10_to_100": 9.03857160905646,
+  "rfr_amplification_10_to_100": 87.91737689496865,
+  "fraction_zero_rfr": 0.848,
+  "rfr_emergence_return_period": 6.578947368421053,
+  "interpretation": "Marginal loss and residual financing return levels, not paired outcomes conditional on the same season."
+}

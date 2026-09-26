@@ -1,0 +1,14 @@
+{
+  "title": "Florida Systemic Insurance Risk Model",
+  "description": "Code and publication outputs for Stress testing insurance market stability under climate risk. The model connects hurricane losses, insurance coverage, insurer capital, risk transfer, and institutional financing capacity. Version 1.1.0 includes the finalized financial calculations, reproduction scripts, a synthetic-data demonstration, and checksummed provenance for 106 validated analyses. The full system-level result archive is attached to the matching GitHub release.",
+  "creators": [{"name": "Meiler, Simona", "affiliation": "Stanford University"}],
+  "license": "GPL-3.0-or-later",
+  "upload_type": "software",
+  "version": "1.1.0",
+  "publication_date": "2026-09-26",
+  "keywords": ["climate risk", "insurance", "tropical cyclones", "Florida", "stress testing"],
+  "related_identifiers": [
+    {"identifier": "https://github.com/simonameiler/systemic_insurance_risk_fl_pub/releases/tag/v1.1.0", "relation": "isSupplementTo", "scheme": "url"},
+    {"identifier": "10.31223/X59X9X", "relation": "isSupplementTo", "scheme": "doi"}
+  ]
+}

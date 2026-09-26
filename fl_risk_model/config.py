@@ -15,9 +15,9 @@ PUBLIC DATA (included in fl_risk_model/data/):
 - 24fin_fhcf.csv - FHCF contract terms
 - florida_*.csv - County-level attribution factors
 
-PROPRIETARY DATA (available on request):
-The following files contain proprietary Florida OIR data and must be
-obtained separately. Contact the authors for access instructions:
+LICENSED DATA (not redistributed):
+The following S&P Capital IQ inputs require the researcher's own license.
+See the repository README for data-access instructions:
 - FL Surplus Capital, Group v Entity.xlsx - Insurer capital data
 - FL HO Market Share Report.xlsx - Market share data
 """
@@ -37,7 +37,7 @@ FIXED_YEAR = 2024
 # Public data (included in repository)
 EXPOSURE_FILE     = DATA_DIR / "FHCF_2024_Exposure_byCounty.xlsx"
 
-# Proprietary data (must be obtained separately - contact authors or Florida OIR)
+# Licensed S&P Capital IQ inputs (must be obtained separately)
 SURPLUS_FILE      = DATA_DIR / "20250805 FL Surplus Capital, Group v Entity.xlsx"
 MARKET_SHARE_XLSX = DATA_DIR / "FL HO Market Share Report_6.10.25.xlsx"
 
@@ -170,7 +170,7 @@ NFIP_PREMIUM_BASE_CSV = DATA_DIR / "nfip_FL_coverage_premium_by_year.csv"   # or
 NFIP_PREMIUM_BASE_YEAR = FIXED_YEAR
 
 # Cat bonds
-CATBONDS_CSV = DATA_DIR / "catbonds_2024.csv"
+CATBONDS_CSV = DATA_DIR / "catbonds_2024_reviewed.csv"
 CATBOND_DEFAULT_ATTACH_MULT = 1.0
 CATBOND_DEFAULT_EXH_MULT   = 2.0
 

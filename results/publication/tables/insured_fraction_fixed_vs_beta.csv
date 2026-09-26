@@ -1,0 +1,11 @@
+metric,label,beta46_mean,fixed04_mean,relative_difference
+wind_insured_private_usd,"Wind insured, private",5491050988.223578,5448908224.58326,-0.007674808289105384
+wind_insured_citizens_usd,"Wind insured, Citizens",1077922754.0709696,1072866334.0773277,-0.004690892714292683
+wind_un_underinsured_usd,Wind un/underinsured,9735462654.356918,9782661837.99088,0.0048481705810701214
+fhcf_shortfall_usd,FHCF shortfall (diagnostic),0.0,0.0,
+figa_residual_deficit_usd,FIGA residual deficit,1239944124.7563002,1213136921.6339374,-0.021619686393232862
+citizens_residual_deficit_usd,Citizens residual deficit,529494321.79326487,521498968.7926033,-0.015099978737417419
+nfip_borrowed_usd,NFIP Treasury borrowing,345997559.61779946,345997559.61779946,0.0
+public_burden_corrected_usd,Residual financing requirement,2115436006.1673644,2080633450.0443406,-0.016451717764829565
+defaults_post,Insurer defaults (count),2.1399,2.1485,0.004018879386887164
+largest_entity_deficit_usd,Largest entity deficit,312021237.2797463,307093345.3152544,-0.015793450495402483

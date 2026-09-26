@@ -1,159 +1,64 @@
-# Byte-compiled / optimized / DLL files
+# Python build and local environments
 __pycache__/
 *.py[cod]
-*$py.class
-
-# Exclude diff_cat_model (separate repository)
-diff_cat_model/
-
-# C extensions
 *.so
-
-# Distribution / packaging
-.Python
 build/
-develop-eggs/
 dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
 *.egg-info/
-.installed.cfg
-*.egg
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
+.eggs/
+.venv/
+venv/
+env/
+.env
+.python-version
+.pytest_cache/
+.coverage*
 htmlcov/
 .tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-
-# Translations
-*.mo
-*.pot
-
-# Jupyter Notebook
-.ipynb_checkpoints
-
-# IPython
-profile_default/
-ipython_config.py
-
-# pyenv
-.python-version
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Spyder project settings
-.spyderproject
-.spyproject
-
-# Rope project settings
-.ropeproject
-
-# mkdocs documentation
-/site
-
-# mypy
 .mypy_cache/
-.dmypy.json
-dmypy.json
 
-# VS Code
-.vscode/
-
-# macOS
+# Editor and operating-system files
 .DS_Store
 .AppleDouble
 .LSOverride
+.vscode/
+.idea/
+.ipynb_checkpoints/
+*~
+*.tmp
+*.temp
 
-# Results directory: track only the specific archived outputs needed for peer review.
-# (Git cannot un-ignore files inside an ignored parent directory, so we list
-#  the subdirectories to exclude individually.)
+# Generated runs, figures, tables, and cluster logs
+results/*
+!results/README.md
+logs/
+*.log
+demo_output/*
+!demo_output/demo_summary.csv
+!demo_output/expected_demo_summary.csv
 
-# Ignore all mc_run subdirectories EXCEPT the four ERA5 policy runs and the
-# historical scenario xlsx archived for notebook reproducibility.
-results/mc_runs/andrew_*/
-results/mc_runs/andrew_then_*/
-results/mc_runs/double_*/
-results/mc_runs/gm_then_*/
-results/mc_runs/great_miami_*/
-results/mc_runs/irma_*/
-results/mc_runs/lake_*/
-results/mc_runs/insured_frac_*/
-results/mc_runs/penetration_capital_*/
-results/mc_runs/variance_*/
-results/mc_runs/scenario_report_with_uncertainty_*.csv
-# Keep ERA5 runs, GCM climate runs (5 GCMs × scenarios/periods), building-code sweeps, and climate_deltas
-
-# Ignore large generated outputs that are not needed for figure reproduction
-results/figures/
-results/tables/
-results/debug/
-results/mc_runs/*/debug/
-
-# Private calibration/validation scripts (use proprietary FLOIR data)
-scripts/hazard/evaluate_losses.py
-
-# Large data files (not tracked)
+# Restricted and large hazard inputs
 *.hdf5
 *.h5
 *.nc
 *.mat
-
-# Logs
-logs/
-*.log
-
-# Temporary files
-*.tmp
-*.temp
-*~
-
-# Helper scripts
-notebooks/clean_notebooks.py
-fl_risk_model/data/fl_per_event_impacts_future_ssp245.csv
-
-# Proprietary data files
 fl_risk_model/data/FL HO Market Share Report_6.10.25.xlsx
 fl_risk_model/data/20250805 FL Surplus Capital, Group v Entity.xlsx
-
-# Large generated data
 fl_risk_model/data/all_events.csv
-
-# Local test metadata (use cluster files for production)
+fl_risk_model/data/fl_per_event_impacts_future_ssp245.csv
 fl_risk_model/data/hazard/emanuel/*/all_events.csv
 fl_risk_model/data/hazard/emanuel/*/annual_frequencies.csv
 fl_risk_model/data/hazard/emanuel/*/event_metadata.csv
 fl_risk_model/data/hazard/emanuel/*/year_sets*.csv
 
-# Notebook for talks (not for production use)
+# Separate projects and private local utilities
+diff_cat_model/
+scripts/hazard/evaluate_losses.py
+notebooks/clean_notebooks.py
 notebooks/probabilistic_risk_analysis_talks.ipynb
+
+# Publication artifacts retained in source control
+!results/publication/
+!results/publication/**
+!results/manifest.json
+!results/SHA256SUMS
