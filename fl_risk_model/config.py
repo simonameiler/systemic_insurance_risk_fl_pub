@@ -179,7 +179,14 @@ MASSBAL_ABS_FLOOR = 1.0     # $1 absolute tolerance
 MASSBAL_REL_TOL   = 1e-9    # relative to CountyTIV
 
 # Group capital contribution settings
-GROUP_CONTRIBUTION_RANGE = (0.6, 0.9)  # Min and max contribution rates
+GROUP_CONTRIBUTION_RANGE = (0.6, 0.9)  # Min and max contribution rates (drawn but unused by the support rule)
+
+# Input integrity
+STRICT_INPUTS = True  # raise instead of silently zeroing FIGA / Citizens Tier-2 bases
+# Loss-bearing insurers without a surplus row: "error" | "impute_premium_ratio" | "legacy_drop".
+# The 2024 S&P surplus extract lacks 29 of the top-100 HO writers (22% of private premium);
+# imputation is interim until the extract covers them. "legacy_drop" reproduces submitted results.
+MISSING_SURPLUS_POLICY = "impute_premium_ratio"
 
 # === Event hazard inputs & scenarios ===
 # Directory holding per-event county loss CSVs (one file per event)

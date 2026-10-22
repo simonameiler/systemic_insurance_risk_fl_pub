@@ -1631,7 +1631,7 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
         dbg(f"Complete: {len(rows):,} years, Errors: {len(errors)}")
         
         # Save results
-        df = pd.DataFrame(rows)
+        df = _fill_zero_event_rows(pd.DataFrame(rows))
         df.to_csv(run_dir / "iterations.csv", index=False)
         
         if errors:
@@ -1655,6 +1655,38 @@ def run_stochastic_tc_monte_carlo(year_sets_csv: Path | str | None = None,
     finally:
         # Always reset the stochastic flag
         _USE_STOCHASTIC_EVENTS = False
+
+
+_ZERO_ROW_ID_COLS = {"year_id", "scenario", "events", "wind_shares", "error"}
+
+
+def _fill_zero_event_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Complete the stub rows written for zero-event seasons.
+
+    Stub rows carry only a few columns, so means over any other column silently
+    skipped them. A computed zero-loss season is used as the template: losses and
+    deficits are zero there, while capacities, the cat-bond limit in force and
+    scaling factors keep their no-loss values (which are not zero).
+    """
+    if "scenario" not in df.columns or "total_damage_usd" not in df.columns:
+        return df
+    stub = df["scenario"].eq("zero_events")
+    if not stub.any():
+        return df
+    ok = df["error"].isna() if "error" in df.columns else pd.Series(True, index=df.index)
+    computed_zero = df[~stub & ok & df["total_damage_usd"].eq(0)]
+    fill_cols = [c for c in df.columns if c not in _ZERO_ROW_ID_COLS]
+    if len(computed_zero):
+        template = computed_zero.iloc[0]
+        for c in fill_cols:
+            if pd.notna(template[c]):
+                df.loc[stub, c] = df.loc[stub, c].fillna(template[c])
+    else:
+        num = df[fill_cols].select_dtypes("number").columns
+        df.loc[stub, num] = df.loc[stub, num].fillna(0.0)
+        dbg("[mc] No computed zero-loss season to template zero-event rows; numeric columns set to 0")
+    return df
 
 
 def _compute_return_period_metrics(df, out_dir):

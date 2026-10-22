@@ -57,6 +57,7 @@ repo_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(repo_root))
 
 from fl_risk_model import config as cfg
+import fl_risk_model.mc_run_events as _mc
 from fl_risk_model.mc_run_events import (
     run_one_iteration,
     _prepare_common_inputs,
@@ -122,10 +123,18 @@ def _set_fixed_params():
 
     FIXED_CONC = 10_000  # effectively deterministic
     cfg.DEFAULT_WIND_SHARE_CONCENTRATION = FIXED_CONC
+    # mc_run_events copies the default concentration into a module global at import,
+    # so setting cfg alone left synthetic-event wind shares at kappa = 10.
+    saved["MC_DEFAULT_WIND_SHARE_CONCENTRATION"] = _mc.DEFAULT_WIND_SHARE_CONCENTRATION
+    _mc.DEFAULT_WIND_SHARE_CONCENTRATION = FIXED_CONC
     for k in cfg.EVENT_WIND_SHARE_PARAMS:
         cfg.EVENT_WIND_SHARE_PARAMS[k]["concentration"] = FIXED_CONC
     for k in cfg.COMPOSITE_WIND_SHARE_PARAMS:
         cfg.COMPOSITE_WIND_SHARE_PARAMS[k]["concentration"] = FIXED_CONC
+
+    # 3. Insured wind fraction pinned to the Beta(4,6) mean (was still sampled per county)
+    saved["FIXED_INSURED_FRAC"] = getattr(cfg, "FIXED_INSURED_FRAC", None)
+    cfg.FIXED_INSURED_FRAC = cfg.INSURED_ALPHA / (cfg.INSURED_ALPHA + cfg.INSURED_BETA)
 
     return saved
 
@@ -134,6 +143,8 @@ def _restore_params(saved: dict):
     """Restore original config after Run B."""
     cfg.SAMPLE_EXPOSURE = saved["SAMPLE_EXPOSURE"]
     cfg.DEFAULT_WIND_SHARE_CONCENTRATION = saved["DEFAULT_WIND_SHARE_CONCENTRATION"]
+    _mc.DEFAULT_WIND_SHARE_CONCENTRATION = saved["MC_DEFAULT_WIND_SHARE_CONCENTRATION"]
+    cfg.FIXED_INSURED_FRAC = saved["FIXED_INSURED_FRAC"]
     for k, v in saved["EVENT_WIND_SHARE_PARAMS"].items():
         cfg.EVENT_WIND_SHARE_PARAMS[k] = v
     for k, v in saved["COMPOSITE_WIND_SHARE_PARAMS"].items():

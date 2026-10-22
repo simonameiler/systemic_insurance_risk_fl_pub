@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import os
 import re
+import warnings
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -36,6 +37,7 @@ from fl_risk_model import config as cfg
 __all__ = [
     "load_surplus_data",
     "load_surplus_data_with_groups",
+    "reconcile_surplus_with_losses",
     "apply_losses_to_surplus",
     "apply_group_capital_contributions",
     "load_citizens_capital_row_from_csv",
@@ -43,6 +45,8 @@ __all__ = [
 
 # Balances smaller than one cent are zero for final solvency classification.
 INSURER_BALANCE_ZERO_TOLERANCE_USD = 0.01
+MISSING_SURPLUS_POLICIES = ("error", "impute_premium_ratio", "legacy_drop")
+_warned_imputed: set[tuple[str, ...]] = set()
 
 # =============================================================================
 # Helpers (header parsing & normalization)
@@ -342,6 +346,113 @@ def load_surplus_data_with_groups(
 # Core operations
 # =============================================================================
 
+def reconcile_surplus_with_losses(
+    surplus_df: pd.DataFrame,
+    losses_df: pd.DataFrame,
+    premium_df: pd.DataFrame | None = None,
+    policy: str = "impute_premium_ratio",
+) -> pd.DataFrame:
+    """
+    Give every entity that carries modeled losses a surplus row.
+
+    `apply_losses_to_surplus` joins losses onto the surplus table, so a loss-bearing
+    entity without a surplus row never depletes capital, never defaults and never
+    reaches FIGA. Entities are matched by StatEntityKey first, then by exact name;
+    key matches take the loss-side display name so downstream name joins line up.
+
+    Parameters
+    ----------
+    surplus_df : pd.DataFrame
+        Output of `load_surplus_data_with_groups` (or a scenario-adjusted copy).
+    losses_df : pd.DataFrame
+        ['Company', 'TotalLossUSD'] and optionally 'StatEntityKey'; Citizens excluded.
+    premium_df : pd.DataFrame, optional
+        ['StatEntityKey', 'PremiumUSD'], needed for "impute_premium_ratio".
+    policy : {"error", "impute_premium_ratio", "legacy_drop"}
+        What to do with entities that still have no surplus row:
+        - "error": raise, listing them.
+        - "impute_premium_ratio": surplus = median(surplus / premium) over matched
+          entities x the entity's premium, with no group support (group fields NaN).
+          An interim assumption until the surplus extract covers every entity.
+        - "legacy_drop": return `surplus_df` unchanged (submitted-code behavior).
+
+    Returns
+    -------
+    pd.DataFrame
+        Surplus table with a boolean 'SurplusImputed' column.
+    """
+    if policy not in MISSING_SURPLUS_POLICIES:
+        raise ValueError(f"policy must be one of {MISSING_SURPLUS_POLICIES}, got {policy!r}")
+    out = surplus_df.copy()
+    out["SurplusImputed"] = False
+    if policy == "legacy_drop" or losses_df.empty:
+        return out
+
+    out["StatEntityKey"] = out["StatEntityKey"].astype(str).str.strip()
+    losses = losses_df.copy()
+    has_key = "StatEntityKey" in losses.columns
+    if has_key:
+        losses["StatEntityKey"] = losses["StatEntityKey"].astype(str).str.strip()
+
+    unmatched = []
+    for _, row in losses.iterrows():
+        name = str(row["Company"])
+        key = str(row["StatEntityKey"]) if has_key else ""
+        key_hit = out.index[out["StatEntityKey"].eq(key)] if key and key != "nan" else []
+        if len(key_hit):
+            out.loc[key_hit, "Company"] = name
+        elif not out["Company"].eq(name).any():
+            unmatched.append((name, key))
+
+    if not unmatched:
+        return out
+
+    names = ", ".join(n for n, _ in unmatched)
+    if policy == "error":
+        raise ValueError(f"{len(unmatched)} loss-bearing entities have no surplus row: {names}")
+
+    if premium_df is None or premium_df.empty:
+        raise ValueError(
+            f"Cannot impute surplus for {len(unmatched)} entities without a premium base: {names}"
+        )
+    prem = (
+        premium_df.assign(StatEntityKey=premium_df["StatEntityKey"].astype(str).str.strip())
+        .groupby("StatEntityKey")["PremiumUSD"].sum()
+    )
+    matched = out[~out["SurplusImputed"]].assign(PremiumUSD=lambda d: d["StatEntityKey"].map(prem))
+    matched = matched[(matched["PremiumUSD"] > 0) & (matched["SurplusUSD"] > 0)]
+    if matched.empty:
+        raise ValueError("No matched entities with positive premium and surplus to derive an imputation ratio")
+    ratio = float((matched["SurplusUSD"] / matched["PremiumUSD"]).median())
+
+    imputed = [ratio * float(prem.get(k, 0.0)) for _, k in unmatched]
+    # Each imputed entity is its own group (ratio 1): no parent support, no pooling
+    # with other imputed entities under a shared "nan" group id.
+    new_rows = pd.DataFrame(
+        {
+            "Company": [n for n, _ in unmatched],
+            "StatEntityKey": [k for _, k in unmatched],
+            "SurplusUSD": imputed,
+            "GroupSurplusUSD": imputed,
+            "GroupToEntityRatio": 1.0,
+            "NAICGroupNumber": [f"imputed:{k or n}" for n, k in unmatched],
+            "NAICGroupName": [f"imputed:{n}" for n, _ in unmatched],
+            "SurplusImputed": True,
+        }
+    )
+    out = pd.concat([out, new_rows], ignore_index=True)
+
+    signature = tuple(sorted(n for n, _ in unmatched))
+    if signature not in _warned_imputed:
+        _warned_imputed.add(signature)
+        imputed_prem = sum(float(prem.get(k, 0.0)) for _, k in unmatched)
+        warnings.warn(
+            f"Imputed surplus for {len(unmatched)} entities without a surplus row "
+            f"(median surplus/premium = {ratio:.2f}; {imputed_prem / max(float(prem.sum()), 1.0):.1%} of private premium): "
+            f"{names}. Replace with statutory surplus when available."
+        )
+    return out
+
 def apply_losses_to_surplus(
     surplus_df: pd.DataFrame,
     losses_df: pd.DataFrame,
@@ -599,15 +710,17 @@ def apply_group_capital_contributions(
             res.loc[[idx[k] for k in donor_idx], "GroupContributionUSD"] = curr - donor_outflows
 
     # Final surplus & default flag (no RBC gate)
-    res["AdjustedSurplusUSD"] = res["EndingSurplusUSD"] + pd.to_numeric(
+    adjusted = res["EndingSurplusUSD"] + pd.to_numeric(
         res["GroupContributionUSD"], errors="coerce"
     ).fillna(0.0)
-    # Cancellation in group transfers can leave a fully funded insurer a few
-    # floating-point units below zero. Normalize the balance itself so default
-    # counts, FIGA eligibility, and assessment membership use the same value.
-    near_zero = res["AdjustedSurplusUSD"].abs() < INSURER_BALANCE_ZERO_TOLERANCE_USD
-    res["SurplusRoundingAdjustmentUSD"] = -res["AdjustedSurplusUSD"].where(near_zero, 0.0)
-    res.loc[near_zero, "AdjustedSurplusUSD"] = 0.0
+    # Text S4: balances with |x| < USD 0.01 are roundoff and set to zero; a deficit
+    # of exactly USD 0.01 is retained and counts as a default. Cancellation in group
+    # transfers can leave a fully funded insurer a few floating-point units below
+    # zero; normalizing the balance itself keeps default counts, FIGA eligibility
+    # and assessment membership on the same value.
+    near_zero = adjusted.abs() < INSURER_BALANCE_ZERO_TOLERANCE_USD
+    res["SurplusRoundingAdjustmentUSD"] = -adjusted.where(near_zero, 0.0)
+    res["AdjustedSurplusUSD"] = adjusted.where(~near_zero, 0.0)
     res["DefaultFlag"] = res["AdjustedSurplusUSD"].lt(0).astype(bool)
     return res
 

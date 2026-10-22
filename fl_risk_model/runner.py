@@ -25,6 +25,7 @@ Notes
 from __future__ import annotations
 
 import re
+import warnings
 import numpy as np
 import pandas as pd
 from typing import Tuple
@@ -71,6 +72,7 @@ from fl_risk_model.capital import (
     load_surplus_data_with_groups,
     apply_group_capital_contributions,
     load_citizens_capital_row_from_csv,
+    reconcile_surplus_with_losses,
 )
 from fl_risk_model.catbonds import (
     load_catbond_table,
@@ -126,6 +128,101 @@ def numsum(x) -> float:
 def numval(x, default=0.0) -> float:
     s = numseries(x, default=default)
     return float(s.iloc[0] if len(s) else default)
+
+
+# =============================================================================
+# Entity keys and premium bases
+# =============================================================================
+
+def _is_citizens(df: pd.DataFrame) -> pd.Series:
+    """Rows that belong to Citizens, by statutory key if configured, else by name."""
+    citizens_key = getattr(cfg, "CITIZENS_STATKEY", None)
+    by_name = df["Company"].astype(str).str.contains("citizens", case=False, na=False)
+    if citizens_key and "StatEntityKey" in df.columns:
+        return df["StatEntityKey"].astype(str).str.strip().eq(str(citizens_key)) | by_name
+    return by_name
+
+
+def _load_private_premium_base() -> pd.DataFrame | None:
+    """
+    Private premium base (Company, StatEntityKey, PremiumUSD) from the market-share
+    workbook. It feeds surplus imputation, FIGA assessments and the Citizens Tier-2
+    base, so a load failure raises unless cfg.STRICT_INPUTS is False. The demo
+    replaces this loader with a synthetic premium base.
+    """
+    try:
+        return load_private_premium_base_from_market_share_xlsx(
+            path=getattr(cfg, "MARKET_SHARE_XLSX"),
+            year=getattr(cfg, "MARKET_SHARE_YEAR", 2024),
+        )
+    except Exception as e:
+        if getattr(cfg, "STRICT_INPUTS", True):
+            raise RuntimeError(
+                "Private premium base (cfg.MARKET_SHARE_XLSX) could not be loaded; "
+                "FIGA capacity and the Citizens Tier-2 base would silently be zero"
+            ) from e
+        warnings.warn("Private premium base unavailable; FIGA and Citizens Tier-2 private base set to zero")
+        return None
+
+
+def citizens_private_split(
+    fhcf_county_df: pd.DataFrame,
+    citizens_exp: pd.DataFrame,
+    private_exp: pd.DataFrame,
+    scaled_portfolio: bool = False,
+) -> pd.DataFrame:
+    """
+    County shares of insured wind for Citizens and private insurers (eq. S8, sigma_c).
+
+    By default the denominator is the FHCF county TIV, as in the baseline and in the
+    market-exit scenario (which defines its Citizens target against the pre-exit total).
+    With `scaled_portfolio=True` (penetration scenario) the denominator is the
+    scenario-adjusted Citizens + private TIV: that transform scales both by county
+    growth factors, and dividing by the unscaled FHCF total inflated Citizens' share
+    above its target.
+
+    Returns
+    -------
+    pd.DataFrame
+        ['County', 'CountyTIV', 'CitizensTIV', 'CitizensFrac', 'PrivateFrac', ...]
+    """
+    _cit_col = "TIV_sampled" if "TIV_sampled" in citizens_exp.columns else "TIV"
+    cit_tiv = (
+        citizens_exp.groupby("County", as_index=False)[_cit_col]
+        .sum()
+        .rename(columns={_cit_col: "CitizensTIV"})
+    )
+
+    if scaled_portfolio:
+        _priv_col = "TIV_sampled" if "TIV_sampled" in private_exp.columns else "TIV"
+        priv_tiv = (
+            private_exp.groupby("County", as_index=False)[_priv_col]
+            .sum()
+            .rename(columns={_priv_col: "PrivateTIV"})
+        )
+        tiv_join = cit_tiv.merge(priv_tiv, on="County", how="outer").fillna(0.0)
+        tiv_join["CountyTIV"] = tiv_join["CitizensTIV"] + tiv_join["PrivateTIV"]
+    else:
+        tiv_join = (
+            fhcf_county_df[["County", "CountyTIV"]]
+            .merge(cit_tiv, on="County", how="left")
+            .fillna({"CitizensTIV": 0.0})
+        )
+
+    tiv_join["CitizensFrac"] = 0.0
+    pos = tiv_join["CountyTIV"] > 0
+    tiv_join.loc[pos, "CitizensFrac"] = tiv_join.loc[pos, "CitizensTIV"] / tiv_join.loc[pos, "CountyTIV"]
+    tiv_join["CitizensFrac"] = tiv_join["CitizensFrac"].clip(0.0, 1.0)
+    tiv_join["PrivateFrac"] = 1.0 - tiv_join["CitizensFrac"]
+    return tiv_join
+
+
+def _private_premium_total(premium_base_df: pd.DataFrame | None) -> float:
+    """Total private premium, excluding Citizens (Citizens enters the statewide base separately)."""
+    if premium_base_df is None or premium_base_df.empty:
+        return 0.0
+    base = premium_base_df[~_is_citizens(premium_base_df)]
+    return float(pd.to_numeric(base["PremiumUSD"], errors="coerce").fillna(0.0).sum())
 
     
 def _sum_col(df, col) -> float:
@@ -634,24 +731,12 @@ def run_one_scenario(
     # carved: ['County','GrossWindLossUSD','InsuredWindUSD','UnderinsuredWindUSD','UninsuredWindUSD']
 
     # --- 4) PRE-SPLIT insured wind between Citizens and Private (use sampled Citizens exposure)
-    _cit_col = "TIV_sampled" if "TIV_sampled" in citizens_exp.columns else "TIV"
-    cit_tiv = (
-        citizens_exp.groupby("County", as_index=False)[_cit_col]
-        .sum()
-        .rename(columns={_cit_col: "CitizensTIV"})
+    tiv_join = citizens_private_split(
+        fhcf_county_df,
+        citizens_exp,
+        private_exp,
+        scaled_portfolio="penetration" in scenario_diagnostics,
     )
-
-    tiv_join = (
-        fhcf_county_df[["County", "CountyTIV"]]
-        .merge(cit_tiv, on="County", how="left")
-        .fillna({"CitizensTIV": 0.0})
-    )
-
-    tiv_join["CitizensFrac"] = 0.0
-    pos = tiv_join["CountyTIV"] > 0
-    tiv_join.loc[pos, "CitizensFrac"] = tiv_join.loc[pos, "CitizensTIV"] / tiv_join.loc[pos, "CountyTIV"]
-    tiv_join["CitizensFrac"] = tiv_join["CitizensFrac"].clip(0.0, 1.0)
-    tiv_join["PrivateFrac"]  = 1.0 - tiv_join["CitizensFrac"]
 
     insured_split = (
         carved[["County", "InsuredWindUSD"]]
@@ -1058,6 +1143,34 @@ def run_one_scenario(
         )
         dbg(f"[SURPLUS] Using baseline surplus (Total: ${surplus_df['SurplusUSD'].sum()/1e9:.2f}B)")
 
+    # Private premium base, loaded once: surplus imputation (here), FIGA (step 10)
+    # and the Citizens Tier-2 statewide base (step 11).
+    premium_base_df = _load_private_premium_base()
+
+    # Citizens' capital is handled in step 11; keep it out of private capital accounting.
+    if "StatEntityKey" in market_share_df.columns:
+        key_by_name = (
+            market_share_df.dropna(subset=["StatEntityKey"])
+            .drop_duplicates("Company")
+            .set_index("Company")["StatEntityKey"]
+            .astype(str).str.strip()
+        )
+        company_total_losses["StatEntityKey"] = company_total_losses["Company"].map(key_by_name)
+    company_total_losses = company_total_losses[~_is_citizens(company_total_losses)].copy()
+
+    # Every entity with modeled losses needs a surplus row; unmatched losses used to
+    # drop out of the capital join silently.
+    premium_scale = float(scenario_diagnostics.get("penetration", {}).get("private_premium_scale_factor", 1.0))
+    premium_for_surplus = None
+    if premium_base_df is not None:
+        premium_for_surplus = premium_base_df.assign(PremiumUSD=premium_base_df["PremiumUSD"] * premium_scale)
+    surplus_df = reconcile_surplus_with_losses(
+        surplus_df=surplus_df,
+        losses_df=company_total_losses,
+        premium_df=premium_for_surplus,
+        policy=getattr(cfg, "MISSING_SURPLUS_POLICY", "impute_premium_ratio"),
+    )
+
     capital_post = apply_losses_to_surplus(
         surplus_df=surplus_df[['Company', 'StatEntityKey', 'SurplusUSD']],
         losses_df=company_total_losses[["Company", "TotalLossUSD"]],
@@ -1127,14 +1240,7 @@ def run_one_scenario(
 
 
     # --- 10) FIGA assessments (keyed by StatEntityKey; exclude Citizens) -------
-    try:
-        premium_base_df = load_private_premium_base_from_market_share_xlsx(
-            path=getattr(cfg, "MARKET_SHARE_XLSX"),
-            year=getattr(cfg, "MARKET_SHARE_YEAR", 2024),
-        )
-    except Exception:
-        premium_base_df = None
-
+    # premium_base_df was loaded in step 9.
     if premium_base_df is not None and not premium_base_df.empty:
         base = premium_base_df.copy()
         base["StatEntityKey"] = base["StatEntityKey"].astype(str).str.strip()
@@ -1303,10 +1409,10 @@ def run_one_scenario(
     except Exception:
         citizens_premium_base = float(getattr(cfg, "CITIZENS_PREMIUM_BASE_DEFAULT", 0.0))
 
-    # Private premium base (from market share workbook)
-    private_premium_base = float(
-        numsum(market_share_df.get("PremiumUSD", 0.0))
-    )
+    # Private premium base (from the market-share workbook, loaded in step 9).
+    # market_share_df carries shares only, so summing its "PremiumUSD" gave zero and
+    # Tier 2 collapsed to 10% of Citizens' own premium.
+    private_premium_base = _private_premium_total(premium_base_df)
     
     # Apply penetration scenario premium base scaling if available
     if "penetration" in scenario_diagnostics:

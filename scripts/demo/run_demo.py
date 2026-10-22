@@ -168,6 +168,13 @@ def _load_demo_market_share(path: Path, year: int = 2024) -> pd.DataFrame:
     total = df["Share"].sum()
     if total > 0:
         df["Share"] = df["Share"] / total   # normalise
+    # The real market-share roster lists Citizens; the cat-bond step needs it there
+    # to accept Citizens' own bond. Zero share: private exposure allocation skips it.
+    cit_key = str(getattr(cfg, "CITIZENS_STATKEY", "C6949"))
+    if cit_key not in set(df["StatEntityKey"].astype(str)):
+        df = pd.concat([df, pd.DataFrame([{"Company": "Citizens Property Ins Corp.",
+                                           "StatEntityKey": cit_key, "Share": 0.0}])],
+                       ignore_index=True)
     return df[["Company", "StatEntityKey", "Share"]]
 
 
@@ -297,6 +304,34 @@ def _patch_surplus_loader(demo_surplus_df: pd.DataFrame):
     return _restore
 
 
+# Illustrative statewide private homeowners premium for the synthetic market
+DEMO_PRIVATE_PREMIUM_USD = 16e9
+
+
+def _patch_premium_base_loader(demo_mshare_df: pd.DataFrame):
+    """
+    Replace the private premium base (FIGA assessments, Citizens Tier-2 base)
+    with demo shares x DEMO_PRIVATE_PREMIUM_USD, so the demo never reads the
+    licensed market-share workbook. Returns a restore function.
+    """
+    import fl_risk_model.runner as _runner_mod
+
+    orig = _runner_mod._load_private_premium_base
+    base = demo_mshare_df[["Company", "StatEntityKey"]].assign(
+        PremiumUSD=demo_mshare_df["Share"] * DEMO_PRIVATE_PREMIUM_USD
+    )
+
+    def _demo_base():
+        return base.copy()
+
+    _runner_mod._load_private_premium_base = _demo_base
+
+    def _restore():
+        _runner_mod._load_private_premium_base = orig
+
+    return _restore
+
+
 # ---------------------------------------------------------------------------
 # Monte Carlo loop
 # ---------------------------------------------------------------------------
@@ -361,8 +396,13 @@ def run_demo(
     print("Building model inputs (FHCF, Citizens, NFIP, county xwalk)...")
     common_inputs = _build_demo_common_inputs(demo_surplus_df, demo_mshare_df)
 
-    # ── Patch surplus loader ────────────────────────────────────────────────
-    restore_fn = _patch_surplus_loader(demo_surplus_df)
+    # ── Patch surplus and premium-base loaders ──────────────────────────────
+    restore_surplus = _patch_surplus_loader(demo_surplus_df)
+    restore_premium = _patch_premium_base_loader(demo_mshare_df)
+
+    def restore_fn():
+        restore_surplus()
+        restore_premium()
 
     try:
         rng = np.random.default_rng(seed)
