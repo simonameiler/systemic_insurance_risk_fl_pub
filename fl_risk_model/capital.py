@@ -730,10 +730,13 @@ def _parse_money_to_float(x: object) -> float:
     if not s:
         return 0.0
     neg = s.startswith("(") and s.endswith(")")
-    s = s.replace("(", "").replace(")", "").replace(",", "")
+    # citizens_capital_pml.csv writes "$4'183'356'808.00": strip currency signs and
+    # apostrophe / comma thousands separators.
+    for ch in "()$', ":
+        s = s.replace(ch, "")
     val = pd.to_numeric(s, errors="coerce")
     if pd.isna(val):
-        return 0.0
+        raise ValueError(f"Cannot parse money value {x!r}")
     v = float(val)
     return -v if neg else v
 
@@ -777,8 +780,11 @@ def load_citizens_capital_row_from_csv(
             line = line.strip()
             if not line:
                 continue
-            parts = line.split(",", 1)
-            if len(parts) != 2:
+            # Columns: year, capital, capital_from_budget, pml10, ... ; take the capital
+            # column only (splitting at the first comma passed the whole rest of the
+            # row to the parser, which returned 0 and left Citizens with no surplus).
+            parts = line.split(",")
+            if len(parts) < 2:
                 continue
             y_str, cap_str = parts[0].strip(), parts[1].strip()
             y = pd.to_numeric(y_str, errors="coerce")

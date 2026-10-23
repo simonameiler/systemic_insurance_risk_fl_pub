@@ -135,6 +135,26 @@ def test_default_flag_roundoff_rule():
     assert not flags["solvent"]
 
 
+# --- Citizens starting surplus ------------------------------------------------------
+
+def test_citizens_surplus_parses_apostrophe_separated_dollars(tmp_path):
+    from fl_risk_model.capital import load_citizens_capital_row_from_csv
+    csv = tmp_path / "cap.csv"
+    csv.write_text(
+        "year,capital,capital_from_budget,pml10\n"
+        "2023, $5'023'466'880.00 , $4'901'300'000 , $2'378'200'000 \n"
+        "2024, $4'183'356'808.00 , $6'284'900'000 , $2'436'400'000 \n"
+    )
+    row = load_citizens_capital_row_from_csv(path=str(csv), year=2024, mode="FIXED_YEAR")
+    assert row["projected_year_end_surplus_usd"] == pytest.approx(4_183_356_808.0)
+
+
+def test_citizens_surplus_from_repo_file_is_positive():
+    from fl_risk_model.capital import load_citizens_capital_row_from_csv
+    row = load_citizens_capital_row_from_csv(year=2024, mode="FIXED_YEAR")
+    assert row["projected_year_end_surplus_usd"] == pytest.approx(4_183_356_808.0)
+
+
 # --- zero-event season rows -----------------------------------------------------
 
 def test_zero_event_rows_filled_from_computed_zero_loss_season():

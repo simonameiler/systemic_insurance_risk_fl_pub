@@ -22,6 +22,7 @@ in `systemic_insurance_model` (architecture §8.2a).
 | 9 | Zero-event seasons written as stub rows with 9 of ~60 columns | Means over other columns silently excluded them | **Fixed here** |
 | 10 | Silent fallback to zero when the FIGA / Tier-2 premium base fails to load | FIGA capacity silently zero | **Fixed here**: raises unless `cfg.STRICT_INPUTS = False` (demo only) |
 | 11 | Variance decomposition "fixed parameter" run did not pin wind-share concentration (module global bound at import) or the insured fraction | Run B could not test "hazard dominates" | **Fixed here** (Table S7 is removed from the manuscript; fix matters only if it returns) |
+| 13 | **Citizens' starting surplus read as $0.** `load_citizens_capital_row_from_csv` split each line at the first comma and passed the rest of the row ("$4'183'356'808.00 , $6'284'900'000 , …") to a parser that cannot read `$` or apostrophe separators. It returned 0. Same on `master`, so every archived run used it. | Citizens' deficits overstated by up to $4.18B per season (2024 surplus, `citizens_capital_pml.csv`); the paper says claims first draw on Citizens' statutory surplus | **Fixed here**: parse the capital column only; unparseable values raise instead of returning 0 |
 | 12 | Demo failed every iteration on the corrections branch. Its synthetic roster lacked Citizens, so the cat-bond check rejected Citizens' Everglades Re bond. It also read the licensed workbook for FIGA when present. | Peer-review demo unusable | **Fixed here**: Citizens added to the demo roster with zero private share; the demo uses a synthetic premium base (demo shares × USD 16B). `demo_output/expected_demo_summary.csv` was regenerated with no licensed files present. |
 
 **Deliberately not changed** (modeling choices for the authors, not bugs):
@@ -105,28 +106,32 @@ applies to entities without a row.
 - "Before" is `earths-future/corrections-and-sensitivity` at `b189a89`, which
   already includes fixes 1–4. "After" is this branch.
 - Script: `scripts/code_paper_fixes_compare.py`. Means for all three variants,
-  including the intermediate one without the surplus fix:
+  for before, all fixes except Citizens' surplus, and all fixes:
   `results/code_paper_fixes/historical_comparison_means.csv`.
 - The probabilistic runs (10,000 seasons, ERA5 and GCMs) need the Emanuel
   event caches and run on Sherlock (§4).
 
 | Scenario | Residual financing (USD B) | FIGA residual | Citizens residual | Private defaults |
 |---|---|---|---|---|
-| Great Miami | 22.18 → 20.62 | 7.00 → 6.78 | 4.17 → 2.83 | 17.8 → 18.8 |
-| Andrew | 10.14 → 8.62 | 3.95 → 3.71 | 4.05 → 2.76 | 15.5 → 15.7 |
+| Great Miami | 22.18 → 18.54 | 7.00 → 6.78 | 4.17 → 0.75 | 17.8 → 18.8 |
+| Andrew | 10.14 → 6.70 | 3.95 → 3.71 | 4.05 → 0.85 | 15.5 → 15.7 |
 | Lake Okeechobee | 15.07 → 14.54 | 1.17 → 0.96 | 0.33 → 0.00 | 11.0 → 11.0 |
 | Irma | 0.14 → 0.06 | 0.10 → 0.01 | 0.00 → 0.00 | 5.5 → 5.5 |
-| Great Miami then Andrew | 45.44 → 45.17 | 16.97 → 18.24 | 12.73 → 11.19 | 21.5 → 36.0 |
-| Double Great Miami | 57.83 → 58.59 | 20.30 → 22.61 | 13.22 → 11.66 | 22.2 → 41.1 |
+| Great Miami then Andrew | 45.44 → 41.25 | 16.97 → 18.24 | 12.73 → 7.27 | 21.5 → 36.0 |
+| Double Great Miami | 57.83 → 54.57 | 20.30 → 22.61 | 13.22 → 7.65 | 22.2 → 41.1 |
 | Double Irma | 2.26 → 1.97 | 0.40 → 0.17 | 0.06 → 0.00 | 9.6 → 9.6 |
-| Great Miami, market exit | 25.56 → 23.79 | 4.85 → 4.61 | 9.70 → 8.17 | 16.5 → 16.7 |
-| Great Miami, penetration | 58.41 → 52.82 | 13.02 → 14.73 | 9.90 → 2.59 | 18.3 → 18.9 |
-| Great Miami, building codes | 11.99 → 10.81 | 2.96 → 2.72 | 1.62 → 0.68 | 15.0 → 15.0 |
+| Great Miami, market exit | 25.56 → 20.10 | 4.85 → 4.61 | 9.70 → 4.48 | 16.5 → 16.7 |
+| Great Miami, penetration | 58.41 → 50.54 | 13.02 → 14.73 | 9.90 → 0.32 | 18.3 → 18.9 |
+| Great Miami, building codes | 11.99 → 10.18 | 2.96 → 2.72 | 1.62 → 0.05 | 15.0 → 15.0 |
 
 NFIP financing and the largest entity deficit are unchanged in every
 scenario.
 
 **What drives the changes**
+- **Citizens' surplus (item 13):** Citizens now absorbs up to $4.18B before
+  any assessment. This is the largest single correction for Citizens: in Great
+  Miami its residual falls from $2.83B (all other fixes) to $0.75B. In the
+  two-storm sequences it falls from about $11.2–11.7B to $7.3–7.7B.
 - **Tier 2 (item 5):** capacity rises from $0.36B to $1.93B ($2.82B under
   penetration). This lowers the Citizens residual by about $1.3–1.5B in every
   scenario where Citizens is in deficit.
@@ -179,5 +184,5 @@ FHCF patch commit `ef77065`, which this branch contains.
 
 ## 5. Tests
 
-`fl_risk_model/tests/earths_future/test_remaining_discrepancies.py` (11
-tests) covers items 5–9. It runs in the `check` suite. Full suite: 130 passed.
+`fl_risk_model/tests/earths_future/test_remaining_discrepancies.py` (13
+tests) covers items 5–9 and 13. It runs in the `check` suite. Full suite: 132 passed.
