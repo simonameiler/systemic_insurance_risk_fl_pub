@@ -183,9 +183,12 @@ GROUP_CONTRIBUTION_RANGE = (0.6, 0.9)  # Min and max contribution rates (drawn b
 
 # Input integrity
 STRICT_INPUTS = True  # raise instead of silently zeroing FIGA / Citizens Tier-2 bases
-# Loss-bearing insurers without a surplus row: "error" | "impute_premium_ratio" | "legacy_drop".
-# The 2024 S&P surplus extract lacks 29 of the top-100 HO writers (22% of private premium);
-# imputation is interim until the extract covers them. "legacy_drop" reproduces submitted results.
+# The 2024 S&P surplus extract lacks 29 of the top-100 HO writers (22% of modeled premium,
+# 26% of private premium). Their 2024 Capital & Surplus comes from the market-share workbook,
+# which matches the extract's Surplus as Regards Policyholders for the 70 private writers in both.
+SURPLUS_FILL_FROM_MARKET_SHARE = True
+# Any loss-bearing insurer still without a surplus row: "error" | "impute_premium_ratio" (warns) |
+# "legacy_drop" (with SURPLUS_FILL_FROM_MARKET_SHARE = False, reproduces the submitted runs).
 MISSING_SURPLUS_POLICY = "impute_premium_ratio"
 
 # === Event hazard inputs & scenarios ===

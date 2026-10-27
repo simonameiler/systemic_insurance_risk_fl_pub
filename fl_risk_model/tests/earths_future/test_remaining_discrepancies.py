@@ -7,6 +7,7 @@ zero-event season rows.
 from __future__ import annotations
 
 import warnings
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -95,6 +96,55 @@ def test_all_private_net_loss_reaches_capital_after_reconcile():
     cap = apply_losses_to_surplus(rec[["Company", "StatEntityKey", "SurplusUSD"]], losses, sample=False)
     assert cap["TotalLossUSD"].sum() == pytest.approx(losses["TotalLossUSD"].sum())
     assert bool(cap.loc[cap["Company"] == "C", "RuinFlag"].item())  # 300 loss vs 100 imputed surplus
+
+
+def test_fill_from_market_share_group_sources():
+    from fl_risk_model.capital import fill_surplus_from_market_share
+    extract = _surplus([["A", "C1", 200.0]]).assign(GroupSurplusUSD=[900.0], NAICGroupNumber=[77.0],
+                                                    SurplusSource="surplus_extract", GroupSurplusSource="surplus_extract")
+    ms = pd.DataFrame({
+        "StatEntityKey": ["C1", "C2", "C3", "C4", cfg.CITIZENS_STATKEY],
+        "Company": ["A", "B", "C", "D", "Citizens Property Ins Corp."],
+        "SurplusUSD": [200.0, 50.0, 40.0, 30.0, float("nan")],
+        "SNLGroup": ["G-A", "G-A", "", "G-D", ""],
+        "SNLGroupSurplusUSD": [950.0, 950.0, float("nan"), 120.0, float("nan")],
+    })
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        out = fill_surplus_from_market_share(extract, ms).set_index("StatEntityKey")
+    assert cfg.CITIZENS_STATKEY not in out.index
+    assert out.loc["C2", "GroupSurplusSource"] == "surplus_extract_sibling"
+    assert out.loc["C2", "NAICGroupNumber"] == 77.0 and out.loc["C2", "GroupSurplusUSD"] == 900.0
+    assert out.loc["C3", "GroupSurplusSource"] == "standalone" and out.loc["C3", "GroupToEntityRatio"] == 1.0
+    assert out.loc["C4", "GroupSurplusSource"] == "market_share_group_sheet"
+    assert out.loc["C4", "GroupSurplusUSD"] == 120.0 and out.loc["C4", "GroupToEntityRatio"] == pytest.approx(4.0)
+
+
+_LICENSED = pytest.mark.skipif(not (Path(cfg.MARKET_SHARE_XLSX).exists() and Path(cfg.SURPLUS_FILE).exists()),
+                               reason="licensed S&P inputs not present")
+
+
+@_LICENSED
+def test_market_share_capital_equals_extract_surplus():
+    from fl_risk_model.capital import load_market_share_capital, load_surplus_data_with_groups
+    ms = load_market_share_capital(cfg.MARKET_SHARE_XLSX).set_index("StatEntityKey")["SurplusUSD"]
+    ex = load_surplus_data_with_groups(cfg.SURPLUS_FILE, year=2024, fill_from_market_share=False)
+    ex = ex.set_index("StatEntityKey")["SurplusUSD"].drop(cfg.CITIZENS_STATKEY, errors="ignore")
+    both = ms.dropna().index.intersection(ex.index)
+    assert len(both) >= 70
+    rel = (ms[both] - ex[both]).abs() / ex[both].abs()
+    assert rel.max() < 1e-3
+
+
+@_LICENSED
+def test_surplus_covers_every_modeled_private_writer():
+    from fl_risk_model.capital import load_surplus_data_with_groups
+    from fl_risk_model.loader import load_market_share
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        sp = load_surplus_data_with_groups(cfg.SURPLUS_FILE, year=2024)
+    roster = set(load_market_share(cfg.MARKET_SHARE_XLSX, include_key=True)["StatEntityKey"].astype(str))
+    assert roster - {cfg.CITIZENS_STATKEY} <= set(sp["StatEntityKey"])
 
 
 # --- penetration-scenario Citizens split ----------------------------------------

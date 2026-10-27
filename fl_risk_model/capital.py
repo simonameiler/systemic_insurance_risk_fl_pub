@@ -26,6 +26,7 @@ from __future__ import annotations
 import os
 import re
 import warnings
+from functools import lru_cache
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -226,9 +227,14 @@ def load_surplus_data_with_groups(
     sheet_name: int | str = 0,
     year: int = 2024,
     header_rows: Tuple[int, ...] = (0, 2, 4),
+    fill_from_market_share: bool | None = None,
 ) -> pd.DataFrame:
     """
     Load entity and group surplus from a 3-level header Excel sheet.
+
+    With fill_from_market_share (default cfg.SURPLUS_FILL_FROM_MARKET_SHARE),
+    market-share writers missing from the extract are added from the market-share
+    workbook (see fill_surplus_from_market_share).
 
     Notes
     -----
@@ -340,7 +346,120 @@ def load_surplus_data_with_groups(
     for opt in ["NAICGroupName", "NAICGroupNumber"]:
         if opt in out.columns:
             cols_order.append(opt)
-    return out[cols_order]
+    out = out[cols_order].assign(SurplusSource="surplus_extract", GroupSurplusSource="surplus_extract")
+
+    if fill_from_market_share is None:
+        fill_from_market_share = bool(getattr(cfg, "SURPLUS_FILL_FROM_MARKET_SHARE", False))
+    if fill_from_market_share:
+        ms_path = getattr(cfg, "MARKET_SHARE_XLSX")
+        out = fill_surplus_from_market_share(out, load_market_share_capital(ms_path, year=year))
+    return out
+
+
+@lru_cache(maxsize=4)
+def _read_market_share_capital(path: str, year: int) -> pd.DataFrame:
+    def sheet(name: str, group_col: bool) -> pd.DataFrame:
+        raw = pd.read_excel(path, sheet_name=name, header=None)
+        cells = raw.astype(str)
+        hdr = cells.apply(lambda col: col.str.strip()).to_numpy()
+        if not (hdr == f"{year} Company Level Data").any():
+            raise ValueError(f"{path} [{name}]: no '{year} Company Level Data' header")
+        r_key, c_key = map(int, np.argwhere(hdr == "Stat Entity Key")[0])
+        c_name = int(np.argwhere(hdr[r_key] == "Entity *")[0][0])
+        c_cap = int(np.argwhere(hdr == "Capital & Surplus ($000)")[0][1])
+        body = raw.iloc[r_key + 1:]
+        key = body[c_key].astype(str).str.strip()
+        keep = body[c_name].notna() & key.str.match(r"^(C|GP)\d+$")
+        out = pd.DataFrame({
+            "StatEntityKey": key[keep],
+            "Company": body.loc[keep, c_name].astype(str).str.strip(),
+            "CapitalSurplusUSD": pd.to_numeric(body.loc[keep, c_cap], errors="coerce") * 1_000.0,
+        })
+        if group_col:
+            c_grp = int(np.argwhere(hdr[r_key] == "Group")[0][0])
+            out["SNLGroup"] = body.loc[keep, c_grp].fillna("").astype(str).str.strip()
+        return out.reset_index(drop=True)
+
+    entities = sheet("FL - Individual Co", group_col=True)
+    groups = sheet("FL - Group", group_col=False)
+    group_capital = groups.drop_duplicates("Company").set_index("Company")["CapitalSurplusUSD"]
+    entities["SNLGroupSurplusUSD"] = entities["SNLGroup"].map(group_capital)
+    return entities.rename(columns={"CapitalSurplusUSD": "SurplusUSD"})
+
+
+def load_market_share_capital(path, year: int = 2024) -> pd.DataFrame:
+    """
+    Entity capital and SNL group capital from the S&P market-share workbook.
+
+    Sheet "FL - Individual Co" gives 2024 company-level Capital & Surplus ($000)
+    for every ranked homeowners writer. For the 70 private insurers that are also
+    in the surplus extract it equals Surplus as Regards Policyholders within 0.1%.
+    Sheet "FL - Group" gives the same measure per SNL group; that group figure
+    differs from the extract's group surplus for about 40% of groups (different
+    group definition).
+
+    Returns
+    -------
+    pd.DataFrame
+        ['StatEntityKey','Company','SurplusUSD','SNLGroup','SNLGroupSurplusUSD'] in USD.
+    """
+    return _read_market_share_capital(str(path), int(year)).copy()
+
+
+_warned_filled: set[tuple[str, ...]] = set()
+
+
+def fill_surplus_from_market_share(surplus_df: pd.DataFrame, ms_capital: pd.DataFrame) -> pd.DataFrame:
+    """
+    Add surplus rows for market-share writers that the surplus extract lacks.
+
+    The 2024 extract misses 29 of the 100 ranked writers. For each, entity surplus
+    is the market-share workbook's Capital & Surplus. Group fields come, in order of
+    preference, from:
+      - a sibling in the extract with the same SNL group (the extract's own group
+        number and group surplus, so the group definition stays consistent);
+      - the market-share workbook's group sheet (group number "snl:<group>");
+      - for unaffiliated writers, the entity itself (no parent support).
+    Citizens is skipped (its capital is handled separately).
+    """
+    out = surplus_df.copy()
+    keys = out["StatEntityKey"].astype(str).str.strip()
+    citizens_key = str(getattr(cfg, "CITIZENS_STATKEY", "C6949"))
+    ms = ms_capital[~ms_capital["StatEntityKey"].str.startswith("GP")]
+    todo = ms[~ms["StatEntityKey"].isin(keys) & (ms["StatEntityKey"] != citizens_key) & ms["SurplusUSD"].notna()]
+    if todo.empty:
+        return out
+
+    present = ms[ms["StatEntityKey"].isin(keys) & (ms["SNLGroup"] != "")].merge(
+        out.assign(StatEntityKey=keys), on="StatEntityKey", suffixes=("", "_x"))
+    siblings = present.drop_duplicates("SNLGroup").set_index("SNLGroup")
+
+    rows = []
+    for r in todo.itertuples():
+        row = {"Company": r.Company, "StatEntityKey": r.StatEntityKey, "SurplusUSD": float(r.SurplusUSD),
+               "SurplusSource": "market_share"}
+        if not r.SNLGroup:
+            row.update(GroupSurplusUSD=float(r.SurplusUSD), NAICGroupName=r.Company,
+                       NAICGroupNumber=f"standalone:{r.StatEntityKey}", GroupSurplusSource="standalone")
+        elif r.SNLGroup in siblings.index:
+            s = siblings.loc[r.SNLGroup]
+            row.update(GroupSurplusUSD=float(s["GroupSurplusUSD"]), NAICGroupName=s.get("NAICGroupName"),
+                       NAICGroupNumber=s.get("NAICGroupNumber"), GroupSurplusSource="surplus_extract_sibling")
+        else:
+            row.update(GroupSurplusUSD=float(r.SNLGroupSurplusUSD), NAICGroupName=r.SNLGroup,
+                       NAICGroupNumber=f"snl:{r.SNLGroup}", GroupSurplusSource="market_share_group_sheet")
+        row["GroupToEntityRatio"] = (row["GroupSurplusUSD"] / row["SurplusUSD"]) if row["SurplusUSD"] > 0 else np.nan
+        rows.append(row)
+    filled = pd.DataFrame(rows)
+    out = pd.concat([out, filled[[c for c in out.columns if c in filled.columns]]], ignore_index=True)
+
+    signature = tuple(sorted(filled["StatEntityKey"]))
+    if signature not in _warned_filled:
+        _warned_filled.add(signature)
+        counts = filled["GroupSurplusSource"].value_counts().to_dict()
+        warnings.warn(f"Surplus for {len(filled)} writers missing from the surplus extract taken from the "
+                      f"market-share workbook (group fields: {counts})")
+    return out
 
 # =============================================================================
 # Core operations
