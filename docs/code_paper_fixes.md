@@ -16,7 +16,7 @@ in `systemic_insurance_model` (architecture §8.2a).
 | 3 | Cat bonds: inert issue-date filter, industry-index bonds paid pro rata to all insurers, beneficiary mapping | $9.46B limit in force vs the paper's eight indemnity bonds ($2.54B) | Fixed earlier: `373994d`, `b189a89` |
 | 4 | Return-period "total public burden" summed marginal quantiles; FHCF shortfall double counted; stale building-code totals | Table 1 / S4 reporting | Fixed earlier: register items R1, C1, C5 |
 | 5 | **Citizens Tier 2 = 10% of Citizens' own premium.** `runner.py` summed a `PremiumUSD` column that `market_share_df` does not carry, so the private base was 0 | Tier-2 capacity $0.36B in every season instead of 10% of the statewide property base ($1.93B) | **Fixed here** |
-| 6 | **29 of the top-100 private insurers have no surplus row.** Losses were joined onto the surplus table by name, so their losses never depleted capital, never caused a default and never reached FIGA. They were also missing from FIGA's survivor premium base. | 22% of private premium outside the solvency calculation | **Fixed here** (code); **data re-pull needed** (§2) |
+| 6 | **29 of the top-100 private insurers have no surplus row.** Losses were joined onto the surplus table by name, so their losses never depleted capital, never caused a default and never reached FIGA. They were also missing from FIGA's survivor premium base. | 22% of modeled premium (26% of private) outside the solvency calculation | **Fixed here**: surplus from the market-share workbook (§2) |
 | 7 | **Penetration scenario: Citizens share** divided scenario-scaled Citizens TIV by the *unscaled* FHCF county TIV | Citizens' effective share about 12–18% instead of the 8% target | **Fixed here** |
 | 8 | USD 0.01 roundoff rule (Text S4) not implemented | Defaults counted on roundoff deficits | **Fixed here** |
 | 9 | Zero-event seasons written as stub rows with 9 of ~60 columns | Means over other columns silently excluded them | **Fixed here** |
@@ -42,29 +42,39 @@ in `systemic_insurance_model` (architecture §8.2a).
 
   See `systemic_insurance_model/docs/research/fl_de_ch_institutions.md`.
 
-## 2. Surplus data gap (item 6): what to re-pull from S&P Capital IQ
+## 2. Surplus data gap (item 6)
 
 The 2024 surplus extract (`20250805 FL Surplus Capital, Group v Entity.xlsx`)
 has 113 entities. Of the top-100 homeowners writers in the market-share
-workbook, 29 are absent by both name and S&P Statutory Entity Key. One more
-(Hartford Ins Co. of the Midwest) differs only in spelling and now matches by
-key. The extract instead contains 43 entities that aren't in the market-share
-list.
+workbook, 29 are absent by both name and S&P Statutory Entity Key. Together they
+hold 22% of modeled premium, 26% of private premium. One more (Hartford Ins Co.
+of the Midwest) differs only in spelling and now matches by key. The extract
+instead contains 42 small writers that aren't in the market-share list.
 
-**Interim handling.** `cfg.MISSING_SURPLUS_POLICY = "impute_premium_ratio"`:
-- surplus = median(surplus / FL HO premium) of matched entities × the
-  entity's premium;
-- no group support for imputed entities;
-- a one-time warning lists the imputed entities.
+The extract seems to keep only writers with three years of Florida homeowners
+premium (its column A is 3 for every row). That explains 10 of the 29 (new
+entrants such as Manatee, Ovation, Orange, Loggerhead), but not the other 19,
+which had premium in all three years.
 
-The other policies:
-- `"error"`: refuse to run with missing surplus;
-- `"legacy_drop"`: reproduce the submitted behavior.
+**Source used.** The market-share workbook (`FL HO Market Share
+Report_6.10.25.xlsx`, sheet "FL - Individual Co", column "Capital & Surplus
+($000)") gives 2024 company-level capital for all 100 writers. For the 70
+private writers in both files it equals the extract's Surplus as Regards
+Policyholders within 0.1%. `load_surplus_data_with_groups` therefore adds the 29
+from it (`cfg.SURPLUS_FILL_FROM_MARKET_SHARE = True`), before any scenario
+adjustment. Group fields:
 
-**Fix:** re-pull entity and group surplus (2024, Surplus as Regards
-Policyholders, with NAIC group code) for these 29 entities and add them to
-the extract. The imputation then switches off automatically, since it only
-applies to entities without a row.
+| Source | Writers | Rule |
+|---|---|---|
+| Unaffiliated | 16 | Standalone; no parent support |
+| Sibling in the extract with the same S&P group | 3 (Ovation, American Modern, Covington) | Extract's group number and group surplus |
+| Market-share workbook, sheet "FL - Group" | 10, in 9 groups (Slide, Accredited, Iron Family, Topa, HJJ, MS&AD, Sutton, Beazley, Lemonade) | That sheet's group Capital & Surplus. It agrees with the extract's group surplus within 1% for only 41 of 69 grouped writers, so these values are flagged in `GroupSurplusSource` |
+
+The earlier premium-ratio estimate (median surplus / premium = 3.4) put Slide's surplus at about 17 times its actual
+value. It remains only as a fallback
+(`cfg.MISSING_SURPLUS_POLICY`) that warns. `"legacy_drop"` with the fill switched
+off reproduces the submitted runs. Optional follow-up: group surplus on the
+extract's definition for the 9 groups above.
 
 | # | Entity (market-share workbook) | S&P Statutory Entity Key |
 |---|---|---|
@@ -102,30 +112,30 @@ applies to entities without a row.
 
 **Setup.**
 - 200 realizations per scenario with seed 42 and the same draws in each
-  version, run locally on 2026-10-22 with the licensed 2024 inputs.
+  version, run locally (2026-10-22 and 2026-10-27) with the licensed 2024 inputs.
 - "Before" is `earths-future/corrections-and-sensitivity` at `b189a89`, which
   already includes fixes 1–4. "After" is this branch.
-- Script: `scripts/code_paper_fixes_compare.py`. Means for all three variants,
-  for before, all fixes except Citizens' surplus, and all fixes:
+- Script: `scripts/code_paper_fixes_compare.py`. Means for before, all fixes
+  with the earlier premium-ratio surplus estimate, and all fixes:
   `results/code_paper_fixes/historical_comparison_means.csv`.
 - The probabilistic runs (10,000 seasons, ERA5 and GCMs) need the Emanuel
   event caches and run on Sherlock (§4).
 
 | Scenario | Residual financing (USD B) | FIGA residual | Citizens residual | Private defaults |
 |---|---|---|---|---|
-| Great Miami | 22.18 → 18.54 | 7.00 → 6.78 | 4.17 → 0.75 | 17.8 → 18.8 |
-| Andrew | 10.14 → 6.70 | 3.95 → 3.71 | 4.05 → 0.85 | 15.5 → 15.7 |
-| Lake Okeechobee | 15.07 → 14.54 | 1.17 → 0.96 | 0.33 → 0.00 | 11.0 → 11.0 |
-| Irma | 0.14 → 0.06 | 0.10 → 0.01 | 0.00 → 0.00 | 5.5 → 5.5 |
-| Great Miami then Andrew | 45.44 → 41.25 | 16.97 → 18.24 | 12.73 → 7.27 | 21.5 → 36.0 |
-| Double Great Miami | 57.83 → 54.57 | 20.30 → 22.61 | 13.22 → 7.65 | 22.2 → 41.1 |
-| Double Irma | 2.26 → 1.97 | 0.40 → 0.17 | 0.06 → 0.00 | 9.6 → 9.6 |
-| Great Miami, market exit | 25.56 → 20.10 | 4.85 → 4.61 | 9.70 → 4.48 | 16.5 → 16.7 |
-| Great Miami, penetration | 58.41 → 50.54 | 13.02 → 14.73 | 9.90 → 0.32 | 18.3 → 18.9 |
-| Great Miami, building codes | 11.99 → 10.18 | 2.96 → 2.72 | 1.62 → 0.05 | 15.0 → 15.0 |
+| Great Miami | 22.18 → 23.61 | 7.00 → 11.86 | 4.17 → 0.75 | 17.8 → 33.4 |
+| Andrew | 10.14 → 9.89 | 3.95 → 6.90 | 4.05 → 0.85 | 15.5 → 29.9 |
+| Lake Okeechobee | 15.07 → 15.65 | 1.17 → 2.08 | 0.33 → 0.00 | 11.0 → 21.7 |
+| Irma | 0.14 → 0.15 | 0.10 → 0.11 | 0.00 → 0.00 | 5.5 → 10.7 |
+| Great Miami then Andrew | 45.44 → 50.65 | 16.97 → 27.65 | 12.73 → 7.27 | 21.5 → 39.5 |
+| Double Great Miami | 57.83 → 64.87 | 20.30 → 32.91 | 13.22 → 7.65 | 22.2 → 40.7 |
+| Double Irma | 2.26 → 2.30 | 0.40 → 0.49 | 0.06 → 0.00 | 9.6 → 18.1 |
+| Great Miami, market exit | 25.56 → 23.90 | 4.85 → 8.41 | 9.70 → 4.48 | 16.5 → 31.5 |
+| Great Miami, penetration | 58.41 → 60.64 | 13.02 → 24.82 | 9.90 → 0.32 | 18.3 → 35.1 |
+| Great Miami, building codes | 11.99 → 12.79 | 2.96 → 5.33 | 1.62 → 0.05 | 15.0 → 29.4 |
 
-NFIP financing and the largest entity deficit are unchanged in every
-scenario.
+NFIP financing is unchanged in every scenario. The largest entity deficit
+changes by less than 2%.
 
 **What drives the changes**
 - **Citizens' surplus (item 13):** Citizens now absorbs up to $4.18B before
@@ -145,20 +155,17 @@ scenario.
   - The paper's finding that penetration raises Citizens capacity exceedance
     (+2.3 pp, Table S5) is likely to shrink or reverse. Check it in the
     re-run.
-- **Surplus coverage (item 6):**
-  - The 29 previously untested insurers now deplete capital and can default.
-    Defaults nearly double in the two-storm sequences (21.5 → 36.0 and
-    22.2 → 41.1), and the FIGA residual rises there.
-  - In single storms the FIGA residual falls slightly, because the added
-    survivors also enlarge FIGA's assessment base.
-  - **These numbers are provisional.** The imputation ratio (median
-    surplus / FL HO premium = 3.4, interquartile range 0.7–16.7) is dominated
-    by national carriers whose surplus is large relative to their Florida
-    book. It probably overstates the capital of Florida-focused writers such
-    as Slide, Olympus or Security First, so the true effect on defaults and
-    FIGA is likely larger.
-  - **Re-pull the surplus data before the production re-run**, or treat the
-    re-run's default and FIGA numbers as provisional.
+- **Surplus coverage (item 6):** the largest change overall.
+  - The 29 previously untested writers now deplete capital and can fail. With
+    their actual surplus, defaults roughly double in every scenario (Great
+    Miami 17.8 → 33.4), and the FIGA residual rises by about 60–90% (Great
+    Miami $7.0B → $11.9B).
+  - With the earlier premium-ratio estimate the same fix had shown almost no
+    change in single storms, because the estimate gave these mostly Florida-
+    focused writers far too much capital.
+  - The residual financing requirement rises in most scenarios despite the
+    lower Citizens residual. For example, Great Miami goes from $22.2B to
+    $23.6B, and double Great Miami from $57.8B to $64.9B.
 
 ## 4. Re-running on Sherlock
 
@@ -169,11 +176,9 @@ FHCF patch commit `ef77065`, which this branch contains.
 
 1. Push this branch and check it out on Sherlock in place of
    `earths-future/corrections-and-sensitivity`.
-2. If the re-pulled S&P surplus extract is ready, copy it to
-   `fl_risk_model/data/` and point `cfg.SURPLUS_FILE` at it. The `check`
-   command records input-file hashes, so the manifest shows which extract a
-   run used. Without it, runs use the interim imputation (§2) and log a
-   warning.
+2. No new S&P data is needed: the 29 writers come from the market-share
+   workbook (§2). The `check` command records input-file hashes, so the
+   manifest shows which inputs each run used.
 3. `scripts/cluster/earths_future.sh check` → `pilot` → `pilot-report` →
    `production`. Production refuses to resubmit only for the *same* code
    revision and inputs, so a new commit or a new surplus file starts a fresh
