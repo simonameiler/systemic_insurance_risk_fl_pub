@@ -1,11 +1,17 @@
-# Code–paper fixes (branch `fix/remaining-code-paper-discrepancies`)
+# Code–paper fixes (branch `rerun/code-paper-fixes-20261028`)
 
-This branch starts from `earths-future/corrections-and-sensitivity` at
-`b189a89` and fixes the remaining places where the code does not do what the
-preprint's Methods and Supporting Text S4 describe. Together with the fixes
-already on that branch, it is the corrected model for re-running all analyses
-on Sherlock. It is also the benchmark (golden master) for the general engine
-in `systemic_insurance_model` (architecture §8.2a).
+These commits fix the remaining places where the code does not do what the
+preprint's Methods and Supporting Text S4 describe. They were written on the
+local branch `fix/remaining-code-paper-discrepancies` (from
+`earths-future/corrections-and-sensitivity` at `b189a89`; commit `957bd67` is
+the golden master for the general engine in `systemic_insurance_model`,
+architecture §8.2a). This branch carries them on top of
+`rerun/default-boundary-20260923` (`014ed02`), whose model code is that of
+release v1.1.0, so a re-run isolates these fixes against the v1.1.0 results.
+The two USD 0.01 balance rules (item 8 here, sub-cent normalization in
+`014ed02`) are the same rule and are merged; the model code otherwise equals
+`957bd67`. Per-company figures from the licensed market-share workbook are
+left out of this document.
 
 ## 1. Status of every known discrepancy
 
@@ -169,25 +175,47 @@ changes by less than 2%.
 
 ## 4. Re-running on Sherlock
 
-The cluster workflow from the corrections branch
-(`docs/earths_future_revision/cluster_runbook.md`,
-`scripts/cluster/earths_future.sh`) applies unchanged. `check` requires the
-FHCF patch commit `ef77065`, which this branch contains.
+The workflow is the one used for the default-boundary re-run
+(`docs/default_boundary_rerun.md`, `scripts/cluster/catbond_revision.sh`). It
+reruns the 106 financial analyses from the existing loss caches; no hazard
+preprocessing. No new S&P data is needed: the 29 writers come from the
+market-share workbook (§2), which `MARKET_SHARE_XLSX` already points to.
+`check` records input-file hashes, so the manifest shows which inputs each run
+used.
 
-1. Push this branch and check it out on Sherlock in place of
-   `earths-future/corrections-and-sensitivity`.
-2. No new S&P data is needed: the 29 writers come from the market-share
-   workbook (§2). The `check` command records input-file hashes, so the
-   manifest shows which inputs each run used.
-3. `scripts/cluster/earths_future.sh check` → `pilot` → `pilot-report` →
-   `production`. Production refuses to resubmit only for the *same* code
-   revision and inputs, so a new commit or a new surplus file starts a fresh
-   inventory.
-4. The production outputs become the benchmark for the general engine. Record
-   the commit hash and the manifest path in
-   `systemic_insurance_model/docs/architecture.md` §8.2a.
+On Sherlock, from the existing checkout, with no local code edits pending:
+
+```bash
+cd ~/repos/systemic_insurance_risk_fl_earths_future
+git status --short        # must print nothing; otherwise preserve the changes first
+git fetch origin
+git switch --track origin/rerun/code-paper-fixes-20261028
+conda activate climada_env
+python -m pytest fl_risk_model/tests/earths_future -q
+bash scripts/cluster/catbond_revision.sh check
+bash scripts/cluster/catbond_revision.sh pilot
+```
+
+When the pilot job has finished:
+
+```bash
+bash scripts/cluster/catbond_revision.sh pilot-report
+bash scripts/cluster/catbond_revision.sh production
+bash scripts/cluster/catbond_revision.sh status        # until all 106 are done
+bash scripts/cluster/catbond_revision.sh postprocess
+```
+
+Production is gated on a passing pilot for the same code and inputs and
+refuses a duplicate submission; a new commit starts a fresh inventory. Keep
+the checkout at this commit until the jobs finish. Copy the results back as in
+`docs/default_boundary_rerun.md` (no `--delete`).
+
+The production outputs are the distribution-level benchmark for the general
+engine (architecture §8.2a(ii)). Record the commit hash and the manifest path
+in `systemic_insurance_model/docs/architecture.md` §8.2a.
 
 ## 5. Tests
 
 `fl_risk_model/tests/earths_future/test_remaining_discrepancies.py` (13
-tests) covers items 5–9 and 13. It runs in the `check` suite. Full suite: 132 passed.
+tests) covers items 5–9 and 13. It runs in the `check` suite. Full suite on
+this branch: 135 passed, 4 skipped.
